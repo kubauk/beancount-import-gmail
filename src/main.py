@@ -44,7 +44,7 @@ class HtmlTable:
 
     def has_transaction_details(self):
         data = self.get_data_for_row(0)
-        if not data:
+        if not data or "Description" != data[0]:
             return False
 
         self._transaction = Transaction(self._date, self.get_data_for_row(1))
@@ -60,9 +60,10 @@ class HtmlTable:
         if len(row) > 0:
             if len(row[0]) > 0:
                 description = row[0][0].strip()
-        if len(row) > 3:
-            if len(row[3]) > 0:
-                amount = row[3][0].strip()
+        if len(row) > 1:
+            column = row[len(row) - 1]
+            if len(column) > 0:
+                amount = column[0].strip()
                 return description, amount
 
         return None
@@ -121,8 +122,8 @@ class Parser(HTMLParser):
 _transactions = list()
 
 
-def process_email(date, payload):
-    html = quopri.decodestring(payload)
+def process_email(date, charset, payload):
+    html = quopri.decodestring(payload).decode(charset)
     parser = Parser(date)
     parser.feed(str(html))
     _transactions.append(parser.get_transaction())
@@ -132,22 +133,36 @@ def parse_date(date_string):
     return datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S %z")
 
 
+class NoCharsetException(Exception):
+    pass
+
+
+def get_charset(message):
+    if message.get_charset():
+        return message.get_charset()
+
+    if 'Content-Type' in message:
+        return message.get('Content-Type').split("charset=")[1]
+
+    raise NoCharsetException()
+
+
 def process_message(message):
     date = parse_date(message.get("Date"))
     if message.is_multipart():
         for part in message.get_payload():
             if part.get_content_type() == "text/html":
-                process_email(date, part.get_payload())
+                process_email(date, get_charset(part), part.get_payload())
     else:
-        process_email(date, message.get_payload())
+        process_email(date, get_charset(message), message.get_payload())
 
 
 def process_mbox(mbox_path):
     mailbox = mbox(mbox_path)
-    # for key, message in mailbox.items():
-    #     print(key)
-    #     process_message(message)
-    process_message(mailbox.get(61))
+    for key, message in mailbox.items():
+        print(key)
+        process_message(message)
+    # process_message(mailbox.get(17))
 
     # for transaction in _transactions:
     #     print(transaction)
