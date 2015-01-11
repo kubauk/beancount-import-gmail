@@ -1,4 +1,5 @@
 import datetime
+from html import entities
 from html.parser import HTMLParser
 import os
 import quopri
@@ -14,7 +15,7 @@ class Transaction(object):
         self.amount = data[1]
 
     def __str__(self):
-        return "%s %s %s" % (self.date, self.description, self.amount)
+        return "%s | %s | %s" % (self.date, self.description, self.amount)
 
 
 class HtmlTable:
@@ -59,7 +60,7 @@ class HtmlTable:
         description = None
         if len(row) > 0:
             if len(row[0]) > 0:
-                description = row[0][0].strip()
+                description = " ".join(row[0]).strip()
         if len(row) > 1:
             column = row[len(row) - 1]
             if len(column) > 0:
@@ -112,6 +113,10 @@ class Parser(HTMLParser):
     def handle_data(self, data):
         current = self._current[len(self._current) - 1]
         current.data(data)
+
+    def handle_entityref(self, name):
+        current = self._current[len(self._current) - 1]
+        current.data(entities.entitydefs[name])
 
     def get_transaction(self):
         if not self._transaction:
