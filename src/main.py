@@ -2,20 +2,21 @@ import datetime
 from html import entities
 from html.parser import HTMLParser
 import os
-import quopri
 import tarfile
 import tempfile
 from mailbox import mbox
 
 
 class Transaction(object):
-    def __init__(self, date, data):
+    def __init__(self, date, sub_transactions):
         self.date = date
-        self.description = data[0]
-        self.amount = data[1]
+        self.sub_transactions = sub_transactions
 
     def __str__(self):
-        return "%s | %s | %s" % (self.date, self.description, self.amount)
+        transactions_string = ""
+        for description, amount in self.sub_transactions:
+            transactions_string += "%s | %s | %s\n" % (self.date, description, amount)
+        return transactions_string
 
 
 class HtmlTable:
@@ -48,7 +49,8 @@ class HtmlTable:
         if not data or "Description" != data[0]:
             return False
 
-        self._transaction = Transaction(self._date, self.get_data_for_row(1))
+        other_data = self.get_other_data()
+        self._transaction = Transaction(self._date, other_data)
         print(self._transaction)
         return True
 
@@ -56,6 +58,9 @@ class HtmlTable:
         return self._transaction
 
     def get_data_for_row(self, index):
+        if len(self._data) <= index:
+            return None
+
         row = self._data[index]
         description = None
         if len(row) > 0:
@@ -68,6 +73,17 @@ class HtmlTable:
                 return description, amount
 
         return None
+
+    def get_other_data(self):
+        data = list()
+        index = 1
+        row = self.get_data_for_row(index)
+        while row:
+            data.append(row)
+            index += 1
+            row = self.get_data_for_row(index)
+
+        return data
 
 
 class NonTable:
@@ -124,13 +140,14 @@ class Parser(HTMLParser):
 
         return self._transaction
 
+
 _transactions = list()
 
 
 def process_email(date, charset, payload):
-    html = quopri.decodestring(payload).decode(charset)
+    html = str(payload.decode(charset))
     parser = Parser(date)
-    parser.feed(str(html))
+    parser.feed(html)
     _transactions.append(parser.get_transaction())
 
 
@@ -153,13 +170,18 @@ def get_charset(message):
 
 
 def process_message(message):
+    gmail_labels = message.get('X-Gmail-Labels').split(',')
+    if not 'paypal receipt' in gmail_labels:
+        print("Not a receipt")
+        return
+
     date = parse_date(message.get("Date"))
     if message.is_multipart():
         for part in message.get_payload():
             if part.get_content_type() == "text/html":
-                process_email(date, get_charset(part), part.get_payload())
+                process_email(date, get_charset(part), part.get_payload(decode=True))
     else:
-        process_email(date, get_charset(message), message.get_payload())
+        process_email(date, get_charset(message), message.get_payload(decode=True))
 
 
 def process_mbox(mbox_path):
@@ -167,10 +189,9 @@ def process_mbox(mbox_path):
     for key, message in mailbox.items():
         print(key)
         process_message(message)
-    # process_message(mailbox.get(17))
 
-    # for transaction in _transactions:
-    #     print(transaction)
+        # for transaction in _transactions:
+        # print(transaction)
 
 
 def extract_mbox(tar, mbox_file):
