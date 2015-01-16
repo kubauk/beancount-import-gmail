@@ -6,6 +6,13 @@ import tarfile
 import tempfile
 from mailbox import mbox
 
+from src.paypal.csv.parser import extract_paypal_transactions_from_csv
+
+
+CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=datetime.timezone.utc)
+
+EXCLUDED_EMAILS_DIR = "./excluded"
+
 
 class Transaction(object):
     def __init__(self, date, sub_transactions):
@@ -141,18 +148,17 @@ class Parser(HTMLParser):
         return self._transaction
 
 
-_transactions = list()
+_transactions = dict()
 
 
-def process_email(date, charset, payload):
-    html = str(payload.decode(charset))
+def extract_transaction_from_html(date, message_body):
     parser = Parser(date)
-    parser.feed(html)
-    _transactions.append(parser.get_transaction())
-
-
-def parse_date(date_string):
-    return datetime.datetime.strptime(date_string, "%a, %d %b %Y %H:%M:%S %z")
+    parser.feed(message_body)
+    try:
+        transaction = parser.get_transaction()
+        _transactions[transaction.date] = transaction
+    except NoTransactionFoundException:
+        raise NoTransactionFoundException
 
 
 class NoCharsetException(Exception):
@@ -169,24 +175,46 @@ def get_charset(message):
     raise NoCharsetException()
 
 
-def process_message(message):
-    gmail_labels = message.get('X-Gmail-Labels').split(',')
-    if not 'paypal receipt' in gmail_labels:
-        print("Not a receipt")
-        return
-
-    date = parse_date(message.get("Date"))
+def process_message_payload(message_date, message, function):
     if message.is_multipart():
         for part in message.get_payload():
             if part.get_content_type() == "text/html":
-                process_email(date, get_charset(part), part.get_payload(decode=True))
+                function(message_date, part.get_payload(decode=True).decode(get_charset(part)))
     else:
-        process_email(date, get_charset(message), message.get_payload(decode=True))
+        function(message_date, message.get_payload(decode=True).decode(get_charset(message)))
+
+
+def dump_message_to_file(message_date, message_body):
+    if not os.path.exists(EXCLUDED_EMAILS_DIR):
+        os.mkdir(EXCLUDED_EMAILS_DIR)
+
+    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.html" % message_date)
+    with open(file, "w") as out:
+        out.write(message_body)
+
+
+def process_message(message):
+    message_parser = extract_transaction_from_html
+
+    message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
+
+    gmail_labels = message.get('X-Gmail-Labels').split(',')
+    if not 'paypal receipt' in gmail_labels:
+        print("Not a receipt, %s, labels: %s, from: %s" % (message_date, gmail_labels, message.get('From')))
+        message_parser = dump_message_to_file
+
+    if message_date < CUT_OFF_DATE:
+        print("Before 2013, %s, from: %s" % (message_date, message.get('From')))
+        message_parser = dump_message_to_file
+
+    process_message_payload(message_date, message, message_parser)
 
 
 def process_mbox(mbox_path):
     mailbox = mbox(mbox_path)
     for key, message in mailbox.items():
+        if key == 145:
+            continue
         print(key)
         process_message(message)
 
@@ -207,3 +235,18 @@ with tarfile.open("paypal.tbz", "r") as tar:
         if "mbox" == extension:
             extract_mbox(tar, member)
 
+_dates = extract_paypal_transactions_from_csv("test.csv")
+
+print()
+print()
+
+for date in _dates.keys():
+    found = False
+    for transaction_date in _transactions.keys():
+        if date.date() == transaction_date.date():
+            print(_dates[date])
+            print(_transactions[transaction_date])
+            found = True
+    if not found:
+        print("nothing found for ", date)
+        print(_dates[date])
