@@ -1,10 +1,11 @@
 import datetime
-from html import entities
-from html.parser import HTMLParser
+import html
+import html.parser
+import html.entities
+import mailbox
 import os
 import tarfile
 import tempfile
-from mailbox import mbox
 
 from src.paypal.csv.parser import extract_paypal_transactions_from_csv
 
@@ -15,22 +16,22 @@ EXCLUDED_EMAILS_DIR = "./excluded"
 
 
 class Transaction(object):
-    def __init__(self, date, sub_transactions):
-        self.date = date
+    def __init__(self, message_date, sub_transactions):
+        self.message_date = message_date
         self.sub_transactions = sub_transactions
 
     def __str__(self):
         transactions_string = ""
         for description, amount in self.sub_transactions:
-            transactions_string += "%s | %s | %s\n" % (self.date, description, amount)
+            transactions_string += "%s | %s | %s\n" % (self.message_date, description, amount)
         return transactions_string
 
 
-class HtmlTable:
-    def __init__(self, date):
+class HtmlTable(object):
+    def __init__(self, message_date):
         super().__init__()
         self._data = list()
-        self._date = date
+        self._message_date = message_date
         self._transaction = None
 
     def starttag(self, tag):
@@ -57,7 +58,7 @@ class HtmlTable:
             return False
 
         other_data = self.get_other_data()
-        self._transaction = Transaction(self._date, other_data)
+        self._transaction = Transaction(self._message_date, other_data)
         print(self._transaction)
         return True
 
@@ -93,7 +94,7 @@ class HtmlTable:
         return data
 
 
-class NonTable:
+class NonTable(object):
     def starttag(self, tag):
         pass
 
@@ -108,17 +109,17 @@ class NoTransactionFoundException(Exception):
     pass
 
 
-class Parser(HTMLParser):
-    def __init__(self, date):
+class PayPalHtmlParser(html.parser.HTMLParser):
+    def __init__(self, message_date):
         super().__init__()
         self._current = list()
         self._current.append(NonTable())
-        self._date = date
+        self._message_date = message_date
         self._transaction = None
 
     def handle_starttag(self, tag, attributes):
         if "table" == tag:
-            self._current.append(HtmlTable(self._date))
+            self._current.append(HtmlTable(self._message_date))
         else:
             current = self._current[len(self._current) - 1]
             current.starttag(tag)
@@ -139,7 +140,7 @@ class Parser(HTMLParser):
 
     def handle_entityref(self, name):
         current = self._current[len(self._current) - 1]
-        current.data(entities.entitydefs[name])
+        current.data(html.entities.entitydefs[name])
 
     def get_transaction(self):
         if not self._transaction:
@@ -151,12 +152,12 @@ class Parser(HTMLParser):
 _transactions = dict()
 
 
-def extract_transaction_from_html(date, message_body):
-    parser = Parser(date)
+def extract_transaction_from_html(message_date, message_body):
+    parser = PayPalHtmlParser(message_date)
     parser.feed(message_body)
     try:
         transaction = parser.get_transaction()
-        _transactions[transaction.date] = transaction
+        _transactions[transaction.message_date] = transaction
     except NoTransactionFoundException:
         raise NoTransactionFoundException
 
@@ -175,51 +176,54 @@ def get_charset(message):
     raise NoCharsetException()
 
 
-def process_message_payload(message_date, message, function):
+def process_message_text(message_date, message):
+    if message.get_content_type() == "text/html":
+        extract_transaction_from_html(message_date, message.get_payload(decode=True).decode(get_charset(message)))
+    elif message.get_content_type == "text/plain:":
+        extract_transaction_from_html(message_date, message)
+
+
+def process_message_payload(message, message_date):
     if message.is_multipart():
         for part in message.get_payload():
-            if part.get_content_type() == "text/html":
-                function(message_date, part.get_payload(decode=True).decode(get_charset(part)))
+            process_message_text(message_date, part)
     else:
-        function(message_date, message.get_payload(decode=True).decode(get_charset(message)))
+        process_message_text(message_date, message)
 
 
-def dump_message_to_file(message_date, message_body):
+def write_email_to_file(message_date, message):
     if not os.path.exists(EXCLUDED_EMAILS_DIR):
         os.mkdir(EXCLUDED_EMAILS_DIR)
 
-    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.html" % message_date)
+    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.eml" % message_date)
     with open(file, "w") as out:
-        out.write(message_body)
+        out.write(message.as_string())
 
 
 def process_message(message):
-    message_parser = extract_transaction_from_html
-
     message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
 
     gmail_labels = message.get('X-Gmail-Labels').split(',')
     if not 'paypal receipt' in gmail_labels:
-        print("Not a receipt, %s, labels: %s, from: %s" % (message_date, gmail_labels, message.get('From')))
-        message_parser = dump_message_to_file
+        print("Skipping as not a receipt, %s, labels: %s, from: %s" % (message_date, gmail_labels, message.get('From')))
+        write_email_to_file(message_date, message)
+        return
 
     if message_date < CUT_OFF_DATE:
-        print("Before 2013, %s, from: %s" % (message_date, message.get('From')))
-        message_parser = dump_message_to_file
+        print("Skipping message as before 2013, %s, from: %s" % (message_date, message.get('From')))
+        write_email_to_file(message_date, message)
+        return
 
-    process_message_payload(message_date, message, message_parser)
+    process_message_payload(message, message_date)
 
 
 def process_mbox(mbox_path):
-    mailbox = mbox(mbox_path)
-    for key, message in mailbox.items():
+    mail_box = mailbox.mbox(mbox_path)
+    for key, message in mail_box.items():
         if key == 145:
             continue
         print(key)
         process_message(message)
-
-        # for transaction in _transactions:
-        # print(transaction)
 
 
 def extract_mbox(tar, mbox_file):
@@ -229,24 +233,21 @@ def extract_mbox(tar, mbox_file):
         process_mbox(extracted_mbox)
 
 
-with tarfile.open("paypal.tbz", "r") as tar:
-    for member in tar.getmembers():
+with tarfile.open("paypal.tbz", "r") as tar_file:
+    for member in tar_file.getmembers():
         extension = os.path.splitext(member.name)[1][1:].strip().lower()
         if "mbox" == extension:
-            extract_mbox(tar, member)
+            extract_mbox(tar_file, member)
 
-_dates = extract_paypal_transactions_from_csv("test.csv")
+dates = extract_paypal_transactions_from_csv("test.csv")
 
-print()
-print()
-
-for date in _dates.keys():
+for date in dates.keys():
     found = False
     for transaction_date in _transactions.keys():
         if date.date() == transaction_date.date():
-            print(_dates[date])
+            print(dates[date])
             print(_transactions[transaction_date])
             found = True
     if not found:
         print("nothing found for ", date)
-        print(_dates[date])
+        print(dates[date])
