@@ -7,6 +7,8 @@ import os
 import tarfile
 import tempfile
 
+import bs4
+
 from src.paypal.csv.parser import extract_paypal_transactions_from_csv
 
 
@@ -152,7 +154,57 @@ class PayPalHtmlParser(html.parser.HTMLParser):
 _transactions = dict()
 
 
+class ParseException(Exception):
+    pass
+
+
+def find_transaction_tables(soup):
+    tables = list()
+    for table in soup.find_all("table"):
+        first_td_text = table.tr.td.get_text().strip()
+        if first_td_text == "Description":
+            tables.append(table)
+        elif first_td_text.startswith("Postage and pack") or first_td_text == "Subtotal":
+            tables.append(table)
+    if len(tables) % 2 != 0:
+        raise ParseException("Failed to find correct number of transaction tables, i.e. 2 per transaction")
+    return tables
+
+
+def next_sibling_tag(first):
+    sibling = first.next_sibling
+    while type(sibling) is not bs4.Tag and sibling is not None:
+        sibling = sibling.next_sibling
+    return sibling
+
+
+def extract_sub_transactions_from_table(table):
+    sub_transactions = list()
+
+    row = next_sibling_tag(table.tr)
+    while row is not None:
+        columns = row.find_all('td')
+        description = columns[0].get_text().strip()
+        total = columns[len(columns) - 1].get_text()
+
+        sub_transactions.append((description, total))
+        row = next_sibling_tag(row)
+
+    return sub_transactions
+
+
 def extract_transaction_from_html(message_date, message_body):
+    soup = bs4.BeautifulSoup(message_body)
+
+    transactions = list()
+
+    tables = find_transaction_tables(soup)
+    while len(tables) > 0:
+        sub_transactions = extract_sub_transactions_from_table(tables.pop(0))
+        totals = tables.pop(0)
+
+        transactions.append(Transaction(message_date, None))
+
     parser = PayPalHtmlParser(message_date)
     parser.feed(message_body)
     try:
