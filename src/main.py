@@ -1,12 +1,10 @@
 import datetime
-import html
-import html.parser
-import html.entities
+from decimal import Decimal
 import mailbox
 import os
+import re
 import tarfile
 import tempfile
-
 import bs4
 
 from src.paypal.csv.parser import extract_paypal_transactions_from_csv
@@ -16,19 +14,38 @@ CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=datetime.timezone.utc)
 
 EXCLUDED_EMAILS_DIR = "./excluded"
 
+MONEY = re.compile("\d{1,3}(?:,\d{3})*\.\d{2}")
+
+
+def money_string_to_decimal(string):
+    match = MONEY.search(string)
+    if not match:
+        raise Exception("No money value found in string \"%s\" to convert to decimal" % string)
+    return Decimal(match.group(0))
+
 
 class Transaction(object):
     def __init__(self, message_date, sub_transactions, totals):
-        self.totals = totals
         self.message_date = message_date
         self.sub_transactions = sub_transactions
 
-    def __str__(self):
-        transactions_string = ""
+        self.sub_total = Decimal("0.00")
         for description, amount in self.sub_transactions:
-            transactions_string += "%s | %s | %s\n" % (self.message_date, description, amount)
-        for description, amount in self.totals:
-            transactions_string += "%s | %s | %s\n" % (self.message_date, description, amount)
+            sub_transaction_total = money_string_to_decimal(amount)
+            self.sub_total += sub_transaction_total
+
+        self.postage_and_packing = Decimal("0.00")
+        for description, amount in totals:
+            if description == "Total":
+                self.total = money_string_to_decimal(amount)
+            if description.startswith("Postage and pack"):
+                self.postage_and_packing = money_string_to_decimal(amount)
+
+    def __str__(self):
+        transactions_string = "%s\n" % self.message_date
+        for description, amount in self.sub_transactions:
+            transactions_string += "%s | %s\n" % (description, amount)
+        transactions_string += "Subtotal %s  Postage %s  Total %s" % (self.sub_total, self.postage_and_packing, self.total)
         return transactions_string
 
 
@@ -62,10 +79,10 @@ def next_sibling_tag(first):
     return sibling
 
 
-def extract_sub_transactions_from_table(table):
+def extract_sub_transactions_from_table(table, skip_header=False):
     sub_transactions = list()
 
-    row = next_sibling_tag(table.tr)
+    row = next_sibling_tag(table.tr) if skip_header else table.tr
     while row is not None:
         columns = row.find_all('td')
         description = columns[0].get_text().strip()
@@ -80,10 +97,9 @@ def extract_sub_transactions_from_table(table):
 def extract_transactions_from_html(transactions, message_date, message_body):
     soup = bs4.BeautifulSoup(message_body)
 
-
     tables = find_transaction_tables(soup)
     while len(tables) > 0:
-        sub_transactions = extract_sub_transactions_from_table(tables.pop(0))
+        sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
         totals = extract_sub_transactions_from_table(tables.pop(0))
         transactions[message_date] = Transaction(message_date, sub_transactions, totals)
 
@@ -104,7 +120,8 @@ def get_charset(message):
 
 def process_message_text(transactions, message_date, message):
     if message.get_content_type() == "text/html":
-        extract_transactions_from_html(transactions, message_date, message.get_payload(decode=True).decode(get_charset(message)))
+        extract_transactions_from_html(transactions, message_date,
+                                       message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
         extract_transactions_from_html(transactions, message_date, message)
 
@@ -148,7 +165,6 @@ def process_mbox(transactions, mbox_path):
     for key, message in mail_box.items():
         if key == 145:
             continue
-        print(key)
         process_message(transactions, message)
 
 
@@ -157,6 +173,7 @@ def extract_mbox(transactions, tar, mbox_file):
         tar.extract(mbox_file, temp_dir)
         extracted_mbox = os.path.join(temp_dir, mbox_file.name)
         process_mbox(transactions, extracted_mbox)
+
 
 _transactions = dict()
 
