@@ -14,7 +14,7 @@ CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=datetime.timezone.utc)
 
 EXCLUDED_EMAILS_DIR = "./excluded"
 
-MONEY = re.compile("\d{1,3}(?:,\d{3})*\.\d{2}")
+MONEY = re.compile("-?\d{1,3}(?:,\d{3})*\.\d{2}")
 
 
 def money_string_to_decimal(string):
@@ -101,7 +101,7 @@ def extract_transactions_from_html(transactions, message_date, message_body):
     while len(tables) > 0:
         sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
         totals = extract_sub_transactions_from_table(tables.pop(0))
-        transactions[message_date] = Transaction(message_date, sub_transactions, totals)
+        transactions.append(Transaction(message_date, sub_transactions, totals))
 
 
 class NoCharsetException(Exception):
@@ -175,13 +175,13 @@ def extract_mbox(transactions, tar, mbox_file):
         process_mbox(transactions, extracted_mbox)
 
 
-_transactions = dict()
+transactions = list()
 
 with tarfile.open("paypal.tbz", "r") as tar_file:
     for member in tar_file.getmembers():
         extension = os.path.splitext(member.name)[1][1:].strip().lower()
         if extension == "mbox":
-            extract_mbox(_transactions, tar_file, member)
+            extract_mbox(transactions, tar_file, member)
 
 print()
 print()
@@ -193,17 +193,23 @@ print()
 
 total_found = 0
 total_not_found = 0
-for date in dates.keys():
+
+
+def pairs_match(paypal_transaction, email_transaction):
+    if paypal_transaction['Transaction Date'].date() == email_transaction.message_date.date():
+        if money_string_to_decimal(paypal_transaction['Amount']) == -email_transaction.total:
+            return True
+    return False
+
+for paypal_transaction in dates:
     found = False
-    for transaction_date in _transactions.keys():
-        if date.date() == transaction_date.date():
-            print("Found for %s" % dates[date])
-            print(_transactions[transaction_date])
+    for email_transaction in transactions:
+        if pairs_match(paypal_transaction, email_transaction):
             found = True
             total_found += 1
+
     if not found:
-        print("nothing found for ", date)
-        print(dates[date])
+        print("-> nothing found for ", paypal_transaction)
         total_not_found += 1
 
 print("found %s, did not find %s" % (total_found, total_not_found))
