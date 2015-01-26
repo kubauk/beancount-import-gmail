@@ -46,13 +46,13 @@ if args.email_tar is None or args.paypal_csv is None:
     argument_parser.print_usage()
     exit(1)
 
-transactions = list()
+email_transactions = list()
 
 with tarfile.open(args.email_tar, "r") as tar_file:
     for member in tar_file.getmembers():
         extension = os.path.splitext(member.name)[1][1:].strip().lower()
         if extension == "mbox":
-            extract_mbox(transactions, tar_file, member)
+            extract_mbox(email_transactions, tar_file, member)
 
 paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
 
@@ -64,7 +64,7 @@ for paypal_transaction in paypal_transactions:
                                       payee=paypal_transaction['Name'],
                                       amount=money_string_to_decimal(paypal_transaction['Amount']))
 
-    for email_transaction in transactions:
+    for email_transaction in email_transactions:
         if pairs_match(paypal_transaction, email_transaction):
             qif_transaction.memo = email_transaction
 
