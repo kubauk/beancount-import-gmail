@@ -3,8 +3,10 @@ import os
 import tarfile
 import tempfile
 
-from paypal_csv.parser import extract_paypal_transactions_from_csv
+from qifparse import qif
+from qifparse.qif import Qif
 
+from paypal_csv.parser import extract_paypal_transactions_from_csv
 from paypal_email.parser import process_email
 from string_utils import money_string_to_decimal
 
@@ -23,7 +25,6 @@ def extract_mbox(transactions, tar, mbox_file):
         extracted_mbox = os.path.join(temp_dir, mbox_file.name)
         process_mbox(transactions, extracted_mbox)
 
-
 transactions = list()
 
 with tarfile.open("paypal.tbz", "r") as tar_file:
@@ -37,20 +38,36 @@ dates = extract_paypal_transactions_from_csv("test.csv")
 total_found = 0
 total_not_found = 0
 
+
 def pairs_match(paypal_transaction, email_transaction):
     if paypal_transaction['Transaction Date'].date() == email_transaction.message_date.date():
         if money_string_to_decimal(paypal_transaction['Amount']) == -email_transaction.total:
             return True
     return False
 
+qif_result = Qif()
+qif_result.add_account(qif.Account(name="PayPal", type='Bank'))
+
+
 for paypal_transaction in dates:
     found = False
+    qif_transaction = qif.Transaction(date=paypal_transaction['Transaction Date'],
+                                      payee=paypal_transaction['Name'],
+                                      amount=money_string_to_decimal(paypal_transaction['Amount']))
+
     for email_transaction in transactions:
         if pairs_match(paypal_transaction, email_transaction):
             found = True
+            qif_transaction.memo = email_transaction
             total_found += 1
 
     if not found:
         total_not_found += 1
 
+    qif_result.add_transaction(qif_transaction, header='!Type:Cash')
+
 print("found %s, did not find %s" % (total_found, total_not_found))
+print()
+print()
+
+print(qif_result)
