@@ -16,7 +16,7 @@ class ParseException(Exception):
 def find_transaction_tables(soup):
     tables = list()
     for table in soup.find_all("table"):
-        first_td_text = table.tr.td.get_text().strip()
+        first_td_text = table.tr.td.get_text(separator=u' ').strip()
         if first_td_text == "Description":
             tables.append(table)
         elif first_td_text.startswith("Postage and pack") or first_td_text == "Subtotal":
@@ -41,8 +41,8 @@ def extract_sub_transactions_from_table(table, skip_header=False):
     row = next_sibling_tag(table.tr) if skip_header else table.tr
     while row is not None:
         columns = row.find_all('td')
-        description = columns[0].get_text().strip()
-        total = columns[len(columns) - 1].get_text()
+        description = columns[0].get_text(separator=u' ').strip()
+        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
 
         sub_transactions.append((description, total))
         row = next_sibling_tag(row)
