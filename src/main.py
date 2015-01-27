@@ -57,8 +57,6 @@ with tarfile.open(args.email_tar, "r") as tar_file:
 paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
 
 qif_result = Qif()
-qif_result.add_account(qif.Account(name="PayPal", type='Bank'))
-
 for paypal_transaction in paypal_transactions:
     qif_transaction = qif.Transaction(date=paypal_transaction['Transaction Date'],
                                       payee=paypal_transaction['Name'],
