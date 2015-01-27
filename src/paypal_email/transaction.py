@@ -20,8 +20,9 @@ class Transaction(object):
                 self.postage_and_packing = money_string_to_decimal(amount)
 
     def __str__(self):
-        transactions_string = "%s\n" % self.message_date
+        transactions_string = "%s" % self.message_date
         for description, amount in self.sub_transactions:
-            transactions_string += "%s | %s\n" % (description, amount)
-        transactions_string += "Subtotal %s  Postage %s  Total %s" % (self.sub_total, self.postage_and_packing, self.total)
+            transactions_string += " | %s %s" % (description, amount)
+        transactions_string += " | Subtotal %s  Postage %s  Total %s" % \
+                               (self.sub_total, self.postage_and_packing, self.total)
         return transactions_string
