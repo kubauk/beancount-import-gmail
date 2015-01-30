@@ -1,10 +1,11 @@
 import datetime
 import os
 import bs4
+import pytz
 from paypal_email.transaction import Transaction
 
 
-CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=datetime.timezone.utc)
+CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
 EXCLUDED_EMAILS_DIR = "./excluded"
 
@@ -104,7 +105,8 @@ def write_email_to_file(message_date, message):
 
 
 def process_email(transactions, message):
-    message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
+    local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
+    message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
 
     gmail_labels = message.get('X-Gmail-Labels').split(',')
     if not 'paypal receipt' in gmail_labels:
