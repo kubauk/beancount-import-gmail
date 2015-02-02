@@ -10,7 +10,7 @@ class Transaction(object):
         self.sub_total = Decimal("0.00")
         for description, amount in self.sub_transactions:
             sub_transaction_total = money_string_to_decimal(amount)
-            self.sub_total += sub_transaction_total
+            self.sub_total += sub_transaction_total[0]
 
         self.postage_and_packing = Decimal("0.00")
         for description, amount in totals:

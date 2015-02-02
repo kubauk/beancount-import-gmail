@@ -29,7 +29,8 @@ def extract_mbox(transactions, tar, mbox_file):
 
 def pairs_match(paypal_data, email_data):
     if paypal_data['Transaction Date'].date() == email_data.message_date.date():
-        if money_string_to_decimal(paypal_data['Amount']) == -email_data.total:
+        if money_string_to_decimal("%s %s" % (paypal_data['Amount'], paypal_data['Currency']))[0] \
+                == -email_data.total[0]:
             return True
     return False
 
@@ -58,14 +59,19 @@ paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
 
 qif_result = Qif()
 for paypal_transaction in paypal_transactions:
-    qif_transaction = qif.Transaction(date=paypal_transaction['Transaction Date'],
-                                      payee=paypal_transaction['Name'],
-                                      amount=money_string_to_decimal(paypal_transaction['Amount']))
+    currency = paypal_transaction['Currency']
+    if "GBP" == currency:
+        amount = "%s %s" % (paypal_transaction['Amount'], currency)
+        qif_transaction = qif.Transaction(date=paypal_transaction['Transaction Date'],
+                                          payee=paypal_transaction['Name'],
+                                          amount=money_string_to_decimal(amount)[0])
 
-    for email_transaction in email_transactions:
-        if pairs_match(paypal_transaction, email_transaction):
-            qif_transaction.memo = email_transaction
+        found = False
+        for email_transaction in email_transactions:
+            if pairs_match(paypal_transaction, email_transaction):
+                found = True
+                qif_transaction.memo = email_transaction
 
-    qif_result.add_transaction(qif_transaction, header='!Type:Cash')
+        qif_result.add_transaction(qif_transaction, header='!Type:Cash')
 
 print(qif_result)
