@@ -13,11 +13,16 @@ class Transaction(object):
             self.sub_total += sub_transaction_total[0]
 
         self.postage_and_packing = Decimal("0.00")
-        for description, amount in totals:
-            if description == "Total":
-                self.total = money_string_to_decimal(amount)
+        for description, amount_string in totals:
+            if description.startswith("From amount") or description == "Total":
+                amount = money_string_to_decimal(amount_string)
+                if "GBP" in amount[1]:
+                    self.total = amount
             if description.startswith("Postage and pack"):
-                self.postage_and_packing = money_string_to_decimal(amount)
+                self.postage_and_packing = money_string_to_decimal(amount_string)
+
+        if self.total is None:
+            raise Exception("Failed to find GBP total in transactions")
 
     def __str__(self):
         transactions_string = "%s" % self.message_date
