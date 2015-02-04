@@ -113,6 +113,7 @@ def process_email(transactions, message):
         write_email_to_file(message_date, message)
         return
 
+#    print(email.header.decode_header(message.get('Subject')))
     if message_date < CUT_OFF_DATE:
         write_email_to_file(message_date, message)
         return
