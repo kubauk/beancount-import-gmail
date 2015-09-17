@@ -1,3 +1,3 @@
 - Handle currency conversion as purchases made in USD do not get matched correctly
-- Handle subscription emails
+- Handle subscription emails (text emails?)
 - Handle email classification from subject rather than by gmail label

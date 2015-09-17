@@ -1,6 +1,8 @@
 from decimal import Decimal
-from money import Money
+
+from model.money import Money
 from string_utils import money_string_to_decimal
+
 
 ZERO_GBP = Money((Decimal("0.00"), "GBP"))
 

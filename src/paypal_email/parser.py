@@ -1,8 +1,10 @@
 import datetime
 import os
+
 import bs4
 import pytz
-from paypal_email.transaction import Transaction
+
+from model.transaction import Transaction
 
 
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)

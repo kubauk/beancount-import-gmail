@@ -1,6 +1,7 @@
 from decimal import Decimal
 import re
-from money import Money
+
+from model.money import Money
 
 
 MONEY = re.compile(r"(-?\d{1,3}(?:,\d{3})*\.\d{2}) ([A-Z]{3})")
