@@ -53,14 +53,17 @@ def extract_sub_transactions_from_table(table, skip_header=False):
     return sub_transactions
 
 
-def extract_transactions_from_html(transactions, message_date, message_body):
+def extract_transactions_from_html(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body)
 
+    transactions = list()
     tables = find_transaction_tables(soup)
     while len(tables) > 0:
         sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
         totals = extract_sub_transactions_from_table(tables.pop(0))
         transactions.append(Transaction(message_date, sub_transactions, totals))
+
+    return transactions
 
 
 class NoTransactionFoundException(Exception):
@@ -81,20 +84,25 @@ def get_charset(message):
     raise NoCharsetException()
 
 
-def process_message_text(transactions, message_date, message):
+def process_message_text(message_date, message):
     if message.get_content_type() == "text/html":
-        extract_transactions_from_html(transactions, message_date,
-                                       message.get_payload(decode=True).decode(get_charset(message)))
+        return extract_transactions_from_html(message_date,
+                                              message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
-        extract_transactions_from_html(transactions, message_date, message)
+        return extract_transactions_from_html(message_date, message)
+    else:
+        return list()
 
 
-def process_message_payload(transactions, message, message_date):
+def process_message_payload(message, message_date):
     if message.is_multipart():
         for part in message.get_payload():
-            process_message_text(transactions, message_date, part)
+            transaction = process_message_text(message_date, part)
+            if transaction:
+                return transaction
+        return list()
     else:
-        process_message_text(transactions, message_date, message)
+        return process_message_text(message_date, message)
 
 
 def write_email_to_file(message_date, message):
@@ -106,18 +114,19 @@ def write_email_to_file(message_date, message):
         out.write(message.as_string())
 
 
-def process_email(transactions, message):
+def extract_transaction(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
 
-    gmail_labels = message.get('X-Gmail-Labels').split(',')
-    if not 'paypal receipt' in gmail_labels:
-        write_email_to_file(message_date, message)
-        return
-
-#    print(email.header.decode_header(message.get('Subject')))
     if message_date < CUT_OFF_DATE:
         write_email_to_file(message_date, message)
-        return
+        return list()
 
-    process_message_payload(transactions, message, message_date)
+    try:
+        return process_message_payload(message, message_date)
+    except NoTransactionFoundException:
+        write_email_to_file(message_date, message)
+    except NoCharsetException:
+        write_email_to_file(message_date, message)
+
+    return list()

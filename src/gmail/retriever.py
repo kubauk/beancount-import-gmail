@@ -9,6 +9,7 @@ from oauth2client import client
 from oauth2client import tools
 import oauth2client
 from oauth2client.file import Storage
+import pytz
 
 
 SCOPES = 'https://www.googleapis.com/auth/gmail.readonly'
@@ -34,20 +35,24 @@ class Retriever:
         return self._current_service
 
     def _get_credentials(self):
-        store = oauth2client.file.Storage(os.path.join(".", "credentials.json"))
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        script_directory = os.path.dirname(os.path.realpath(__file__))
+        store = oauth2client.file.Storage(os.path.join(script_directory, "credentials.json"))
+        flow = client.flow_from_clientsecrets(os.path.join(script_directory, CLIENT_SECRET_FILE), SCOPES)
         flow.user_agent = APPLICATION_NAME
         return tools.run_flow(flow, store, self._args)
 
     def _list_messages_for_day(self, transaction_date):
         service = self._get_service()
+
+        us_pacific_tz = pytz.timezone('US/Pacific')
+        transaction_date = transaction_date.astimezone(us_pacific_tz)
+
         after = transaction_date.strftime("%Y/%m/%d")
         before = (transaction_date + timedelta(days=1)).strftime("%Y/%m/%d")
         query = 'from:service@paypal.co.uk after:%s before:%s' % (after, before)
-        list_request = service.users().messages().list(userId=self._email_address, q=query)
-        result = list_request.execute()
-        messages = result.get('messages', [])
-        return messages
+        result = service.users().messages().list(userId=self._email_address, q=query).execute()
+        message_ids = result.get('messages', [])
+        return message_ids
 
     def _retrieve_messages(self, transaction_date):
         message_ids = self._list_messages_for_day(transaction_date)
@@ -60,21 +65,11 @@ class Retriever:
         service = self._get_service()
         get_query = service.users().messages().get(userId=self._email_address, id=message_id['id'], format='raw')
         result = get_query.execute()
-
-        message_bytes = base64.urlsafe_b64decode(result['raw'].encode('ASCII'))
-        return email.message_from_string(message_bytes.decode('ascii'))
-
-    # @staticmethod
-    # def _parse_part(part):
-    # mime_type = part['mimeType']
-    #     content_type = list(filter(lambda header: header['name'] == 'Content-Type', part['headers'])).pop()
-    #     if content_type is None:
-    #         raise Exception()
-    #
-    #     if mime_type == "text/html":
-    #         pass
-    #     elif mime_type == "text/plain":
-    #         pass
+        try:
+            message_bytes = base64.urlsafe_b64decode(result['raw'])
+            return email.message_from_string(message_bytes.decode('ascii'))
+        except UnicodeDecodeError:
+            pass
 
     @staticmethod
     def _build_service(current_credentials):

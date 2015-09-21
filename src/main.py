@@ -6,11 +6,12 @@ from qifparse.qif import Qif
 
 import gmail.retriever
 from paypal_csv.parser import extract_paypal_transactions_from_csv
+from paypal_email.parser import extract_transaction
 from string_utils import money_string_to_decimal
 
 
 def pairs_match(paypal_data, email_data):
-    if paypal_data['Transaction Date'].date() == email_data.message_date.date():
+    if email_data and paypal_data['Transaction Date'].date() == email_data.message_date.date():
         if money_string_to_decimal("%s %s" % (paypal_data['Amount'], paypal_data['Currency']))[0] \
                 == -email_data.total[0]:
             return True
@@ -25,10 +26,6 @@ more than one mbox within the tarball is supported")
 argument_parser.add_argument("--email_address", dest="email_address", help="gmail email address")
 
 args = argument_parser.parse_args()
-
-print(args.email_address)
-print(args.email_tar)
-print(args.paypal_csv)
 
 if (args.paypal_csv is None or args.email_tar is None) and \
         (args.email_address is None or args.paypal_csv is None):
@@ -55,12 +52,14 @@ for paypal_transaction in paypal_transactions:
         qif_transaction = qif.Transaction(date=transaction_date,
                                           payee=paypal_transaction['Name'],
                                           amount=money_string_to_decimal(amount)[0])
-        email_transactions = retriever.get_messages_for_date(transaction_date)
+        emails = retriever.get_messages_for_date(transaction_date)
 
-
-        for email_transaction in email_transactions:
-            if pairs_match(paypal_transaction, email_transaction):
-                qif_transaction.memo = email_transaction
+        for email in emails:
+            if email:
+                transactions = extract_transaction(email)
+                for transaction in transactions:
+                    if pairs_match(paypal_transaction, transaction):
+                        qif_transaction.memo = transaction
 
         qif_result.add_transaction(qif_transaction, header='!Type:Cash')
 
