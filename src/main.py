@@ -1,10 +1,11 @@
 import argparse
+import os
 
 from oauth2client import tools
 from qifparse import qif
 from qifparse.qif import Qif
+import gmailmessagessearch.retriever
 
-import gmail.retriever
 from paypal_csv.parser import extract_paypal_transactions_from_csv
 from paypal_email.parser import extract_transaction
 from string_utils import money_string_to_decimal
@@ -42,7 +43,9 @@ if (args.paypal_csv is None or args.email_tar is None) and \
 
 paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
 
-retriever = gmail.retriever.Retriever(args, args.email_address)
+retriever = gmailmessagessearch.retriever.Retriever(args, 'PayPal Quickened', args.email_address,
+                                                    'from:service@paypal.co.uk',
+                                                    os.path.dirname(os.path.realpath(__file__)))
 qif_result = Qif()
 for paypal_transaction in paypal_transactions:
     currency = paypal_transaction['Currency']
