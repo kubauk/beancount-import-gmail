@@ -54,7 +54,7 @@ def extract_sub_transactions_from_table(table, skip_header=False):
 
 
 def extract_transactions_from_html(message_date, message_body):
-    soup = bs4.BeautifulSoup(message_body)
+    soup = bs4.BeautifulSoup(message_body, "html.parser")
 
     transactions = list()
     tables = find_transaction_tables(soup)
