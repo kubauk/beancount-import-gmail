@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from model.money import Money
+from money import Money
 from string_utils import money_string_to_decimal
 
 
-ZERO_GBP = Money((Decimal("0.00"), "GBP"))
+ZERO_GBP = Money(Decimal("0.00"), "GBP")
 
 
 class Transaction(object):
@@ -25,7 +25,7 @@ class Transaction(object):
         for description, amount_string in totals:
             if description.startswith("From amount") or description == "Total":
                 amount = money_string_to_decimal(amount_string)
-                if "GBP" in amount[1]:
+                if "GBP" in amount.currency:
                     self.total = amount
             if description.startswith("Postage and pack"):
                 self.postage_and_packing = money_string_to_decimal(amount_string)
@@ -44,7 +44,7 @@ class Transaction(object):
 
     @staticmethod
     def _currencies_match(sub_total, sub_transaction_total):
-        return sub_total[1] == sub_transaction_total[1]
+        return sub_total.currency == sub_transaction_total.currency
 
     @staticmethod
     def _amount_is_zero(sub_total):

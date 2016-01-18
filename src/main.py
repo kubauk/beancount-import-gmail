@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from money import Money
 from oauth2client import tools
 from qifparse import qif
 from qifparse.qif import Qif
@@ -13,8 +14,8 @@ from string_utils import money_string_to_decimal
 
 def pairs_match(paypal_data, email_data):
     if email_data and paypal_data['Transaction Date'].date() == email_data.message_date.date():
-        if money_string_to_decimal("%s %s" % (paypal_data['Amount'], paypal_data['Currency']))[0] \
-                == -email_data.total[0]:
+        if money_string_to_decimal("%s %s" % (paypal_data['Amount'], paypal_data['Currency'])) \
+                == -email_data.total:
             return True
     return False
 
@@ -50,11 +51,10 @@ qif_result = Qif()
 for paypal_transaction in paypal_transactions:
     currency = paypal_transaction['Currency']
     if "GBP" == currency:
-        amount = "%s %s" % (paypal_transaction['Amount'], currency)
         transaction_date = paypal_transaction['Transaction Date']
         qif_transaction = qif.Transaction(date=transaction_date,
                                           payee=paypal_transaction['Name'],
-                                          amount=money_string_to_decimal(amount)[0])
+                                          amount=Money(paypal_transaction['Amount'], currency).amount)
         emails = retriever.get_messages_for_date(transaction_date)
 
         for email in emails:
