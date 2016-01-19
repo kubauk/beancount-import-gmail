@@ -3,6 +3,7 @@ import os
 
 import bs4
 import pytz
+import re
 
 from model.transaction import Transaction
 
@@ -18,7 +19,11 @@ class ParseException(Exception):
 
 def find_transaction_tables(soup):
     tables = list()
+    refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
+
     for table in soup.find_all("table"):
+        if table.find("table") is not None:
+            continue
         first_td_text = table.tr.td.get_text(separator=u' ').strip()
         if first_td_text == "Description":
             tables.append(table)
@@ -28,7 +33,7 @@ def find_transaction_tables(soup):
         raise NoTransactionFoundException("Did not find any transactions")
     if len(tables) % 2 != 0:
         raise ParseException("Failed to find correct number of transaction tables, i.e. 2 per transaction")
-    return tables
+    return tables, refund
 
 
 def next_sibling_tag(first):
@@ -47,7 +52,9 @@ def extract_sub_transactions_from_table(table, skip_header=False):
         description = columns[0].get_text(separator=u' ').strip()
         total = columns[len(columns) - 1].get_text(separator=u' ').strip()
 
-        sub_transactions.append((description, total))
+        if (description is not None and description is not '') \
+                and (total is not None and total is not ''):
+            sub_transactions.append((description, total))
         row = next_sibling_tag(row)
 
     return sub_transactions
@@ -57,11 +64,11 @@ def extract_transactions_from_html(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
 
     transactions = list()
-    tables = find_transaction_tables(soup)
+    tables, refund = find_transaction_tables(soup)
     while len(tables) > 0:
         sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
         totals = extract_sub_transactions_from_table(tables.pop(0))
-        transactions.append(Transaction(message_date, sub_transactions, totals))
+        transactions.append(Transaction(message_date, sub_transactions, totals, refund))
 
     return transactions
 
