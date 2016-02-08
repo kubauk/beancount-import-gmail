@@ -4,7 +4,7 @@ import re
 from money import Money
 
 
-MONEY = re.compile(r"(-?\d{1,3}(?:,\d{3})*\.\d{2}) ([A-Z]{3})")
+MONEY = re.compile(r"(-?\d{1,3}(?:,\d{3})*\.\d{2})\s+([A-Z]{3})")
 
 
 def _negate(value, negate):

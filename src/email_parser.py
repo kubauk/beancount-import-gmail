@@ -1,12 +1,11 @@
 import datetime
 import os
+import re
 
 import bs4
 import pytz
-import re
 
-from model.transaction import Transaction
-
+from transaction import Transaction
 
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
@@ -60,16 +59,19 @@ def extract_sub_transactions_from_table(table, skip_header=False):
     return sub_transactions
 
 
-def extract_transactions_from_html(message_date, message_body):
+def extract_transactions_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
 
+    return extract_transactions_from_html(message_date, soup)
+
+
+def extract_transactions_from_html(message_date, soup):
     transactions = list()
     tables, refund = find_transaction_tables(soup)
     while len(tables) > 0:
         sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
         totals = extract_sub_transactions_from_table(tables.pop(0))
         transactions.append(Transaction(message_date, sub_transactions, totals, refund))
-
     return transactions
 
 
@@ -93,10 +95,10 @@ def get_charset(message):
 
 def process_message_text(message_date, message):
     if message.get_content_type() == "text/html":
-        return extract_transactions_from_html(message_date,
-                                              message.get_payload(decode=True).decode(get_charset(message)))
+        return extract_transactions_from_email(message_date,
+                                               message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
-        return extract_transactions_from_html(message_date, message)
+        return extract_transactions_from_email(message_date, message)
     else:
         return list()
 

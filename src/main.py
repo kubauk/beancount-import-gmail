@@ -1,14 +1,14 @@
 import argparse
 import os
 
+import gmailmessagessearch.retriever
 from money import Money
 from oauth2client import tools
 from qifparse import qif
 from qifparse.qif import Qif
-import gmailmessagessearch.retriever
 
-from paypal_csv.parser import extract_paypal_transactions_from_csv
-from paypal_email.parser import extract_transaction
+from email_parser import extract_transaction
+from csv_parser import extract_paypal_transactions_from_csv
 from string_utils import money_string_to_decimal
 
 

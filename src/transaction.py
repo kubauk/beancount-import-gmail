@@ -8,6 +8,8 @@ ZERO_GBP = Money(Decimal("0.00"), "GBP")
 
 
 class Transaction(object):
+    total = None
+
     def __init__(self, message_date, sub_transactions, totals, refund):
         self.message_date = message_date
         self.sub_transactions = sub_transactions
@@ -23,7 +25,7 @@ class Transaction(object):
 
         self.postage_and_packing = ZERO_GBP
         for description, amount_string in totals:
-            if description.startswith("From amount") or "Total" in description:
+            if description.startswith("From amount") or "Total" in description or "Subtotal" in description:
                 amount = money_string_to_decimal(amount_string, refund)
                 if "GBP" in amount.currency:
                     self.total = amount
