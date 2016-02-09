@@ -1,4 +1,7 @@
 import datetime
+
+import pytest
+import sys
 from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
 from hamcrest.core.core.isnone import not_none
@@ -23,8 +26,21 @@ def test_refund_email_produces_correct_sub_transactions(soup):
     assert_that(transaction.postage_and_packing, equal_to(ZERO_GBP))
 
 
+def test_merchant_purchase_produces_correct_sub_transactions(soup):
+    html = soup("merchant-purchase-nov-2015.html")
+    transactions = extract_transactions_from_html(datetime.datetime.now(), html)
+    assert_that(len(transactions), equal_to(1))
+    transaction = transactions[0]
+    assert_that(transaction.total, equal_to(Money("32.00", "GBP")))
+    assert_that(len(transaction.sub_transactions), equal_to(0))
+    assert_that(transaction.postage_and_packing, equal_to(ZERO_GBP))
+
+
 def test_new_format_email_produces_correct_sub_transactions(soup):
-    html = soup("new-format.html")
+    html = soup("new-format-dec-2015.html")
     transactions = extract_transactions_from_html(datetime.datetime.now(), html)
     assert_that(len(transactions), equal_to(3))
     pass
+
+if __name__ == "__name__":
+    pytest.main(sys.argv)
