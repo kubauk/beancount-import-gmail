@@ -16,23 +16,61 @@ class ParseException(Exception):
     pass
 
 
-def find_transaction_tables(soup):
-    tables = list()
-    refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
+class NoTransactionFoundException(Exception):
+    pass
 
+
+class NoCharsetException(Exception):
+    pass
+
+
+def find_transaction_tables(message_date, soup):
+    transactions = list()
+
+    tables = list()
     for table in soup.find_all("table"):
         if table.find("table") is not None:
             continue
-        first_td_text = table.tr.td.get_text(separator=u' ').strip()
-        if first_td_text == "Description":
+        if table.find("th"):
+            table_element = table.tr.th
+            new_format = True
+        else:
+            table_element = table.tr.td
+            new_format = False
+
+        if contains_interesting_table(table_element):
             tables.append(table)
-        elif first_td_text.startswith("Postage and pack") or first_td_text == "Subtotal":
-            tables.append(table)
-    if len(tables) == 0:
+
+        if not new_format and len(tables) == 2:
+            refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
+            transactions.append(extract_original_format_transaction(message_date, refund, tables))
+        elif new_format and len(tables) == 1:
+            transactions.append(extract_new_format_transactions(message_date, tables))
+
+    if len(transactions) == 0:
         raise NoTransactionFoundException("Did not find any transactions")
-    if len(tables) % 2 != 0:
-        raise ParseException("Failed to find correct number of transaction tables, i.e. 2 per transaction")
-    return tables, refund
+    return transactions
+
+
+def extract_new_format_transactions(message_date, tables):
+    sub_transactions, totals = extract_new_format_sub_transactions_from_table(tables.pop(0))
+    return Transaction(message_date, sub_transactions, totals, False)
+
+
+def extract_original_format_transaction(message_date, refund, tables):
+    sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
+    totals = extract_sub_transactions_from_table(tables.pop(0))
+    return Transaction(message_date, sub_transactions, totals, refund)
+
+
+def contains_interesting_table(table_element):
+    first_td_text = table_element.get_text(separator=u' ').strip()
+    if first_td_text == "Description":
+        return True
+    elif first_td_text.startswith("Postage and pack") or first_td_text == "Subtotal":
+        return True
+
+    return False
 
 
 def next_sibling_tag(first):
@@ -59,28 +97,33 @@ def extract_sub_transactions_from_table(table, skip_header=False):
     return sub_transactions
 
 
+def extract_new_format_sub_transactions_from_table(table):
+    sub_transactions = list()
+    totals = list()
+    for row in table.find_all('tr', class_="datarow"):
+        columns = row.find_all('td')
+        description = columns[0].get_text(separator=u' ').strip()
+        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
+        if (description is not None and description is not '') \
+                and (total is not None and total is not ''):
+            sub_transactions.append((description, total))
+
+    for row in table.find_all('tr'):
+        columns = row.find_all('td')
+        if len(columns) == 0:
+            continue
+        description = columns[len(columns) - 2].get_text(separator=u' ').strip()
+        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
+        if (description is not None and description is not '') \
+                and (total is not None and total is not ''):
+            totals.append((description, total))
+
+    return sub_transactions, totals
+
+
 def extract_transactions_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
-
-    return extract_transactions_from_html(message_date, soup)
-
-
-def extract_transactions_from_html(message_date, soup):
-    transactions = list()
-    tables, refund = find_transaction_tables(soup)
-    while len(tables) > 0:
-        sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
-        totals = extract_sub_transactions_from_table(tables.pop(0))
-        transactions.append(Transaction(message_date, sub_transactions, totals, refund))
-    return transactions
-
-
-class NoTransactionFoundException(Exception):
-    pass
-
-
-class NoCharsetException(Exception):
-    pass
+    return find_transaction_tables(message_date, soup)
 
 
 def get_charset(message):
