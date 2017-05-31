@@ -80,13 +80,19 @@ def next_sibling_tag(first):
     return sibling
 
 
+def sanitise_html(soup):
+    for tag in ["div", "span"]:
+        [div.unwrap() for div in soup.findAll(tag)]
+
+
 def extract_sub_transactions_from_table(table, skip_header=False):
+    sanitise_html(table)
     sub_transactions = list()
 
     row = next_sibling_tag(table.tr) if skip_header else table.tr
     while row is not None:
         columns = row.find_all('td')
-        description = columns[0].get_text(separator=u' ').strip()
+        description = columns[0].get_text(strip=True, separator=u' ')
         total = columns[len(columns) - 1].get_text(separator=u' ').strip()
 
         if (description is not None and description is not '') \
@@ -103,7 +109,7 @@ def extract_new_format_sub_transactions_from_table(table):
     for row in table.find_all('tr', class_="datarow"):
         columns = row.find_all('td')
         description = columns[0].get_text(separator=u' ').strip()
-        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
+        total = columns[len(columns) - 1].get_text(strip=True, separator=u' ')
         if (description is not None and description is not '') \
                 and (total is not None and total is not ''):
             sub_transactions.append((description, total))

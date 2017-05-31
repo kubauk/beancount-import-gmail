@@ -38,7 +38,7 @@ def test_merchant_purchase_produces_correct_sub_transactions(soup):
     assert_that(len(transaction.sub_transactions), equal_to(0))
 
 
-def test_new_format_email_produces_correct_sub_transactions(soup):
+def test_new_format_dec_2015_email_produces_correct_sub_transactions(soup):
     transactions = find_transaction_tables(datetime.datetime.now(), soup("new-format-dec-2015.html"))
 
     assert_that(len(transactions), equal_to(3))
@@ -61,6 +61,19 @@ def test_new_format_email_produces_correct_sub_transactions(soup):
     assert_that(transactions[2].sub_transactions[0][0],
                 equal_to("Universal Qi Wireless Charging Receiver Pad Kit for All Micro-USB Android Mobile"))
     assert_that(transactions[2].sub_transactions[0][1], equal_to("£3.49\xa0GBP"))
+
+
+def test_new_format_feb_2017_email_produces_correct_sub_transactions(soup):
+    transactions = find_transaction_tables(datetime.datetime.now(), soup("new-format-feb-2017.html"))
+
+    assert_that(len(transactions), equal_to(1))
+
+    assert_that(transactions[0].total, equal_to(Money("1.15", "GBP")))
+    assert_that(transactions[0].postage_and_packing, equal_to(Money("0.16", "GBP")))
+    assert_that(transactions[0].sub_transactions[0][0],
+                equal_to("Mini Household Sealing Machine Sealer Impulse Sealer Poly Food Jewelry Item Number 272490036626"))
+    assert_that(transactions[0].sub_transactions[0][1], equal_to("£0.99 GBP"))
+
 
 
 if __name__ == "__name__":
