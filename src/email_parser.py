@@ -24,31 +24,40 @@ class NoCharsetException(Exception):
     pass
 
 
+def parse_new_format(message_date, soup, tables, transactions):
+    if len(tables) == 1:
+        transactions.append(extract_new_format_transactions(message_date, tables))
+
+
+def parse_original_format(message_date, soup, tables, transactions):
+    if len(tables) == 2:
+        refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
+        transactions.append(extract_original_format_transaction(message_date, refund, tables))
+
+
 def find_transaction_tables(message_date, soup):
     transactions = list()
 
     tables = list()
     for table in soup.find_all("table"):
+
         if table.find("table") is not None:
             continue
         if table.find("th"):
             table_element = table.tr.th
-            new_format = True
+            parser = parse_new_format
         else:
             table_element = table.tr.td
-            new_format = False
+            parser = parse_original_format
 
         if contains_interesting_table(table_element):
             tables.append(table)
 
-        if not new_format and len(tables) == 2:
-            refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
-            transactions.append(extract_original_format_transaction(message_date, refund, tables))
-        elif new_format and len(tables) == 1:
-            transactions.append(extract_new_format_transactions(message_date, tables))
+        parser(message_date, soup, tables, transactions)
 
     if len(transactions) == 0:
         raise NoTransactionFoundException("Did not find any transactions")
+
     return transactions
 
 
