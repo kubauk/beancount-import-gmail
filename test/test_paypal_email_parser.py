@@ -75,6 +75,18 @@ def test_new_format_feb_2017_email_produces_correct_sub_transactions(soup):
     assert_that(transactions[0].sub_transactions[0][1], equal_to("£0.99 GBP"))
 
 
+def test_donation_format_dec_2017_produces_correct_sub_transactions(soup):
+    transactions = find_transaction_tables(datetime.datetime.now(), soup("donation-dec-2017.html"))
+
+    assert_that(len(transactions), equal_to(1))
+
+    assert_that(transactions[0].total, equal_to(Money("50.00", "GBP")))
+    assert_that(transactions[0].sub_transactions[0][0],
+                equal_to("Anxiety UK Donation"))
+    assert_that(transactions[0].sub_transactions[0][1], equal_to("£50.00 GBP"))
+
+    pass
+
 
 if __name__ == "__name__":
     pytest.main(sys.argv)

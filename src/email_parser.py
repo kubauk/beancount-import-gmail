@@ -7,9 +7,15 @@ import pytz
 
 from transaction import Transaction
 
+DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}).*"
+                                 u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}).*"
+                                 u"Purpose:(?P<Purpose>[ \S]+) Contributor:")
+
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
 EXCLUDED_EMAILS_DIR = "./excluded"
+
+UUID_PATTERN = r"[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}"
 
 
 class ParseException(Exception):
@@ -25,7 +31,7 @@ class NoCharsetException(Exception):
 
 
 def parse_new_format(message_date, soup, tables, transactions):
-    if len(tables) == 1:
+    while len(tables) >= 1:
         transactions.append(extract_new_format_transactions(message_date, tables))
 
 
@@ -35,15 +41,33 @@ def parse_original_format(message_date, soup, tables, transactions):
         transactions.append(extract_original_format_transaction(message_date, refund, tables))
 
 
+def _extract_transactions_details(text):
+    return DONATION_DETAILS_RE.search(text).groupdict()
+
+
+def parse_donation(message_date, table, transactions):
+    details = _extract_transactions_details(table.get_text().replace(u"\xa0", " "))
+
+    transactions.append(
+        Transaction(message_date, [(details['Purpose'], details['Donation'])],
+                    [("Total", details['Total'])], False))
+
+
 def find_transaction_tables(message_date, soup):
     transactions = list()
+
+    if soup.title is not None and soup.title.find(
+            text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None:
+        parse_donation(message_date, soup.find("table", {"id": re.compile(UUID_PATTERN)}), transactions)
+        return transactions
 
     tables = list()
     for table in soup.find_all("table"):
 
         if table.find("table") is not None:
             continue
-        if table.find("th"):
+
+        elif table.find("th"):
             table_element = table.tr.th
             parser = parse_new_format
         else:
@@ -91,7 +115,7 @@ def next_sibling_tag(first):
 
 def sanitise_html(soup):
     for tag in ["div", "span"]:
-        [div.unwrap() for div in soup.findAll(tag)]
+        [div.unwrap() for div in soup.find_all(tag)]
 
 
 def extract_sub_transactions_from_table(table, skip_header=False):
