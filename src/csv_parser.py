@@ -16,11 +16,12 @@ class PayPalDialect(csv.Dialect):
     skipinitialspace = True
     strict = True
 
+
 csv.register_dialect("paypal", PayPalDialect)
 
 
 def amount_is_negative(x):
-    amount_string = "%s %s" % (x['Amount'], x['Currency'])
+    amount_string = "%s %s" % (x['amount'], x['currency'])
     return money_string_to_decimal(amount_string)[0] < Decimal("0")
 
 
@@ -29,7 +30,7 @@ def foreign_amount_is_negative(x):
 
 
 def foreign_currency(x):
-    return "GBP" not in x['Currency']
+    return "GBP" not in x['currency']
 
 
 def squash_foreign_currency_transactions(foreign_currency_dates, dates):
@@ -43,7 +44,7 @@ def squash_foreign_currency_transactions(foreign_currency_dates, dates):
         actual_transaction = [x for x in transaction_list if not foreign_currency(x) and amount_is_negative(x)]
         if len(actual_transaction) != 1:
             raise Exception("Only expected one GBP transaction to be found")
-        actual_transaction[0]['Name'] = foreign_transaction[0]['Name']
+        actual_transaction[0]['name'] = foreign_transaction[0]['name']
 
         squashed_transactions = [x for x in transaction_list if not foreign_currency(x)]
 
@@ -51,27 +52,27 @@ def squash_foreign_currency_transactions(foreign_currency_dates, dates):
 
 
 def time_zone_is_british(row):
-    return "GMT" in row['Time Zone'] or "BST" in row['Time Zone']
+    return "GMT" in row['time zone'] or "BST" in row['time zone']
 
 
 def extract_paypal_transactions_from_csv(csv_transaction_file):
     dates = dict()
-    with open(csv_transaction_file) as csv_file:
-        csv_reader = csv.DictReader(csv_file, dialect="paypal")
+    with open(csv_transaction_file, encoding='utf-8-sig', newline='') as csv_file:
+        csv_reader = LowerCaseFieldDictReader(csv_file, dialect="paypal")
 
         foreign_currency_dates = set()
 
         for row in csv_reader:
             europe_london_tz = pytz.timezone('Europe/London')
             if not time_zone_is_british(row):
-                raise Exception("Did not expect %s as time zone. Only expecting GMT and BST" % row['Time Zone'])
+                raise Exception("Did not expect %s as time zone. Only expecting GMT and BST" % row['time zone'])
 
-            naive_date = datetime.strptime("%s %s" % (row['Date'], row['Time']), r"%d/%m/%Y %H:%M:%S")
+            naive_date = datetime.strptime("%s %s" % (row['date'], row['time']), r"%d/%m/%Y %H:%M:%S")
             local_date = europe_london_tz.localize(naive_date)
             transaction_date = pytz.utc.normalize(local_date.astimezone(pytz.utc))
-            row['Transaction Date'] = transaction_date
+            row['transaction date'] = transaction_date
 
-            if "GBP" not in row['Currency']:
+            if foreign_currency(row):
                 foreign_currency_dates.add(transaction_date)
 
             transactions_for_date = dates.get(transaction_date, list())
@@ -81,3 +82,9 @@ def extract_paypal_transactions_from_csv(csv_transaction_file):
     squash_foreign_currency_transactions(foreign_currency_dates, dates)
 
     return [x for y in dates.keys() for x in dates[y]]
+
+
+class LowerCaseFieldDictReader(csv.DictReader):
+    @property
+    def fieldnames(self):
+        return [field.lower() for field in super(LowerCaseFieldDictReader, self).fieldnames]

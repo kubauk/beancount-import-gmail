@@ -13,8 +13,8 @@ from string_utils import money_string_to_decimal
 
 
 def pairs_match(paypal_data, email_data):
-    if email_data and paypal_data['Transaction Date'].date() == email_data.message_date.date():
-        if money_string_to_decimal("%s %s" % (paypal_data['Amount'], paypal_data['Currency'])) \
+    if email_data and paypal_data['transaction date'].date() == email_data.message_date.date():
+        if money_string_to_decimal("%s %s" % (paypal_data['amount'], paypal_data['currency'])) \
                 == -email_data.total:
             return True
     return False
@@ -49,12 +49,12 @@ retriever = gmailmessagessearch.retriever.Retriever(args, 'PayPal Quickened', ar
                                                     os.path.dirname(os.path.realpath(__file__)))
 qif_result = Qif()
 for paypal_transaction in paypal_transactions:
-    currency = paypal_transaction['Currency']
+    currency = paypal_transaction['currency']
     if "GBP" == currency:
-        transaction_date = paypal_transaction['Transaction Date']
+        transaction_date = paypal_transaction['transaction date']
         qif_transaction = qif.Transaction(date=transaction_date,
-                                          payee=paypal_transaction['Name'],
-                                          amount=Money(paypal_transaction['Amount'], currency).amount)
+                                          payee=paypal_transaction['name'],
+                                          amount=Money(paypal_transaction['amount'], currency).amount)
         emails = retriever.get_messages_for_date(transaction_date)
 
         for email in emails:
