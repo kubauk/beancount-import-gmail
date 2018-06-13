@@ -7,9 +7,10 @@ import pytz
 
 from transaction import Transaction
 
-DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}).*"
-                                 u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}).*"
-                                 u"Purpose:(?P<Purpose>[ \S]+) Contributor:")
+DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
+                                 u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
+                                 u"Purpose:(?P<Purpose>[ \S]+\S) +"
+                                 u"Contributor:")
 
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
@@ -46,7 +47,7 @@ def _extract_transactions_details(text):
 
 
 def parse_donation(message_date, table, transactions):
-    details = _extract_transactions_details(table.get_text().replace(u"\xa0", " "))
+    details = _extract_transactions_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
 
     transactions.append(
         Transaction(message_date, [(details['Purpose'], details['Donation'])],
