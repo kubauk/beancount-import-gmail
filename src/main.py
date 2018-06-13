@@ -20,6 +20,12 @@ def pairs_match(paypal_data, email_data):
     return False
 
 
+def payee_and_memo(_name, _type):
+    if _name is "" or _name is None:
+        return _type, None
+    return _name, _type
+
+
 def main():
     argument_parser = argparse.ArgumentParser(parents=[tools.argparser])
     argument_parser.add_argument("--paypal_csv", dest="paypal_csv",
@@ -42,8 +48,10 @@ def main():
         currency = paypal_transaction['currency']
         if "GBP" == currency:
             transaction_date = paypal_transaction['transaction date']
+            name_payee_tuple = payee_and_memo(paypal_transaction['name'], paypal_transaction['type'])
             qif_transaction = qif.Transaction(date=transaction_date,
-                                              payee=paypal_transaction['name'],
+                                              payee=name_payee_tuple[0],
+                                              memo=name_payee_tuple[1],
                                               amount=Money(paypal_transaction['amount'], currency).amount)
             emails = retriever.get_messages_for_date(transaction_date)
 
