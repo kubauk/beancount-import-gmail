@@ -20,50 +20,44 @@ def pairs_match(paypal_data, email_data):
     return False
 
 
-argument_parser = argparse.ArgumentParser(parents=[tools.argparser])
-argument_parser.add_argument("--paypal_csv", dest="paypal_csv",
-                             help="balance affecting transaction csv from paypal")
-argument_parser.add_argument("--email_tar", dest="email_tar", help="(un)compressed tar of the email mbox. \
-more than one mbox within the tarball is supported")
-argument_parser.add_argument("--email_address", dest="email_address", help="gmail email address")
+def main():
+    argument_parser = argparse.ArgumentParser(parents=[tools.argparser])
+    argument_parser.add_argument("--paypal_csv", dest="paypal_csv",
+                                 help="balance affecting transaction csv from paypal")
+    argument_parser.add_argument("--email_address", dest="email_address", help="gmail email address")
 
-args = argument_parser.parse_args()
+    args = argument_parser.parse_args()
 
-if (args.paypal_csv is None or args.email_tar is None) and \
-        (args.email_address is None or args.paypal_csv is None):
-    argument_parser.print_usage()
-    exit(1)
+    if args.email_address is None or args.paypal_csv is None:
+        argument_parser.print_usage()
+        exit(1)
 
-# email_transactions = list()
+    paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
 
-# with tarfile.open(args.email_tar, "r") as tar_file:
-# for member in tar_file.getmembers():
-# extension = os.path.splitext(member.name)[1][1:].strip().lower()
-# if extension == "mbox":
-#             extract_mbox(email_transactions, tar_file, member)
+    retriever = gmailmessagessearch.retriever.Retriever(args, 'PayPal Quickened', args.email_address,
+                                                        'from:service@paypal.co.uk',
+                                                        os.path.dirname(os.path.realpath(__file__)))
+    qif_result = Qif()
+    for paypal_transaction in paypal_transactions:
+        currency = paypal_transaction['currency']
+        if "GBP" == currency:
+            transaction_date = paypal_transaction['transaction date']
+            qif_transaction = qif.Transaction(date=transaction_date,
+                                              payee=paypal_transaction['name'],
+                                              amount=Money(paypal_transaction['amount'], currency).amount)
+            emails = retriever.get_messages_for_date(transaction_date)
 
-paypal_transactions = extract_paypal_transactions_from_csv(args.paypal_csv)
+            for email in emails:
+                if email:
+                    transactions = extract_transaction(email)
+                    for transaction in transactions:
+                        if pairs_match(paypal_transaction, transaction):
+                            qif_transaction.memo = transaction
 
-retriever = gmailmessagessearch.retriever.Retriever(args, 'PayPal Quickened', args.email_address,
-                                                    'from:service@paypal.co.uk',
-                                                    os.path.dirname(os.path.realpath(__file__)))
-qif_result = Qif()
-for paypal_transaction in paypal_transactions:
-    currency = paypal_transaction['currency']
-    if "GBP" == currency:
-        transaction_date = paypal_transaction['transaction date']
-        qif_transaction = qif.Transaction(date=transaction_date,
-                                          payee=paypal_transaction['name'],
-                                          amount=Money(paypal_transaction['amount'], currency).amount)
-        emails = retriever.get_messages_for_date(transaction_date)
+            qif_result.add_transaction(qif_transaction, header='!Type:Cash')
 
-        for email in emails:
-            if email:
-                transactions = extract_transaction(email)
-                for transaction in transactions:
-                    if pairs_match(paypal_transaction, transaction):
-                        qif_transaction.memo = transaction
+    print(qif_result)
 
-        qif_result.add_transaction(qif_transaction, header='!Type:Cash')
 
-print(qif_result)
+if __name__ == "__main__":
+    main()
