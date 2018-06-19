@@ -21,8 +21,13 @@ def pairs_match(paypal_data, email_data):
 
 
 def payee_and_memo(_name, _type):
-    if _name is "" or _name is None:
-        return _type, None
+    unwanted_payees = ["To get contact details, please visit your order details on My eBay"]
+    if "Credit" in _type:
+        return "PayPal Credit", _type
+
+    if _name is "" or _name is None or _name in unwanted_payees:
+        return "PayPal", _type
+
     return _name, _type
 
 
