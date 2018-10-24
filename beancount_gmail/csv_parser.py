@@ -1,9 +1,11 @@
 import csv
+from csv import Sniffer
 from datetime import datetime
 from decimal import Decimal
 
 import pytz
-from string_utils import money_string_to_decimal
+
+from beancount_gmail.string_utils import money_string_to_decimal
 
 
 class PayPalDialect(csv.Dialect):
@@ -55,29 +57,28 @@ def time_zone_is_british(row):
     return "GMT" in row['time zone'] or "BST" in row['time zone']
 
 
-def extract_paypal_transactions_from_csv(csv_transaction_file):
+def extract_paypal_transactions_from_csv(csv_file_memo):
     dates = dict()
-    with open(csv_transaction_file, encoding='utf-8-sig', newline='') as csv_file:
-        csv_reader = LowerCaseFieldDictReader(csv_file, dialect="paypal")
 
-        foreign_currency_dates = set()
+    foreign_currency_dates = set()
 
-        for row in csv_reader:
-            europe_london_tz = pytz.timezone('Europe/London')
-            if not time_zone_is_british(row):
-                raise Exception("Did not expect %s as time zone. Only expecting GMT and BST" % row['time zone'])
+    dialect = Sniffer().sniff(csv_file_memo.head())
+    for row in LowerCaseFieldDictReader(csv_file_memo.contents().splitlines(), dialect=dialect):
+        europe_london_tz = pytz.timezone('Europe/London')
+        if not time_zone_is_british(row):
+            raise Exception("Did not expect %s as time zone. Only expecting GMT and BST" % row['time zone'])
 
-            naive_date = datetime.strptime("%s %s" % (row['date'], row['time']), r"%d/%m/%Y %H:%M:%S")
-            local_date = europe_london_tz.localize(naive_date)
-            transaction_date = pytz.utc.normalize(local_date.astimezone(pytz.utc))
-            row['transaction date'] = transaction_date
+        naive_date = datetime.strptime("%s %s" % (row['date'], row['time']), r"%d/%m/%Y %H:%M:%S")
+        local_date = europe_london_tz.localize(naive_date)
+        transaction_date = pytz.utc.normalize(local_date.astimezone(pytz.utc))
+        row['transaction date'] = transaction_date
 
-            if foreign_currency(row):
-                foreign_currency_dates.add(transaction_date)
+        if foreign_currency(row):
+            foreign_currency_dates.add(transaction_date)
 
-            transactions_for_date = dates.get(transaction_date, list())
-            transactions_for_date.append(row)
-            dates[transaction_date] = transactions_for_date
+        transactions_for_date = dates.get(transaction_date, list())
+        transactions_for_date.append(row)
+        dates[transaction_date] = transactions_for_date
 
     squash_foreign_currency_transactions(foreign_currency_dates, dates)
 
