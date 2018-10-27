@@ -36,12 +36,15 @@ class GmailImporter(ImporterProtocol):
                     if email:
                         for transaction in email_parser.extract_transaction(email):
                             if pairs_match(paypal_transaction, transaction):
+                                metadata['Transaction Details'] = transaction.__str__()
                                 data_transaction = data.Transaction(meta=metadata, date=transaction_date,
                                                                     flag=self.FLAG,
                                                                     payee=paypal_transaction['name'],
                                                                     narration=paypal_transaction['type'], tags=set(),
                                                                     links=set(),
                                                                     postings=list())
+                                data.create_simple_posting(data_transaction, self.file_account(file),
+                                                           transaction.total.amount, transaction.total.currency)
                                 transactions.append(data_transaction)
 
         return transactions
