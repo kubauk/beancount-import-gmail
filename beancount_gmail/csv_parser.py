@@ -64,12 +64,9 @@ def extract_paypal_transactions_from_csv(csv_file_memo):
 
     dialect = Sniffer().sniff(csv_file_memo.head())
     for row in LowerCaseFieldDictReader(csv_file_memo.contents().splitlines(), dialect=dialect):
-        europe_london_tz = pytz.timezone('Europe/London')
-        if not time_zone_is_british(row):
-            raise Exception("Did not expect %s as time zone. Only expecting GMT and BST" % row['time zone'])
 
-        naive_date = datetime.strptime("%s %s" % (row['date'], row['time']), r"%d/%m/%Y %H:%M:%S")
-        local_date = europe_london_tz.localize(naive_date)
+        local_date = datetime.strptime("{} {} {}".format(row['date'], row['time'], row['time zone']),
+                                       r"%d/%m/%Y %H:%M:%S %Z")
         transaction_date = pytz.utc.normalize(local_date.astimezone(pytz.utc))
         row['transaction date'] = transaction_date
 
