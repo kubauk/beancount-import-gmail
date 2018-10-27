@@ -1,3 +1,3 @@
-from beancount_gmail.importer import Importer
+from beancount_gmail.importer import GmailImporter
 
-GmailImporter = Importer
+GmailImporter = GmailImporter
