@@ -18,6 +18,9 @@ def pairs_match(paypal_data, email_data):
 
 
 class GmailImporter(ImporterProtocol):
+    def __init__(self, postage_account):
+        self._postage_account = postage_account
+
     def extract(self, file, existing_entries=None):
         paypal_transactions = extract_paypal_transactions_from_csv(file)
 
@@ -43,7 +46,8 @@ class GmailImporter(ImporterProtocol):
                                                                     narration=paypal_transaction['type'], tags=set(),
                                                                     links=set(),
                                                                     postings=list())
-                                data_transaction.postings.append(transaction.postage_and_packing_posting())
+                                data_transaction.postings.append(
+                                    transaction.postage_and_packing_posting(self._postage_account))
                                 transactions.append(data_transaction)
 
         return transactions

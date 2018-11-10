@@ -45,8 +45,8 @@ class Transaction(object):
                                (self.sub_total, self.postage_and_packing, self.total)
         return transactions_string
 
-    def postage_and_packing_posting(self):
-        return data.Posting("Expenses:Postage",
+    def postage_and_packing_posting(self, postage_account):
+        return data.Posting(postage_account,
                             Amount(self.postage_and_packing.amount, self.postage_and_packing.currency),
                             None, None, None, dict())
 
