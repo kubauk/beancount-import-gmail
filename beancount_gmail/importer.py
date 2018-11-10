@@ -43,8 +43,7 @@ class GmailImporter(ImporterProtocol):
                                                                     narration=paypal_transaction['type'], tags=set(),
                                                                     links=set(),
                                                                     postings=list())
-                                data.create_simple_posting(data_transaction, self.file_account(file),
-                                                           transaction.total.amount, transaction.total.currency)
+                                data_transaction.postings.append(transaction.postage_and_packing_posting())
                                 transactions.append(data_transaction)
 
         return transactions

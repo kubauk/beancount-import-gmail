@@ -1,8 +1,9 @@
 from decimal import Decimal
 
+from beancount.core import data
+from beancount.core.amount import Amount
 from money import Money
 from string_utils import money_string_to_decimal
-
 
 ZERO_GBP = Money(Decimal("0.00"), "GBP")
 
@@ -43,6 +44,11 @@ class Transaction(object):
         transactions_string += " | Subtotal %s  Postage %s  Total %s" % \
                                (self.sub_total, self.postage_and_packing, self.total)
         return transactions_string
+
+    def postage_and_packing_posting(self):
+        return data.Posting("Expenses:Postage",
+                            Amount(self.postage_and_packing.amount, self.postage_and_packing.currency),
+                            None, None, None, dict())
 
     @staticmethod
     def _currencies_match(sub_total, sub_transaction_total):
