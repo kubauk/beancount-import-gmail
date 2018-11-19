@@ -53,6 +53,7 @@ class GmailImporter(ImporterProtocol):
                             data_transaction.postings.extend(transaction.sub_transaction_postings())
                             data_transaction.postings.append(
                                 transaction.postage_and_packing_posting(self._postage_account))
+                            data_transaction.postings.append(transaction.total_posting(self.file_account(file)))
                             transactions.append(data_transaction)
 
         return transactions

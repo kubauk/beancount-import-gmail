@@ -37,15 +37,6 @@ class Transaction(object):
         if self.total is None:
             raise Exception("Failed to find GBP total in transactions")
 
-    def __str__(self):
-        transactions_string = "%s" % self.message_date
-        for description, amount in self.sub_transactions:
-            transactions_string += " | %s %s" % (description, amount)
-
-        transactions_string += " | Subtotal %s  Postage %s  Total %s" % \
-                               (self.sub_total, self.postage_and_packing, self.total)
-        return transactions_string
-
     def sub_transaction_postings(self):
         return [self._with_meta(amount, description) for description, amount in
                 self.sub_transactions]
@@ -58,7 +49,11 @@ class Transaction(object):
     def postage_and_packing_posting(self, postage_account):
         return self._posting(postage_account, self.postage_and_packing)
 
-    def _posting(self, account, money):
+    def total_posting(self, total_account):
+        return self._posting(total_account, self.total)
+
+    @staticmethod
+    def _posting(account, money):
         return data.Posting(account,
                             Amount(money.amount, money.currency),
                             None, None, None, dict())
