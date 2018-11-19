@@ -1,4 +1,3 @@
-import operator
 import os
 
 import gmailmessagessearch.retriever
@@ -41,20 +40,14 @@ class GmailImporter(ImporterProtocol):
                 transaction_date = paypal_transaction['transaction date']
                 metadata = data.new_metadata(file.name, 0)
                 for email in messages:
-                    for transaction in email_parser.extract_transaction(email):
-                        if pairs_match(paypal_transaction, transaction):
-                            data_transaction = data.Transaction(meta=metadata, date=transaction_date,
-                                                                flag=self.FLAG,
-                                                                payee=paypal_transaction['name'],
-                                                                narration=paypal_transaction['type'],
-                                                                tags=set(),
-                                                                links=set(),
-                                                                postings=list())
-                            data_transaction.postings.extend(transaction.sub_transaction_postings())
-                            data_transaction.postings.append(
-                                transaction.postage_and_packing_posting(self._postage_account))
-                            data_transaction.postings.append(transaction.total_posting(self.file_account(file)))
-                            transactions.append(data_transaction)
+                    for email_transaction in email_parser.extract_transaction(email):
+                        if pairs_match(paypal_transaction, email_transaction):
+                            transactions.append(email_transaction.
+                                                as_beancount_transaction(transaction_date, metadata,
+                                                                         paypal_transaction['name'],
+                                                                         paypal_transaction['type'],
+                                                                         self._postage_account,
+                                                                         self.file_account(file)))
 
         return transactions
 
