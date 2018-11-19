@@ -1,3 +1,4 @@
+import operator
 import os
 
 import gmailmessagessearch.retriever
@@ -28,6 +29,10 @@ class GmailImporter(ImporterProtocol):
                                                             'from:service@paypal.co.uk',
                                                             os.path.dirname(os.path.realpath(__file__)))
 
+        dates = [transaction['transaction date'] for transaction in paypal_transactions]
+
+        messages = retriever.get_messages_for_date_range(min(dates), max(dates))
+
         transactions = list()
 
         for paypal_transaction in paypal_transactions:
@@ -35,21 +40,21 @@ class GmailImporter(ImporterProtocol):
             if "GBP" == currency:
                 transaction_date = paypal_transaction['transaction date']
                 metadata = data.new_metadata(file.name, 0)
-                for email in retriever.get_messages_for_date(transaction_date):
-                    if email:
-                        for transaction in email_parser.extract_transaction(email):
-                            if pairs_match(paypal_transaction, transaction):
-                                metadata['Transaction Details'] = transaction.__str__()
-                                data_transaction = data.Transaction(meta=metadata, date=transaction_date,
-                                                                    flag=self.FLAG,
-                                                                    payee=paypal_transaction['name'],
-                                                                    narration=paypal_transaction['type'], tags=set(),
-                                                                    links=set(),
-                                                                    postings=list())
-                                data_transaction.postings.extend(transaction.sub_transaction_postings())
-                                data_transaction.postings.append(
-                                    transaction.postage_and_packing_posting(self._postage_account))
-                                transactions.append(data_transaction)
+                for email in messages:
+                    for transaction in email_parser.extract_transaction(email):
+                        if pairs_match(paypal_transaction, transaction):
+                            metadata['Transaction Details'] = transaction.__str__()
+                            data_transaction = data.Transaction(meta=metadata, date=transaction_date,
+                                                                flag=self.FLAG,
+                                                                payee=paypal_transaction['name'],
+                                                                narration=paypal_transaction['type'],
+                                                                tags=set(),
+                                                                links=set(),
+                                                                postings=list())
+                            data_transaction.postings.extend(transaction.sub_transaction_postings())
+                            data_transaction.postings.append(
+                                transaction.postage_and_packing_posting(self._postage_account))
+                            transactions.append(data_transaction)
 
         return transactions
 
