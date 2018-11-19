@@ -42,7 +42,7 @@ class Transaction(object):
                 self.sub_transactions]
 
     def _with_meta(self, amount, description):
-        posting = self._posting("Expense:Unknown", amount)
+        posting = self._posting("Expenses:Unknown", amount)
         posting.meta['Description'] = description
         return posting
 
