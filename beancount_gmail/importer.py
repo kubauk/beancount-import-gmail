@@ -43,7 +43,6 @@ class GmailImporter(ImporterProtocol):
                 for email in messages:
                     for transaction in email_parser.extract_transaction(email):
                         if pairs_match(paypal_transaction, transaction):
-                            metadata['Transaction Details'] = transaction.__str__()
                             data_transaction = data.Transaction(meta=metadata, date=transaction_date,
                                                                 flag=self.FLAG,
                                                                 payee=paypal_transaction['name'],
