@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+from mailbox import Message
 
 import bs4
 import pytz
@@ -14,7 +15,7 @@ DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z
 
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
-EXCLUDED_EMAILS_DIR = "./excluded"
+EXCLUDED_DATA_DIR = "./excluded"
 
 UUID_PATTERN = r"[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}"
 
@@ -23,11 +24,11 @@ class ParseException(Exception):
     pass
 
 
-class NoTransactionFoundException(Exception):
+class NoTransactionFoundException(ParseException):
     pass
 
 
-class NoCharsetException(Exception):
+class NoCharsetException(ParseException):
     pass
 
 
@@ -178,10 +179,10 @@ def get_charset(message):
 
 def process_message_text(message_date, message):
     if message.get_content_type() == "text/html":
-        return extract_transactions_from_email(message_date,
-                                               message.get_payload(decode=True).decode(get_charset(message)))
+        return write_debugging_file_on_exception(extract_transactions_from_email, "html", message_date,
+                                                 message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
-        return extract_transactions_from_email(message_date, message)
+        return write_debugging_file_on_exception(extract_transactions_from_email, "txt", message_date, message)
     else:
         return list()
 
@@ -197,30 +198,38 @@ def process_message_payload(message_date, message):
         return process_message_text(message_date, message)
 
 
-def write_email_to_file(reason, extension, message_date, message):
-    if not os.path.exists(EXCLUDED_EMAILS_DIR):
-        os.mkdir(EXCLUDED_EMAILS_DIR)
+def write_debugging_data_to_file(reason, extension, message_date, message):
+    if not os.path.exists(EXCLUDED_DATA_DIR):
+        os.mkdir(EXCLUDED_DATA_DIR)
 
-    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.%s.%s" % (message_date, reason, extension))
+    file = os.path.join(EXCLUDED_DATA_DIR, "%s.%s.%s" % (message_date, reason, extension))
     with open(file, "w") as out:
-        out.write(message.as_string())
+        if isinstance(message, Message):
+            out.write(message.as_string())
+        else:
+            out.write(message)
 
 
 def extract_transaction(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
 
-    return write_debugging_file_on_exception(process_message_payload, message_date, message)
-
-
-def write_debugging_file_on_exception(fn, message_date, message):
     if message_date < CUT_OFF_DATE:
-        write_email_to_file("TooOld", "eml", message_date, message)
+        write_debugging_data_to_file("TooOld", "eml", message_date, message)
         return list()
+
+    try:
+        return process_message_payload(message_date, message)
+    except ParseException:
+        return list()
+
+
+def write_debugging_file_on_exception(fn, extension, message_date, message):
     try:
         return fn(message_date, message)
-    except NoTransactionFoundException:
-        write_email_to_file("NoTransactionsFound", "eml", message_date, message)
-    except NoCharsetException:
-        write_email_to_file("NoCharset", "eml", message_date, message)
-    return list()
+    except NoTransactionFoundException as e:
+        write_debugging_data_to_file("NoTransactionsFound", extension, message_date, message)
+        raise e
+    except NoCharsetException as e:
+        write_debugging_data_to_file("NoCharset", extension, message_date, message)
+        raise e
