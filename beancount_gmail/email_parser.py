@@ -197,11 +197,11 @@ def process_message_payload(message_date, message):
         return process_message_text(message_date, message)
 
 
-def write_email_to_file(reason, message_date, message):
+def write_email_to_file(reason, extension, message_date, message):
     if not os.path.exists(EXCLUDED_EMAILS_DIR):
         os.mkdir(EXCLUDED_EMAILS_DIR)
 
-    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.%s.eml" % (message_date, reason))
+    file = os.path.join(EXCLUDED_EMAILS_DIR, "%s.%s.%s" % (message_date, reason, extension))
     with open(file, "w") as out:
         out.write(message.as_string())
 
@@ -210,15 +210,17 @@ def extract_transaction(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
 
+    return write_debugging_file_on_exception(process_message_payload, message_date, message)
+
+
+def write_debugging_file_on_exception(fn, message_date, message):
     if message_date < CUT_OFF_DATE:
-        write_email_to_file("TooOld", message_date, message)
+        write_email_to_file("TooOld", "eml", message_date, message)
         return list()
-
     try:
-        return process_message_payload(message_date, message)
+        return fn(message_date, message)
     except NoTransactionFoundException:
-        write_email_to_file("NoTransactionsFound", message_date, message)
+        write_email_to_file("NoTransactionsFound", "eml", message_date, message)
     except NoCharsetException:
-        write_email_to_file("NoCharset", message_date, message)
-
+        write_email_to_file("NoCharset", "eml", message_date, message)
     return list()
