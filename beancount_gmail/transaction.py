@@ -9,6 +9,10 @@ from string_utils import money_string_to_decimal
 ZERO_GBP = Money(Decimal("0.00"), "GBP")
 
 
+def _strip_newlines(description):
+    return description.replace('\n', ' ')
+
+
 class Transaction(object):
     total = None
     postage_and_packing = ZERO_GBP
@@ -44,7 +48,7 @@ class Transaction(object):
 
     def _with_meta(self, amount, description):
         posting = self._posting("Expenses:Unknown", amount)
-        posting.meta['Description'] = description
+        posting.meta['Description'] = _strip_newlines(description)
         return posting
 
     def postage_and_packing_posting(self, postage_account):
@@ -67,8 +71,8 @@ class Transaction(object):
     def _amount_is_zero(sub_total):
         return sub_total is ZERO_GBP
 
-    def as_beancount_transaction(self, transaction_date, metadata, payee, narration, _postage_account, total_account):
-        data_transaction = data.Transaction(meta=metadata, date=transaction_date,
+    def as_beancount_transaction(self, metadata, payee, narration, postage_account, total_account):
+        data_transaction = data.Transaction(meta=metadata, date=self.message_date,
                                             flag=flags.FLAG_OKAY,
                                             payee=payee,
                                             narration=narration,
@@ -77,6 +81,6 @@ class Transaction(object):
                                             postings=list())
         data_transaction.postings.extend(self.sub_transaction_postings())
         if self.postage_and_packing != ZERO_GBP:
-            data_transaction.postings.append(self.postage_and_packing_posting(_postage_account))
+            data_transaction.postings.append(self.postage_and_packing_posting(postage_account))
         data_transaction.postings.append(self.total_posting(total_account))
         return data_transaction

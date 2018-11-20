@@ -43,7 +43,7 @@ class GmailImporter(ImporterProtocol):
                     for email_transaction in email_parser.extract_transaction(email):
                         if pairs_match(paypal_transaction, email_transaction):
                             transactions.append(email_transaction.
-                                                as_beancount_transaction(transaction_date, metadata,
+                                                as_beancount_transaction(metadata,
                                                                          paypal_transaction['name'],
                                                                          paypal_transaction['type'],
                                                                          self._postage_account,
