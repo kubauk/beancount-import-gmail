@@ -186,7 +186,7 @@ def process_message_text(message_date, message):
         return list()
 
 
-def process_message_payload(message, message_date):
+def process_message_payload(message_date, message):
     if message.is_multipart():
         for part in message.get_payload():
             transaction = process_message_text(message_date, part)
@@ -215,7 +215,7 @@ def extract_transaction(message):
         return list()
 
     try:
-        return process_message_payload(message, message_date)
+        return process_message_payload(message_date, message)
     except NoTransactionFoundException:
         write_email_to_file("NoTransactionsFound", message_date, message)
     except NoCharsetException:
