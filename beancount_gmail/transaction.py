@@ -48,7 +48,7 @@ class Transaction(object):
 
     def _with_meta(self, amount, description):
         posting = self._posting("ReplaceWithAccount", amount)
-        posting.meta['Description'] = _strip_newlines(description)
+        posting.meta['description'] = _strip_newlines(description)
         return posting
 
     def postage_and_packing_posting(self, postage_account):
