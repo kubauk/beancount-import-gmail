@@ -6,7 +6,7 @@ from mailbox import Message
 import bs4
 import pytz
 
-from transaction import Transaction
+from beancount_gmail.transaction import Transaction
 
 DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"

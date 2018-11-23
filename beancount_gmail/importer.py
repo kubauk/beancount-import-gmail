@@ -4,9 +4,9 @@ import gmailmessagessearch.retriever
 from beancount.core import data
 from beancount.ingest.importer import ImporterProtocol
 
-import email_parser
 from beancount_gmail.csv_parser import extract_paypal_transactions_from_csv
-from string_utils import money_string_to_decimal
+from beancount_gmail.email_parser import extract_transaction
+from beancount_gmail.string_utils import money_string_to_decimal
 
 
 def pairs_match(paypal_data, email_data):
@@ -40,7 +40,7 @@ class GmailImporter(ImporterProtocol):
                 transaction_date = paypal_transaction['transaction date']
                 metadata = data.new_metadata(file.name, 0)
                 for email in messages:
-                    for email_transaction in email_parser.extract_transaction(email):
+                    for email_transaction in extract_transaction(email):
                         if pairs_match(paypal_transaction, email_transaction):
                             transactions.append(email_transaction.
                                                 as_beancount_transaction(metadata,

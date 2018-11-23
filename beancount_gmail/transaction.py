@@ -2,9 +2,9 @@ from decimal import Decimal
 
 from beancount.core import data, flags
 from beancount.core.amount import Amount
-from beancount.core.data import Flag
 from money import Money
-from string_utils import money_string_to_decimal
+
+from beancount_gmail.string_utils import money_string_to_decimal
 
 ZERO_GBP = Money(Decimal("0.00"), "GBP")
 
