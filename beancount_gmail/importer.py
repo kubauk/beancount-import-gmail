@@ -37,7 +37,6 @@ class GmailImporter(ImporterProtocol):
         for paypal_transaction in paypal_transactions:
             currency = paypal_transaction['currency']
             if "GBP" == currency:
-                transaction_date = paypal_transaction['transaction date']
                 metadata = data.new_metadata(file.name, 0)
                 for email in messages:
                     for email_transaction in extract_transaction(email):
