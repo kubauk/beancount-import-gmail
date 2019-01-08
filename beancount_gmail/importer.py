@@ -18,15 +18,16 @@ def pairs_match(paypal_data, email_data):
 
 
 class GmailImporter(ImporterProtocol):
-    def __init__(self, postage_account):
+    def __init__(self, postage_account, secrets_directory=os.path.dirname(os.path.realpath(__file__))):
         self._postage_account = postage_account
+        self._secrets_directory = secrets_directory
 
     def extract(self, file, existing_entries=None):
         paypal_transactions = extract_paypal_transactions_from_csv(file)
 
-        retriever = gmailmessagessearch.retriever.Retriever(None, 'PayPal Quickened', 'kuba.jamro@gmail.com',
+        retriever = gmailmessagessearch.retriever.Retriever('PayPal Quickened', 'kuba.jamro@gmail.com',
                                                             'from:service@paypal.co.uk',
-                                                            os.path.dirname(os.path.realpath(__file__)))
+                                                            self._secrets_directory)
 
         dates = [transaction['transaction date'] for transaction in paypal_transactions]
 
