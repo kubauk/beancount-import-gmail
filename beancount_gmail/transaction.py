@@ -55,7 +55,7 @@ class Transaction(object):
         return self._posting(postage_account, self.postage_and_packing)
 
     def total_posting(self, total_account):
-        return self._posting(-total_account, self.total)
+        return self._posting(total_account, -self.total)
 
     @staticmethod
     def _posting(account, money):
