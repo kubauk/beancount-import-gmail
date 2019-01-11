@@ -72,7 +72,7 @@ class Transaction(object):
         return sub_total is ZERO_GBP
 
     def as_beancount_transaction(self, metadata, payee, narration, postage_account, total_account):
-        data_transaction = data.Transaction(meta=metadata, date=self.message_date,
+        data_transaction = data.Transaction(meta=metadata, date=self.message_date.date(),
                                             flag=flags.FLAG_OKAY,
                                             payee=payee,
                                             narration=narration,
