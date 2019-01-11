@@ -13,6 +13,14 @@ def _strip_newlines(description):
     return description.replace('\n', ' ')
 
 
+def _escape_double_quotes(description):
+    return description.replace('"', '\\"')
+
+
+def _sanitise_description(description):
+    return _escape_double_quotes(_strip_newlines(description))
+
+
 class Transaction(object):
     total = None
     postage_and_packing = ZERO_GBP
@@ -48,7 +56,7 @@ class Transaction(object):
 
     def _with_meta(self, amount, description):
         posting = self._posting("ReplaceWithAccount", amount)
-        posting.meta['description'] = _strip_newlines(description)
+        posting.meta['description'] = _sanitise_description(description)
         return posting
 
     def postage_and_packing_posting(self, postage_account):
