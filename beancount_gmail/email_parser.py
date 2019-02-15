@@ -6,7 +6,7 @@ from mailbox import Message
 import bs4
 import pytz
 
-from beancount_gmail.transaction import Transaction
+from beancount_gmail.receipt import Receipt
 
 DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
@@ -24,7 +24,7 @@ class ParseException(Exception):
     pass
 
 
-class NoTransactionFoundException(ParseException):
+class NoReceiptsFoundException(ParseException):
     pass
 
 
@@ -32,36 +32,35 @@ class NoCharsetException(ParseException):
     pass
 
 
-def parse_new_format(message_date, soup, tables, transactions):
+def parse_new_format(message_date, soup, tables, receipts):
     while len(tables) >= 1:
-        transactions.append(extract_new_format_transactions(message_date, tables))
+        receipts.append(extract_new_format_receipt(message_date, tables))
 
 
-def parse_original_format(message_date, soup, tables, transactions):
+def parse_original_format(message_date, soup, tables, receipts):
     if len(tables) == 2:
         refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
-        transactions.append(extract_original_format_transaction(message_date, refund, tables))
+        receipts.append(extract_original_format_receipt(message_date, refund, tables))
 
 
-def _extract_transactions_details(text):
+def _extract_donation_details(text):
     return DONATION_DETAILS_RE.search(text).groupdict()
 
 
-def parse_donation(message_date, table, transactions):
-    details = _extract_transactions_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
+def parse_donation(message_date, table, receipts):
+    details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
 
-    transactions.append(
-        Transaction(message_date, [(details['Purpose'], details['Donation'])],
-                    [("Total", details['Total'])], False))
+    receipts.append(
+        Receipt(message_date, [(details['Purpose'], details['Donation'])], [("Total", details['Total'])], False))
 
 
-def find_transaction_tables(message_date, soup):
-    transactions = list()
+def find_receipts(message_date, soup):
+    receipts = list()
 
     if soup.title is not None and soup.title.find(
             text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None:
-        parse_donation(message_date, soup.find("table", {"id": re.compile(UUID_PATTERN)}), transactions)
-        return transactions
+        parse_donation(message_date, soup.find("table", {"id": re.compile(UUID_PATTERN)}), receipts)
+        return receipts
 
     tables = list()
     for table in soup.find_all("table"):
@@ -79,23 +78,23 @@ def find_transaction_tables(message_date, soup):
         if contains_interesting_table(table_element):
             tables.append(table)
 
-        parser(message_date, soup, tables, transactions)
+        parser(message_date, soup, tables, receipts)
 
-    if len(transactions) == 0:
-        raise NoTransactionFoundException("Did not find any transactions")
+    if len(receipts) == 0:
+        raise NoReceiptsFoundException("Did not find any receipts")
 
-    return transactions
-
-
-def extract_new_format_transactions(message_date, tables):
-    sub_transactions, totals = extract_new_format_sub_transactions_from_table(tables.pop(0))
-    return Transaction(message_date, sub_transactions, totals, False)
+    return receipts
 
 
-def extract_original_format_transaction(message_date, refund, tables):
-    sub_transactions = extract_sub_transactions_from_table(tables.pop(0), skip_header=True)
-    totals = extract_sub_transactions_from_table(tables.pop(0))
-    return Transaction(message_date, sub_transactions, totals, refund)
+def extract_new_format_receipt(message_date, tables):
+    receipt_details, totals = extract_new_format_receipt_details_from_table(tables.pop(0))
+    return Receipt(message_date, receipt_details, totals, False)
+
+
+def extract_original_format_receipt(message_date, refund, tables):
+    receipt_details = extract_receipt_details_from_table(tables.pop(0), skip_header=True)
+    totals = extract_receipt_details_from_table(tables.pop(0))
+    return Receipt(message_date, receipt_details, totals, refund)
 
 
 def contains_interesting_table(table_element):
@@ -120,9 +119,9 @@ def sanitise_html(soup):
         [div.unwrap() for div in soup.find_all(tag)]
 
 
-def extract_sub_transactions_from_table(table, skip_header=False):
+def extract_receipt_details_from_table(table, skip_header=False):
     sanitise_html(table)
-    sub_transactions = list()
+    receipt_details = list()
 
     row = next_sibling_tag(table.tr) if skip_header else table.tr
     while row is not None:
@@ -132,14 +131,14 @@ def extract_sub_transactions_from_table(table, skip_header=False):
 
         if (description is not None and description is not '') \
                 and (total is not None and total is not ''):
-            sub_transactions.append((description, total))
+            receipt_details.append((description, total))
         row = next_sibling_tag(row)
 
-    return sub_transactions
+    return receipt_details
 
 
-def extract_new_format_sub_transactions_from_table(table):
-    sub_transactions = list()
+def extract_new_format_receipt_details_from_table(table):
+    receipt_details = list()
     totals = list()
     for row in table.find_all('tr', class_="datarow"):
         columns = row.find_all('td')
@@ -147,7 +146,7 @@ def extract_new_format_sub_transactions_from_table(table):
         total = columns[len(columns) - 1].get_text(strip=True, separator=u' ')
         if (description is not None and description is not '') \
                 and (total is not None and total is not ''):
-            sub_transactions.append((description, total))
+            receipt_details.append((description, total))
 
     for row in table.find_all('tr'):
         columns = row.find_all('td')
@@ -159,12 +158,12 @@ def extract_new_format_sub_transactions_from_table(table):
                 and (total is not None and total is not ''):
             totals.append((description, total))
 
-    return sub_transactions, totals
+    return receipt_details, totals
 
 
-def extract_transactions_from_email(message_date, message_body):
+def extract_receipts_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
-    return find_transaction_tables(message_date, soup)
+    return find_receipts(message_date, soup)
 
 
 def get_charset(message):
@@ -179,10 +178,10 @@ def get_charset(message):
 
 def process_message_text(message_date, message):
     if message.get_content_type() == "text/html":
-        return write_debugging_file_on_exception(extract_transactions_from_email, "html", message_date,
+        return write_debugging_file_on_exception(extract_receipts_from_email, "html", message_date,
                                                  message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
-        return write_debugging_file_on_exception(extract_transactions_from_email, "txt", message_date, message)
+        return write_debugging_file_on_exception(extract_receipts_from_email, "txt", message_date, message)
     else:
         return list()
 
@@ -190,9 +189,9 @@ def process_message_text(message_date, message):
 def process_message_payload(message_date, message):
     if message.is_multipart():
         for part in message.get_payload():
-            transaction = process_message_text(message_date, part)
-            if transaction:
-                return transaction
+            receipts = process_message_text(message_date, part)
+            if receipts:
+                return receipts
         return list()
     else:
         return process_message_text(message_date, message)
@@ -210,7 +209,7 @@ def write_debugging_data_to_file(reason, extension, message_date, message):
             out.write(message)
 
 
-def extract_transaction(message):
+def extract_receipts(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
 
@@ -227,8 +226,8 @@ def extract_transaction(message):
 def write_debugging_file_on_exception(fn, extension, message_date, message):
     try:
         return fn(message_date, message)
-    except NoTransactionFoundException as e:
-        write_debugging_data_to_file("NoTransactionsFound", extension, message_date, message)
+    except NoReceiptsFoundException as e:
+        write_debugging_data_to_file("NoReceiptsFound", extension, message_date, message)
         raise e
     except NoCharsetException as e:
         write_debugging_data_to_file("NoCharset", extension, message_date, message)

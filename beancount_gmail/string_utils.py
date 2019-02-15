@@ -1,7 +1,7 @@
 import re
-from decimal import Decimal
 
-from money import Money
+from beancount.core.amount import Amount
+from beancount.core.number import D
 
 MONEY = re.compile(r"(-?\d{1,3}(?:,\d{3})*\.\d{2})\s+([A-Z]{3})")
 
@@ -10,8 +10,8 @@ def _negate(value, negate):
     return (-1 if negate else 1) * value
 
 
-def money_string_to_decimal(string, negate=False):
+def money_string_to_amount(string, negate=False):
     match = MONEY.search(string)
     if not match:
         raise Exception("No money value found in string \"%s\" to convert to decimal" % string)
-    return _negate(Money(Decimal(match.group(1)), match.group(2)), negate)
+    return Amount(_negate(D(match.group(1)), negate), match.group(2))
