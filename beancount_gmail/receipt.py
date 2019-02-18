@@ -24,10 +24,10 @@ def _posting(account, amount):
 
 
 class Receipt(object):
-    total = None
-    postage_and_packing = ZERO_GBP
 
     def __init__(self, message_date, receipt_details, totals, refund):
+        self.total = None
+        self.postage_and_packing = ZERO_GBP
         self.message_date = message_date
         self.receipt_details = list()
 

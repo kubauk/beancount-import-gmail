@@ -39,7 +39,7 @@ def parse_new_format(message_date, soup, tables, receipts):
 
 def parse_original_format(message_date, soup, tables, receipts):
     if len(tables) == 2:
-        refund = soup.find(text=re.compile(".*refund.*", re.IGNORECASE)) is not None
+        refund = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None
         receipts.append(extract_original_format_receipt(message_date, refund, tables))
 
 
