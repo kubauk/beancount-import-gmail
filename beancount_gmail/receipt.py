@@ -3,6 +3,7 @@ from beancount.core.amount import add, Amount
 from beancount.core.number import ZERO
 
 from beancount_gmail.string_utils import money_string_to_amount
+from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
 
 ZERO_GBP = Amount(ZERO, "GBP")
 
@@ -46,7 +47,7 @@ class Receipt(object):
                 amount = money_string_to_amount(amount_string, refund)
                 if "GBP" in amount.currency:
                     self.total = amount
-            if description.startswith("Postage and pack"):
+            if POSTAGE_AND_PACKAGING_RE.match(description):
                 self.postage_and_packing = money_string_to_amount(amount_string, refund)
 
         if self.total is None:

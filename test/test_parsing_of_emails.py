@@ -79,6 +79,13 @@ def test_donation_format_june_2018_produces_correct_receipt(soup):
                                    "Premium Safety DE [50 (10 packs of 5)] Item Number\n\n\n132213313603", "4.49")
 
 
+def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
+    receipts = find_receipts(datetime.datetime.now(), soup("dec-2018-with-extra-postage-message.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "13.98", "Selected:", "13.98", "3.99")
+
+
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0'):
     assert_that(receipt.total, equal_to(Amount(D(total), "GBP")))
     assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), "GBP")))

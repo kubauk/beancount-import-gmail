@@ -7,6 +7,7 @@ import bs4
 import pytz
 
 from beancount_gmail.receipt import Receipt
+from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
 
 DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
@@ -101,7 +102,7 @@ def contains_interesting_table(table_element):
     first_td_text = table_element.get_text(separator=u' ').strip()
     if first_td_text == "Description":
         return True
-    elif first_td_text.startswith("Postage and pack") or first_td_text == "Subtotal":
+    elif POSTAGE_AND_PACKAGING_RE.match(first_td_text) or first_td_text == "Subtotal":
         return True
 
     return False
