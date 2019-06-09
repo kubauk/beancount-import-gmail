@@ -29,6 +29,10 @@ class NoReceiptsFoundException(ParseException):
     pass
 
 
+class NoTableFoundException(ParseException):
+    pass
+
+
 class NoCharsetException(ParseException):
     pass
 
@@ -75,6 +79,9 @@ def find_receipts(message_date, soup):
         else:
             table_element = table.tr.td
             parser = parse_original_format
+
+        if table_element is None:
+            raise NoTableFoundException()
 
         if contains_interesting_table(table_element):
             tables.append(table)
@@ -227,6 +234,9 @@ def extract_receipts(message):
 def write_debugging_file_on_exception(fn, extension, message_date, message):
     try:
         return fn(message_date, message)
+    except NoTableFoundException as e:
+        write_debugging_data_to_file("NoTableFound", extension, message_date, message)
+        raise e
     except NoReceiptsFoundException as e:
         write_debugging_data_to_file("NoReceiptsFound", extension, message_date, message)
         raise e
