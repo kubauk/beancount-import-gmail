@@ -37,8 +37,8 @@ class GmailImporter(ImporterProtocol):
         retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail-paypal', self._gmail_address,
                                                             'from:service@paypal.co.uk', self._secrets_directory)
 
-        dates = [date_or_datetime(transaction) for transaction in transactions
-                 if isinstance(transaction, Transaction)]
+        dates = sorted({date_or_datetime(transaction) for transaction in transactions
+                 if isinstance(transaction, Transaction)})
         receipts = [receipt for email in retriever.get_messages_for_date_range(min(dates), max(dates) + timedelta(days=1))
                     for receipt in extract_receipts(email)]
 
