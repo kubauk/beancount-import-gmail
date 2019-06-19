@@ -20,6 +20,8 @@ EXCLUDED_DATA_DIR = "./excluded"
 
 UUID_PATTERN = r"[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}"
 
+TIMEZONE = pytz.timezone("Europe/London")
+
 
 class ParseException(Exception):
     pass
@@ -219,7 +221,7 @@ def write_debugging_data_to_file(reason, extension, message_date, message):
 
 def extract_receipts(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
-    message_date = pytz.utc.normalize(local_message_date.astimezone(pytz.utc))
+    message_date = TIMEZONE.normalize(local_message_date.astimezone(TIMEZONE))
 
     if message_date < CUT_OFF_DATE:
         write_debugging_data_to_file("TooOld", "eml", message_date, message)
