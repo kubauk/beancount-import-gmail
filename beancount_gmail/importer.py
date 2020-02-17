@@ -43,8 +43,9 @@ class GmailImporter(ImporterProtocol):
                     for receipt in extract_receipts(email)]
 
         for transaction in transactions:
-            for receipt in receipts:
+            for receipt in receipts.copy():
                 if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
+                    receipts.remove(receipt)
                     receipt.append_postings(transaction, self._postage_account)
 
         return transactions
