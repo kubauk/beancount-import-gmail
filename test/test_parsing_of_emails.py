@@ -1,13 +1,11 @@
 import datetime
-
-import pytest
 import sys
 
+import pytest
 from beancount.core.amount import Amount
 from beancount.core.number import D
 from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
-from money.money import Money
 
 from email_parser import find_receipts
 
@@ -33,6 +31,17 @@ def test_merchant_purchase_produces_correct_receipt(soup):
     assert_that(receipt.total, equal_to(Amount(D("32.00"), "GBP")))
     assert_that(receipt.postage_and_packing, equal_to(ZERO_GBP))
     assert_that(len(receipt.receipt_details), equal_to(0))
+
+
+def test_mar_2019_selling_produces_correct_receipt(soup):
+    receipts = find_receipts(datetime.datetime.now(), soup("mar-2019-selling.html"))
+
+    assert_that(len(receipts), equal_to(1))
+
+    assert_receipt_with_one_detail(receipts[0], "-3.41",
+                                   "The Secret Life of Pets DVD (2016) Chris Renaud Item Number 254143897831",
+                                   "-2.01",
+                                   "-1.40")
 
 
 def test_new_format_dec_2015_email_produces_correct_receipt(soup):

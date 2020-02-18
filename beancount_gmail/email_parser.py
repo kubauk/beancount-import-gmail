@@ -46,8 +46,10 @@ def parse_new_format(message_date, soup, tables, receipts):
 
 def parse_original_format(message_date, soup, tables, receipts):
     if len(tables) == 2:
-        refund = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None
-        receipts.append(extract_original_format_receipt(message_date, refund, tables))
+        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
+                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
+
+        receipts.append(extract_original_format_receipt(message_date, negate, tables))
 
 
 def _extract_donation_details(text):
@@ -101,10 +103,10 @@ def extract_new_format_receipt(message_date, tables):
     return Receipt(message_date, receipt_details, totals, False)
 
 
-def extract_original_format_receipt(message_date, refund, tables):
+def extract_original_format_receipt(message_date, negate, tables):
     receipt_details = extract_receipt_details_from_table(tables.pop(0), skip_header=True)
     totals = extract_receipt_details_from_table(tables.pop(0))
-    return Receipt(message_date, receipt_details, totals, refund)
+    return Receipt(message_date, receipt_details, totals, negate)
 
 
 def contains_interesting_table(table_element):

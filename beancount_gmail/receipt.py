@@ -26,7 +26,7 @@ def _posting(account, amount):
 
 class Receipt(object):
 
-    def __init__(self, message_date, receipt_details, totals, refund):
+    def __init__(self, message_date, receipt_details, totals, negate):
         self.total = None
         self.postage_and_packing = ZERO_GBP
         self.message_date = message_date
@@ -34,7 +34,7 @@ class Receipt(object):
 
         self.sub_total = ZERO_GBP
         for description, amount in receipt_details:
-            receipt_detail_amount = money_string_to_amount(amount, refund)
+            receipt_detail_amount = money_string_to_amount(amount, negate)
             self.receipt_details.append((description, receipt_detail_amount))
             if not self._currencies_match(self.sub_total, receipt_detail_amount) \
                     and self._amount_is_zero(self.sub_total):
@@ -44,11 +44,11 @@ class Receipt(object):
 
         for description, amount_string in totals:
             if description.startswith("From amount") or "Total" in description or "Subtotal" in description:
-                amount = money_string_to_amount(amount_string, refund)
+                amount = money_string_to_amount(amount_string, negate)
                 if "GBP" in amount.currency:
                     self.total = amount
             if POSTAGE_AND_PACKAGING_RE.match(description):
-                self.postage_and_packing = money_string_to_amount(amount_string, refund)
+                self.postage_and_packing = money_string_to_amount(amount_string, negate)
 
         if self.total is None:
             raise Exception("Failed to find GBP total in receipt")
