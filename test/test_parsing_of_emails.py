@@ -95,12 +95,19 @@ def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
     assert_receipt_with_one_detail(receipts[0], "13.98", "Selected:", "13.98", "3.99")
 
 
-def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0'):
-    assert_that(receipt.total, equal_to(Amount(D(total), "GBP")))
-    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), "GBP")))
+def test_totals_in_usd_do_not_produce_receipt(soup):
+    receipts = find_receipts(datetime.datetime.now(), soup("totals-in-usd-2020.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "12.71", "Porkbun.com Order ID: 657601", "12.71", "0", "USD")
+
+
+def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
+    assert_that(receipt.total, equal_to(Amount(D(total), currency)))
+    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
     assert_that(receipt.receipt_details[0][0],
                 equal_to(detail))
-    assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), "GBP")))
+    assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), currency)))
 
 
 if __name__ == "__name__":

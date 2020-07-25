@@ -28,7 +28,7 @@ class Receipt(object):
 
     def __init__(self, message_date, receipt_details, totals, negate):
         self.total = None
-        self.postage_and_packing = ZERO_GBP
+        self.postage_and_packing = None
         self.message_date = message_date
         self.receipt_details = list()
 
@@ -44,14 +44,15 @@ class Receipt(object):
 
         for description, amount_string in totals:
             if description.startswith("From amount") or "Total" in description or "Subtotal" in description:
-                amount = money_string_to_amount(amount_string, negate)
-                if "GBP" in amount.currency:
-                    self.total = amount
+                self.total = money_string_to_amount(amount_string, negate)
             if POSTAGE_AND_PACKAGING_RE.match(description):
                 self.postage_and_packing = money_string_to_amount(amount_string, negate)
 
         if self.total is None:
-            raise Exception("Failed to find GBP total in receipt")
+            raise Exception("Failed to find total in receipt")
+
+        if self.postage_and_packing is None:
+            self.postage_and_packing = Amount(ZERO, self.total.currency)
 
     def _receipt_details_postings(self):
         return [self._with_meta(amount, description) for description, amount in
