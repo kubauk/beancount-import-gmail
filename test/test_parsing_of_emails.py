@@ -4,10 +4,10 @@ import sys
 import pytest
 from beancount.core.amount import Amount
 from beancount.core.number import D
-from hamcrest import assert_that
+from hamcrest import assert_that, calling, raises
 from hamcrest.core.core.isequal import equal_to
 
-from email_parser import find_receipts
+from email_parser import find_receipts, NoTableFoundException
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
@@ -100,6 +100,11 @@ def test_totals_in_usd_do_not_produce_receipt(soup):
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "12.71", "Porkbun.com Order ID: 657601", "12.71", "0", "USD")
+
+
+def test_facebook_donation_does_not_produce_receipt(soup):
+    assert_that(calling(find_receipts, ).with_args(datetime.datetime.now(), soup("facebook-donation-2020-07.html")),
+                raises(NoTableFoundException))
 
 
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):

@@ -9,10 +9,10 @@ import pytz
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
 
-DONATION_DETAILS_RE = re.compile(u"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
-                                 u"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
-                                 u"Purpose:(?P<Purpose>[ \S]+\S) +"
-                                 u"Contributor:")
+DONATION_DETAILS_RE = re.compile(r"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
+                                 r"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
+                                 r"Purpose:(?P<Purpose>[ \S]+\S) +"
+                                 r"Contributor:")
 
 CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
 
@@ -81,8 +81,11 @@ def find_receipts(message_date, soup):
             table_element = table.tr.th
             parser = parse_new_format
         else:
-            table_element = table.tr.td
-            parser = parse_original_format
+            if hasattr(table.tr, 'td'):
+                table_element = table.tr.td
+                parser = parse_original_format
+            else:
+                raise NoTableFoundException
 
         if table_element is None:
             raise NoTableFoundException()
@@ -238,12 +241,6 @@ def extract_receipts(message):
 def write_debugging_file_on_exception(fn, extension, message_date, message):
     try:
         return fn(message_date, message)
-    except NoTableFoundException as e:
-        write_debugging_data_to_file("NoTableFound", extension, message_date, message)
-        raise e
-    except NoReceiptsFoundException as e:
-        write_debugging_data_to_file("NoReceiptsFound", extension, message_date, message)
-        raise e
-    except NoCharsetException as e:
-        write_debugging_data_to_file("NoCharset", extension, message_date, message)
+    except Exception as e:
+        write_debugging_data_to_file(e.__class__.__name__, extension, message_date, message)
         raise e

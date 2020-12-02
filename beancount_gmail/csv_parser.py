@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytz
 
-from beancount_gmail.string_utils import money_string_to_decimal
+from string_utils import money_string_to_amount
 
 
 class PayPalDialect(csv.Dialect):
@@ -24,7 +24,7 @@ csv.register_dialect("paypal", PayPalDialect)
 
 def amount_is_negative(x):
     amount_string = "%s %s" % (x['amount'], x['currency'])
-    return money_string_to_decimal(amount_string)[0] < Decimal("0")
+    return money_string_to_amount(amount_string)[0] < Decimal("0")
 
 
 def foreign_amount_is_negative(x):
