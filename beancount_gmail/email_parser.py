@@ -113,10 +113,10 @@ def extract_original_format_receipt(message_date, negate, tables):
 
 
 def contains_interesting_table(table_element):
-    first_td_text = table_element.get_text(separator=u' ').strip()
-    if first_td_text == "Description":
-        return True
-    elif POSTAGE_AND_PACKAGING_RE.match(first_td_text) or first_td_text == "Subtotal":
+    stripped_text = table_element.get_text(separator=u' ').strip()
+    if "Description" in stripped_text or \
+            POSTAGE_AND_PACKAGING_RE.match(stripped_text) or \
+            "Subtotal" in stripped_text:
         return True
 
     return False
