@@ -5,6 +5,7 @@ from mailbox import Message
 
 import bs4
 import pytz
+from bs4 import NavigableString
 
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
@@ -174,6 +175,44 @@ def extract_new_format_receipt_details_from_table(table):
             totals.append((description, total))
 
     return receipt_details, totals
+
+
+def extract_text(element):
+    elements = []
+    link = None
+
+    def strip_duplicate_white_spaces(s):
+        return re.sub(r' {2,}', ' ', re.sub(r'[\n\t]', r' ', s))
+
+    for elem in element.children:
+        if isinstance(elem, NavigableString):
+            if elem.strip():
+                s = strip_duplicate_white_spaces(elem.string.strip())
+                elements.append(link + " " + s if link else s)
+                link = None
+        elif elem.name == 'a':
+            link = strip_duplicate_white_spaces(elem.string)
+        else:
+            elements.extend(extract_text(elem))
+
+    return elements
+
+
+def find_receipts_new(message_date, soup):
+    receipt_data = []
+    for table in soup.find_all("table"):
+        if table.find("table") is not None:
+            continue
+        if contains_interesting_table(table):
+            receipt_row = []
+            for row in table.find_all("tr"):
+                if row.get_text().strip():
+                    receipt_row.append(";".join(extract_text(row)))
+            receipt_data.append(receipt_row)
+
+    receipt_details = [(detail.split(';')[0], detail.split(';')[3]) for detail in receipt_data[0][1:]]
+    total_details = [detail.split(';') for detail in receipt_data[1] if len(detail.split(';')) == 2]
+    return [Receipt(message_date, receipt_details, total_details, False)]
 
 
 def extract_receipts_from_email(message_date, message_body):

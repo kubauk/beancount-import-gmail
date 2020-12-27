@@ -7,7 +7,7 @@ from beancount.core.number import D
 from hamcrest import assert_that, calling, raises
 from hamcrest.core.core.isequal import equal_to
 
-from email_parser import find_receipts, NoTableFoundException
+from email_parser import find_receipts, NoTableFoundException, find_receipts_new
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
@@ -18,6 +18,15 @@ def test_refund_email_produces_correct_receipt(soup):
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "12.98", "Electronic C TWIST Shisha Variable Voltage 1300mah Battery\n"
                                                          "                                            "
+                                                         "HOOKAH PEN + FREE USB [Red] Item Number 252189791369",
+                                   "12.98")
+
+
+def test_new_refund_email_produces_correct_receipt(soup):
+    receipts = find_receipts_new(datetime.datetime.now(), soup("refund-nov-2015.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "12.98", "Electronic C TWIST Shisha Variable Voltage 1300mah Battery "
                                                          "HOOKAH PEN + FREE USB [Red] Item Number 252189791369",
                                    "12.98")
 
