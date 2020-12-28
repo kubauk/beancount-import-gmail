@@ -13,16 +13,6 @@ ZERO_GBP = Amount(D("0.00"), "GBP")
 
 
 def test_refund_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("refund-nov-2015.html"))
-
-    assert_that(len(receipts), equal_to(1))
-    assert_receipt_with_one_detail(receipts[0], "12.98", "Electronic C TWIST Shisha Variable Voltage 1300mah Battery\n"
-                                                         "                                            "
-                                                         "HOOKAH PEN + FREE USB [Red] Item Number 252189791369",
-                                   "12.98")
-
-
-def test_new_refund_email_produces_correct_receipt(soup):
     receipts = find_receipts_new(datetime.datetime.now(), soup("refund-nov-2015.html"))
 
     assert_that(len(receipts), equal_to(1))
@@ -43,7 +33,7 @@ def test_merchant_purchase_produces_correct_receipt(soup):
 
 
 def test_mar_2019_selling_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("mar-2019-selling.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("mar-2019-selling.html"))
 
     assert_that(len(receipts), equal_to(1))
 

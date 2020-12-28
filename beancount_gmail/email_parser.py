@@ -179,21 +179,31 @@ def extract_new_format_receipt_details_from_table(table):
 
 def extract_text(element):
     elements = []
-    link = None
+    to_append = None
 
-    def strip_duplicate_white_spaces(s):
-        return re.sub(r' {2,}', ' ', re.sub(r'[\n\t]', r' ', s))
+    def remove_unwanted_white_spaces(s):
+        return re.sub(r' {2,}', ' ', re.sub(r'[\n\t]', r' ', re.sub(u'\xa0', ' ', s.strip())))
 
     for elem in element.children:
         if isinstance(elem, NavigableString):
             if elem.strip():
-                s = strip_duplicate_white_spaces(elem.string.strip())
-                elements.append(link + " " + s if link else s)
-                link = None
-        elif elem.name == 'a':
-            link = strip_duplicate_white_spaces(elem.string)
+                s = remove_unwanted_white_spaces(elem.string.strip())
+                elements.append(to_append + " " + s if to_append else s)
+                to_append = None
+        elif elem.name == 'a' or elem.name == 'span':
+            to_append = to_append + " " + remove_unwanted_white_spaces(elem.text) if to_append \
+                else remove_unwanted_white_spaces(elem.text)
         else:
-            elements.extend(extract_text(elem))
+            text = extract_text(elem)
+            if to_append and len(text) > 0:
+                text[0] = to_append + ' ' + text[0]
+            elements.extend(text)
+
+    if to_append:
+        elements.append(to_append)
+        to_append = None
+
+    assert to_append is None
 
     return elements
 
@@ -212,7 +222,11 @@ def find_receipts_new(message_date, soup):
 
     receipt_details = [(detail.split(';')[0], detail.split(';')[3]) for detail in receipt_data[0][1:]]
     total_details = [detail.split(';') for detail in receipt_data[1] if len(detail.split(';')) == 2]
-    return [Receipt(message_date, receipt_details, total_details, False)]
+
+    negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
+             soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
+
+    return [Receipt(message_date, receipt_details, total_details, negate)]
 
 
 def extract_receipts_from_email(message_date, message_body):
