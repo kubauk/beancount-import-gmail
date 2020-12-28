@@ -178,7 +178,7 @@ def extract_new_format_receipt_details_from_table(table):
 
 
 def extract_text(element):
-    elements = []
+    text = ''
     to_append = None
 
     def remove_unwanted_white_spaces(s):
@@ -188,24 +188,28 @@ def extract_text(element):
         if isinstance(elem, NavigableString):
             if elem.strip():
                 s = remove_unwanted_white_spaces(elem.string.strip())
-                elements.append(to_append + " " + s if to_append else s)
+                text += to_append + " " + s if to_append else s
                 to_append = None
         elif elem.name == 'a' or elem.name == 'span':
             to_append = to_append + " " + remove_unwanted_white_spaces(elem.text) if to_append \
                 else remove_unwanted_white_spaces(elem.text)
         else:
-            text = extract_text(elem)
-            if to_append and len(text) > 0:
-                text[0] = to_append + ' ' + text[0]
-            elements.extend(text)
+            extracted = extract_text(elem)
+            if to_append and extracted:
+                extracted = to_append + ' ' + extracted
+            text += extracted
 
     if to_append:
-        elements.append(to_append)
-        to_append = None
+        text += to_append
 
-    assert to_append is None
+    return text
 
-    return elements
+
+def extract_row_text(row):
+    cell_text = []
+    for cell in row.find_all("td"):
+        cell_text.append(extract_text(cell))
+    return ";".join(cell_text)
 
 
 def find_receipts_new(message_date, soup):
@@ -217,7 +221,7 @@ def find_receipts_new(message_date, soup):
             receipt_row = []
             for row in table.find_all("tr"):
                 if row.get_text().strip():
-                    receipt_row.append(";".join(extract_text(row)))
+                    receipt_row.append(extract_row_text(row))
             receipt_data.append(receipt_row)
 
     receipt_details = [(detail.split(';')[0], detail.split(';')[3]) for detail in receipt_data[0][1:]]
