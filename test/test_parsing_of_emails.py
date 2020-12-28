@@ -63,7 +63,7 @@ def test_new_format_dec_2015_email_produces_correct_receipt(soup):
 
 
 def test_new_format_feb_2017_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("new-format-feb-2017.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("new-format-feb-2017.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "1.15",
@@ -88,14 +88,14 @@ def test_donation_format_june_2018_produces_correct_receipt(soup):
 
 
 def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("dec-2018-with-extra-postage-message.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("dec-2018-with-extra-postage-message.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "13.98", "Selected:", "13.98", "3.99")
 
 
 def test_totals_in_usd_do_not_produce_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("totals-in-usd-2020.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("totals-in-usd-2020.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "12.71", "Porkbun.com Order ID: 657601", "12.71", "0", "USD")
