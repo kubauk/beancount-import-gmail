@@ -44,7 +44,7 @@ def test_mar_2019_selling_produces_correct_receipt(soup):
 
 
 def test_new_format_dec_2015_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("new-format-dec-2015.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("new-format-dec-2015.html"))
 
     assert_that(len(receipts), equal_to(3))
 

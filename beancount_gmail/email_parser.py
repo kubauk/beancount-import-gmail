@@ -197,6 +197,7 @@ def extract_text(element):
             extracted = extract_text(elem)
             if to_append and extracted:
                 extracted = to_append + ' ' + extracted
+                to_append = None
             text += extracted
 
     if to_append:
@@ -207,9 +208,23 @@ def extract_text(element):
 
 def extract_row_text(row):
     cell_text = []
-    for cell in row.find_all("td"):
+    for cell in row.find_all(['td', 'th']):
         cell_text.append(extract_text(cell))
-    return ";".join(cell_text)
+    return cell_text
+
+
+def post_process_for_new_format(receipt_table_data):
+    result = [[]]
+    for row in receipt_table_data:
+        if len(row) == 3:
+            continue
+        if len(row) == 4 and row[1] == '':
+            if len(result) == 1:
+                result.append([])
+            result[1].append([row[2], row[3]])
+        else:
+            result[0].append(row)
+    return result
 
 
 def find_receipts_new(message_date, soup):
@@ -218,19 +233,23 @@ def find_receipts_new(message_date, soup):
         if table.find("table") is not None:
             continue
         if contains_interesting_table(table):
-            receipt_row = []
+            receipt_table_data = []
             for row in table.find_all("tr"):
                 if row.get_text().strip():
-                    receipt_row.append(extract_row_text(row))
-            receipt_data.append(receipt_row)
+                    receipt_table_data.append(extract_row_text(row))
+            receipt_data.extend(post_process_for_new_format(receipt_table_data))
 
-    receipt_details = [(detail.split(';')[0], detail.split(';')[3]) for detail in receipt_data[0][1:]]
-    total_details = [detail.split(';') for detail in receipt_data[1] if len(detail.split(';')) == 2]
+    receipts = []
+    while len(receipt_data) > 0:
+        receipt_details = [(detail[0], detail[3]) for detail in receipt_data.pop(0)[1:]]
+        total_details = [(detail[0], detail[1]) for detail in receipt_data.pop(0) if len(detail) == 2]
 
-    negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
-             soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
+        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
+                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
 
-    return [Receipt(message_date, receipt_details, total_details, negate)]
+        receipts.append(Receipt(message_date, receipt_details, total_details, negate))
+
+    return receipts
 
 
 def extract_receipts_from_email(message_date, message_body):
