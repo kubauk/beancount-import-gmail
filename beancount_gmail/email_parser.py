@@ -9,7 +9,6 @@ from bs4 import NavigableString
 
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
-from receipt import Receipt
 
 DONATION_DETAILS_RE = re.compile(r"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  r"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
@@ -65,44 +64,6 @@ def parse_donation(message_date, table, receipts):
         Receipt(message_date, [(details['Purpose'], details['Donation'])], [("Total", details['Total'])], False))
 
 
-def find_receipts(message_date, soup):
-    receipts = list()
-
-    if soup.title is not None and soup.title.find(
-            text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None:
-        parse_donation(message_date, soup.find("table", {"id": re.compile(UUID_PATTERN)}), receipts)
-        return receipts
-
-    tables = list()
-    for table in soup.find_all("table"):
-
-        if table.find("table") is not None:
-            continue
-
-        elif table.find("th"):
-            table_element = table.tr.th
-            parser = parse_new_format
-        else:
-            if hasattr(table.tr, 'td'):
-                table_element = table.tr.td
-                parser = parse_original_format
-            else:
-                raise NoTableFoundException
-
-        if table_element is None:
-            raise NoTableFoundException()
-
-        if contains_interesting_table(table_element):
-            tables.append(table)
-
-        parser(message_date, soup, tables, receipts)
-
-    if len(receipts) == 0:
-        raise NoReceiptsFoundException("Did not find any receipts")
-
-    return receipts
-
-
 def extract_new_format_receipt(message_date, tables):
     receipt_details, totals = extract_new_format_receipt_details_from_table(tables.pop(0))
     return Receipt(message_date, receipt_details, totals, False)
@@ -117,7 +78,7 @@ def extract_original_format_receipt(message_date, negate, tables):
 def contains_interesting_table(table_element):
     stripped_text = table_element.get_text(separator=u' ').strip()
     return "Description" in stripped_text or \
-           POSTAGE_AND_PACKAGING_RE.match(stripped_text) or \
+           POSTAGE_AND_PACKAGING_RE.match(stripped_text) is not None or \
            "Subtotal" in stripped_text or \
            "Total" in stripped_text
 
@@ -256,6 +217,9 @@ def find_receipts_new(message_date, soup):
 
         receipts.append(Receipt(message_date, receipt_details, total_details, negate))
 
+    if len(receipts) == 0:
+        raise NoReceiptsFoundException("Did not find any receipts")
+
     return receipts
 
 
@@ -270,7 +234,7 @@ def extract_receipt_details_from_donation(soup):
 
 def extract_receipts_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
-    return find_receipts(message_date, soup)
+    return find_receipts_new(message_date, soup)
 
 
 def get_charset(message):
