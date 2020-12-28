@@ -94,6 +94,13 @@ def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
     assert_receipt_with_one_detail(receipts[0], "13.98", "Selected:", "13.98", "3.99")
 
 
+def test_nov_2020_sent_payment_produces_correct_receipt(soup):
+    receipts = find_receipts_new(datetime.datetime.now(), soup("nov-2020-sent-payment.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "5.00", "AdBlock Item No X0G0 FEOWSI wabsiec39704501", "5.00")
+
+
 def test_totals_in_usd_do_not_produce_receipt(soup):
     receipts = find_receipts_new(datetime.datetime.now(), soup("totals-in-usd-2020.html"))
 

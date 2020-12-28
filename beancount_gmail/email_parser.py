@@ -244,7 +244,7 @@ def find_receipts_new(message_date, soup):
     receipt_data = extract_receipt_details_from_donation(soup) \
         if soup.title is not None and \
            soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
-        else extract_new_format_receipt_details_from_table(soup)
+        else extract_receipt_data_from_tables(soup)
 
     receipts = []
     while len(receipt_data) > 0:
