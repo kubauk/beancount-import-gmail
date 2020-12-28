@@ -9,6 +9,7 @@ from bs4 import NavigableString
 
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
+from receipt import Receipt
 
 DONATION_DETAILS_RE = re.compile(r"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  r"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
@@ -115,12 +116,10 @@ def extract_original_format_receipt(message_date, negate, tables):
 
 def contains_interesting_table(table_element):
     stripped_text = table_element.get_text(separator=u' ').strip()
-    if "Description" in stripped_text or \
-            POSTAGE_AND_PACKAGING_RE.match(stripped_text) or \
-            "Subtotal" in stripped_text:
-        return True
-
-    return False
+    return "Description" in stripped_text or \
+           POSTAGE_AND_PACKAGING_RE.match(stripped_text) or \
+           "Subtotal" in stripped_text or \
+           "Total" in stripped_text
 
 
 def next_sibling_tag(first):
@@ -227,7 +226,7 @@ def post_process_for_new_format(receipt_table_data):
     return result
 
 
-def find_receipts_new(message_date, soup):
+def extract_receipt_data_from_tables(soup):
     receipt_data = []
     for table in soup.find_all("table"):
         if table.find("table") is not None:
@@ -238,6 +237,14 @@ def find_receipts_new(message_date, soup):
                 if row.get_text().strip():
                     receipt_table_data.append(extract_row_text(row))
             receipt_data.extend(post_process_for_new_format(receipt_table_data))
+    return receipt_data
+
+
+def find_receipts_new(message_date, soup):
+    receipt_data = extract_receipt_details_from_donation(soup) \
+        if soup.title is not None and \
+           soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
+        else extract_new_format_receipt_details_from_table(soup)
 
     receipts = []
     while len(receipt_data) > 0:
@@ -250,6 +257,15 @@ def find_receipts_new(message_date, soup):
         receipts.append(Receipt(message_date, receipt_details, total_details, negate))
 
     return receipts
+
+
+def extract_receipt_details_from_donation(soup):
+    table = soup.find("table", {"id": re.compile(UUID_PATTERN)})
+    dontation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
+    receipt_details = [['Description', 'Unit Price', 'Quantity', 'Amount'],
+                       [dontation_details['Purpose'], '', '', dontation_details['Donation']]]
+    total_details = [["Total", dontation_details['Total']]]
+    return [receipt_details, total_details]
 
 
 def extract_receipts_from_email(message_date, message_body):

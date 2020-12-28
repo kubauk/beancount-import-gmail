@@ -72,7 +72,7 @@ def test_new_format_feb_2017_email_produces_correct_receipt(soup):
 
 
 def test_donation_format_dec_2017_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("donation-dec-2017.html"))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("donation-dec-2017.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "50.00", "Anxiety UK Donation", "50.00")
