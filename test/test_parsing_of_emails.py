@@ -4,10 +4,10 @@ import sys
 import pytest
 from beancount.core.amount import Amount
 from beancount.core.number import D
-from hamcrest import assert_that, calling, raises
+from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
 
-from email_parser import find_receipts, NoTableFoundException, find_receipts_new
+from email_parser import find_receipts_new
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
@@ -109,16 +109,22 @@ def test_totals_in_usd_do_not_produce_receipt(soup):
 
 
 def test_facebook_donation_does_not_produce_receipt(soup):
-    assert_that(calling(find_receipts, ).with_args(datetime.datetime.now(), soup("facebook-donation-2020-07.html")),
-                raises(NoTableFoundException))
+    receipts = find_receipts_new(datetime.datetime.now(), soup("facebook-donation-2020-07.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_totals(receipts[0], "10.00")
 
 
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
-    assert_that(receipt.total, equal_to(Amount(D(total), currency)))
-    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
+    assert_receipt_totals(receipt, total, postage, currency)
     assert_that(receipt.receipt_details[0][0],
                 equal_to(detail))
     assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), currency)))
+
+
+def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
+    assert_that(receipt.total, equal_to(Amount(D(total), currency)))
+    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
 
 
 if __name__ == "__name__":
