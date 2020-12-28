@@ -108,11 +108,22 @@ def test_totals_in_usd_do_not_produce_receipt(soup):
     assert_receipt_with_one_detail(receipts[0], "12.71", "Porkbun.com Order ID: 657601", "12.71", "0", "USD")
 
 
-def test_facebook_donation_does_not_produce_receipt(soup):
+def test_facebook_donation_produces_receipt(soup):
     receipts = find_receipts_new(datetime.datetime.now(), soup("facebook-donation-2020-07.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_totals(receipts[0], "10.00")
+
+
+def test_nov_2020_payment_processes_receipt(soup):
+    receipts = find_receipts_new(datetime.datetime.now(), soup("nov-2020-payment.html"))
+
+    assert_that(len(receipts), equal_to(2))
+    assert_receipt_with_one_detail(receipts[0], "8.49", "Korean GINSENG MAX 3125mg Tablets (90) EXTRA POTENCY "
+                                                        "Ginsenosides (PANAX)322883226060", "8.49")
+
+    assert_receipt_with_one_detail(receipts[1], "7.99", "GINKGO BILOBA 6000MG TABLETS HIGH STRENGTH "
+                                                        "✅UK Made ✅Letterbox Friendly [90]121738405227", "7.99")
 
 
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):

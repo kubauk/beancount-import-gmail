@@ -196,7 +196,9 @@ def extract_receipt_data_from_tables(soup):
             receipt_table_data = []
             for row in table.find_all("tr"):
                 if row.get_text().strip():
-                    receipt_table_data.append(extract_row_text(row))
+                    extracted_text = extract_row_text(row)
+                    if len(extracted_text) == 2 or len(extracted_text) == 4:
+                        receipt_table_data.append(extracted_text)
             receipt_data.extend(post_process_for_new_format(receipt_table_data))
     return receipt_data
 
