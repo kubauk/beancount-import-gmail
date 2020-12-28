@@ -78,13 +78,13 @@ def test_donation_format_dec_2017_produces_correct_receipt(soup):
     assert_receipt_with_one_detail(receipts[0], "50.00", "Anxiety UK Donation", "50.00")
 
 
-def test_donation_format_june_2018_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("june-2018.html"))
+def test_format_june_2018_produces_correct_receipt(soup):
+    receipts = find_receipts_new(datetime.datetime.now(), soup("june-2018.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "4.49",
-                                   "Derby Premium Black Stainless | Double Edge Razor Blades |  "
-                                   "Premium Safety DE [50 (10 packs of 5)] Item Number\n\n\n132213313603", "4.49")
+                                   "Derby Premium Black Stainless | Double Edge Razor Blades | "
+                                   "Premium Safety DE [50 (10 packs of 5)] Item Number 132213313603", "4.49")
 
 
 def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
