@@ -32,47 +32,12 @@ class NoReceiptsFoundException(ParseException):
     pass
 
 
-class NoTableFoundException(ParseException):
-    pass
-
-
 class NoCharsetException(ParseException):
     pass
 
 
-def parse_new_format(message_date, soup, tables, receipts):
-    while len(tables) >= 1:
-        receipts.append(extract_new_format_receipt(message_date, tables))
-
-
-def parse_original_format(message_date, soup, tables, receipts):
-    if len(tables) == 2:
-        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
-                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
-
-        receipts.append(extract_original_format_receipt(message_date, negate, tables))
-
-
 def _extract_donation_details(text):
     return DONATION_DETAILS_RE.search(text).groupdict()
-
-
-def parse_donation(message_date, table, receipts):
-    details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
-
-    receipts.append(
-        Receipt(message_date, [(details['Purpose'], details['Donation'])], [("Total", details['Total'])], False))
-
-
-def extract_new_format_receipt(message_date, tables):
-    receipt_details, totals = extract_new_format_receipt_details_from_table(tables.pop(0))
-    return Receipt(message_date, receipt_details, totals, False)
-
-
-def extract_original_format_receipt(message_date, negate, tables):
-    receipt_details = extract_receipt_details_from_table(tables.pop(0), skip_header=True)
-    totals = extract_receipt_details_from_table(tables.pop(0))
-    return Receipt(message_date, receipt_details, totals, negate)
 
 
 def contains_interesting_table(table_element):
@@ -81,60 +46,6 @@ def contains_interesting_table(table_element):
            POSTAGE_AND_PACKAGING_RE.match(stripped_text) is not None or \
            "Subtotal" in stripped_text or \
            "Total" in stripped_text
-
-
-def next_sibling_tag(first):
-    sibling = first.next_sibling
-    while type(sibling) is not bs4.Tag and sibling is not None:
-        sibling = sibling.next_sibling
-    return sibling
-
-
-def sanitise_html(soup):
-    for tag in ["div", "span"]:
-        [div.unwrap() for div in soup.find_all(tag)]
-
-
-def extract_receipt_details_from_table(table, skip_header=False):
-    sanitise_html(table)
-    receipt_details = list()
-
-    row = next_sibling_tag(table.tr) if skip_header else table.tr
-    while row is not None:
-        columns = row.find_all('td')
-        description = columns[0].get_text(strip=True, separator=u' ')
-        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
-
-        if (description is not None and description is not '') \
-                and (total is not None and total is not ''):
-            receipt_details.append((description, total))
-        row = next_sibling_tag(row)
-
-    return receipt_details
-
-
-def extract_new_format_receipt_details_from_table(table):
-    receipt_details = list()
-    totals = list()
-    for row in table.find_all('tr', class_="datarow"):
-        columns = row.find_all('td')
-        description = columns[0].get_text(separator=u' ').strip()
-        total = columns[len(columns) - 1].get_text(strip=True, separator=u' ')
-        if (description is not None and description is not '') \
-                and (total is not None and total is not ''):
-            receipt_details.append((description, total))
-
-    for row in table.find_all('tr'):
-        columns = row.find_all('td')
-        if len(columns) == 0:
-            continue
-        description = columns[len(columns) - 2].get_text(separator=u' ').strip()
-        total = columns[len(columns) - 1].get_text(separator=u' ').strip()
-        if (description is not None and description is not '') \
-                and (total is not None and total is not ''):
-            totals.append((description, total))
-
-    return receipt_details, totals
 
 
 def extract_text(element):
@@ -173,7 +84,7 @@ def extract_row_text(row):
     return cell_text
 
 
-def post_process_for_new_format(receipt_table_data):
+def post_process_for_alternate_format(receipt_table_data):
     result = [[]]
     for row in receipt_table_data:
         if len(row) == 3:
@@ -199,11 +110,20 @@ def extract_receipt_data_from_tables(soup):
                     extracted_text = extract_row_text(row)
                     if len(extracted_text) == 2 or len(extracted_text) == 4:
                         receipt_table_data.append(extracted_text)
-            receipt_data.extend(post_process_for_new_format(receipt_table_data))
+            receipt_data.extend(post_process_for_alternate_format(receipt_table_data))
     return receipt_data
 
 
-def find_receipts_new(message_date, soup):
+def extract_receipt_details_from_donation(soup):
+    table = soup.find("table", {"id": re.compile(UUID_PATTERN)})
+    dontation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
+    receipt_details = [['Description', 'Unit Price', 'Quantity', 'Amount'],
+                       [dontation_details['Purpose'], '', '', dontation_details['Donation']]]
+    total_details = [["Total", dontation_details['Total']]]
+    return [receipt_details, total_details]
+
+
+def find_receipts(message_date, soup):
     receipt_data = extract_receipt_details_from_donation(soup) \
         if soup.title is not None and \
            soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
@@ -225,18 +145,9 @@ def find_receipts_new(message_date, soup):
     return receipts
 
 
-def extract_receipt_details_from_donation(soup):
-    table = soup.find("table", {"id": re.compile(UUID_PATTERN)})
-    dontation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
-    receipt_details = [['Description', 'Unit Price', 'Quantity', 'Amount'],
-                       [dontation_details['Purpose'], '', '', dontation_details['Donation']]]
-    total_details = [["Total", dontation_details['Total']]]
-    return [receipt_details, total_details]
-
-
 def extract_receipts_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
-    return find_receipts_new(message_date, soup)
+    return find_receipts(message_date, soup)
 
 
 def get_charset(message):
