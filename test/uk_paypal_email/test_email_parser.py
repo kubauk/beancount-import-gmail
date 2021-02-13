@@ -1,6 +1,6 @@
 from hamcrest.core import assert_that, is_
 
-from email_parser import contains_interesting_table
+from uk_paypal_email.parser import contains_interesting_table
 
 
 def mock_soup_table_with_row(row_text):

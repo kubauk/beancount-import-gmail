@@ -1,3 +1,5 @@
+import os.path
+
 import bs4
 from pytest import fixture
 
@@ -14,4 +16,5 @@ def test_html(request):
 
 @fixture
 def soup(test_html):
-    return lambda file_name: bs4.BeautifulSoup(test_html(file_name).read(), "html.parser")
+    return lambda file_name: bs4.BeautifulSoup(
+        test_html(os.path.join(os.path.dirname(__file__), file_name)).read(), "html.parser")

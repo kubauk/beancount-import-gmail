@@ -3,7 +3,7 @@ from beancount.core.amount import add, Amount
 from beancount.core.number import ZERO
 
 from beancount_gmail.string_utils import money_string_to_amount
-from beancount_gmail.common_re import POSTAGE_AND_PACKAGING_RE
+from beancount_gmail.uk_paypal_email.common_re import POSTAGE_AND_PACKAGING_RE
 
 ZERO_GBP = Amount(ZERO, "GBP")
 
@@ -79,3 +79,7 @@ class Receipt(object):
         if self.postage_and_packing != ZERO_GBP:
             transaction.postings.append(self._postage_and_packing_posting(postage_account))
         return transaction
+
+
+class NoReceiptsFoundException(Exception):
+    pass
