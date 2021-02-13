@@ -4,7 +4,7 @@ from datetime import timedelta
 
 import gmailmessagessearch.retriever
 from beancount.core.data import Transaction
-from beancount.ingest.importer import ImporterProtocol
+from beangulp.importer import ImporterProtocol
 
 from beancount_gmail.email_parser import extract_receipts
 
