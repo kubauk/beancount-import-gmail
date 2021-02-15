@@ -10,7 +10,7 @@ from beancount_gmail.email_parser import extract_receipts
 
 
 def pairs_match(transaction, receipt):
-    if receipt and transaction.date == receipt.message_date.date():
+    if receipt and transaction.date == receipt.receipt_date.date():
         if transaction.postings[0].units == -receipt.total:
             return True
     return False

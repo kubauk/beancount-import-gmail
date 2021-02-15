@@ -61,10 +61,10 @@ def _with_meta(amount, description):
 
 
 class Receipt(object):
-    def __init__(self, message_date, receipt_details, totals, negate):
+    def __init__(self, receipt_date, receipt_details, totals, negate):
         self.total = None
         self.postage_and_packing = None
-        self.message_date = message_date
+        self.receipt_date = receipt_date
         self.receipt_details = list()
 
         self.sub_total = ZERO_GBP
