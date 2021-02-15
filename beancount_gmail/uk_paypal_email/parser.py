@@ -3,16 +3,12 @@ import re
 from bs4 import NavigableString
 
 import receipt
-from beancount_gmail.receipt import Receipt, NoReceiptsFoundException
-from beancount_gmail.uk_paypal_email.common_re import POSTAGE_AND_PACKAGING_RE, DONATION_DETAILS_RE, UUID_PATTERN
+from beancount_gmail.uk_paypal_email.common_re import DONATION_DETAILS_RE, UUID_PATTERN
 
 
 def contains_interesting_table(table_element):
     stripped_text = table_element.get_text(separator=u' ').strip()
-    return receipt.DESCRIPTION in stripped_text or \
-           POSTAGE_AND_PACKAGING_RE.match(stripped_text) is not None or \
-           "Subtotal" in stripped_text or \
-           "Total" in stripped_text
+    return receipt.contain_interesting_receipt_fields(stripped_text)
 
 
 def _extract_donation_details(text):
@@ -108,9 +104,9 @@ def find_receipts(message_date, soup):
         negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
                  soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
 
-        receipts.append(Receipt(message_date, receipt_details, total_details, negate))
+        receipts.append(receipt.Receipt(message_date, receipt_details, total_details, negate))
 
     if len(receipts) == 0:
-        raise NoReceiptsFoundException("Did not find any receipts")
+        raise receipt.NoReceiptsFoundException("Did not find any receipts")
 
     return receipts

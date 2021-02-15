@@ -1,8 +1,5 @@
 import re
 
-
-POSTAGE_AND_PACKAGING_RE = re.compile("Postage and packaging(?! .)")
-
 DONATION_DETAILS_RE = re.compile(r"Donation amount:(?P<Donation>£\d+\.\d\d [A-Z]{3}) +"
                                  r"Total:(?P<Total>£\d+\.\d\d [A-Z]{3}) +"
                                  r"Purpose:(?P<Purpose>[ \S]+\S) +"

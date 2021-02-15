@@ -1,9 +1,10 @@
+import re
+
 from beancount.core import data
 from beancount.core.amount import add, Amount
 from beancount.core.number import ZERO
 
 from beancount_gmail.string_utils import money_string_to_amount
-from beancount_gmail.uk_paypal_email.common_re import POSTAGE_AND_PACKAGING_RE
 
 ZERO_GBP = Amount(ZERO, "GBP")
 
@@ -12,10 +13,30 @@ DESCRIPTION = "Description"
 UNIT_PRICE = "Unit Price"
 QUANTITY = "Quantity"
 AMOUNT = "Amount"
+SUB_TOTAL = "Subtotal"
+TOTAL = "Total"
+
+POSTAGE_AND_PACKAGING_RE = re.compile("Postage and packaging(?! .)")
+
+
+def match_field_lambda(field):
+    return lambda t: field if field in t else None
+
 
 RECEIPT_DETAILS = [
-    (POSTAGE_AND_PACKAGING, lambda t: POSTAGE_AND_PACKAGING_RE.match(t))
+    (POSTAGE_AND_PACKAGING, lambda t: POSTAGE_AND_PACKAGING_RE.match(t)),
+    (DESCRIPTION, match_field_lambda(DESCRIPTION)),
+    (SUB_TOTAL, match_field_lambda(SUB_TOTAL)),
+    (TOTAL, match_field_lambda(TOTAL))
 ]
+
+
+def contain_interesting_receipt_fields(text):
+    for detail in RECEIPT_DETAILS:
+        if detail[1](text) is not None:
+            return True
+    return False
+
 
 
 def _strip_newlines(description):
