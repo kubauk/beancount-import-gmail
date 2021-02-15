@@ -17,10 +17,10 @@ def _extract_donation_details(text):
 
 def extract_receipt_details_from_donation(soup):
     table = soup.find("table", {"id": re.compile(UUID_PATTERN)})
-    dontation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
+    donation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
     receipt_details = [[receipt.DESCRIPTION, receipt.UNIT_PRICE, receipt.QUANTITY, receipt.AMOUNT],
-                       [dontation_details['Purpose'], '', '', dontation_details['Donation']]]
-    total_details = [["Total", dontation_details['Total']]]
+                       [donation_details['Purpose'], '', '', donation_details['Donation']]]
+    total_details = [["Total", donation_details['Total']]]
     return [receipt_details, total_details]
 
 

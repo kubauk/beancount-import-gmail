@@ -38,7 +38,6 @@ def contain_interesting_receipt_fields(text):
     return False
 
 
-
 def _strip_newlines(description):
     return description.replace('\n', ' ')
 
