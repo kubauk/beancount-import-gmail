@@ -2,13 +2,14 @@ import re
 
 from bs4 import NavigableString
 
+import receipt
 from beancount_gmail.receipt import Receipt, NoReceiptsFoundException
 from beancount_gmail.uk_paypal_email.common_re import POSTAGE_AND_PACKAGING_RE, DONATION_DETAILS_RE, UUID_PATTERN
 
 
 def contains_interesting_table(table_element):
     stripped_text = table_element.get_text(separator=u' ').strip()
-    return "Description" in stripped_text or \
+    return receipt.DESCRIPTION in stripped_text or \
            POSTAGE_AND_PACKAGING_RE.match(stripped_text) is not None or \
            "Subtotal" in stripped_text or \
            "Total" in stripped_text
@@ -18,32 +19,10 @@ def _extract_donation_details(text):
     return DONATION_DETAILS_RE.search(text).groupdict()
 
 
-def find_receipts(message_date, soup):
-    receipt_data = extract_receipt_details_from_donation(soup) \
-        if soup.title is not None and \
-           soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
-        else extract_receipt_data_from_tables(soup)
-
-    receipts = []
-    while len(receipt_data) > 0:
-        receipt_details = [(detail[0], detail[3]) for detail in receipt_data.pop(0)[1:]]
-        total_details = [(detail[0], detail[1]) for detail in receipt_data.pop(0) if len(detail) == 2]
-
-        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
-                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
-
-        receipts.append(Receipt(message_date, receipt_details, total_details, negate))
-
-    if len(receipts) == 0:
-        raise NoReceiptsFoundException("Did not find any receipts")
-
-    return receipts
-
-
 def extract_receipt_details_from_donation(soup):
     table = soup.find("table", {"id": re.compile(UUID_PATTERN)})
     dontation_details = _extract_donation_details(table.get_text().replace(u"\xa0", " ").replace("\n", " "))
-    receipt_details = [['Description', 'Unit Price', 'Quantity', 'Amount'],
+    receipt_details = [[receipt.DESCRIPTION, receipt.UNIT_PRICE, receipt.QUANTITY, receipt.AMOUNT],
                        [dontation_details['Purpose'], '', '', dontation_details['Donation']]]
     total_details = [["Total", dontation_details['Total']]]
     return [receipt_details, total_details]
@@ -113,3 +92,25 @@ def extract_receipt_data_from_tables(soup):
                         receipt_table_data.append(extracted_text)
             receipt_data.extend(post_process_for_alternate_format(receipt_table_data))
     return receipt_data
+
+
+def find_receipts(message_date, soup):
+    receipt_data = extract_receipt_details_from_donation(soup) \
+        if soup.title is not None and \
+           soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
+        else extract_receipt_data_from_tables(soup)
+
+    receipts = []
+    while len(receipt_data) > 0:
+        receipt_details = [(detail[0], detail[3]) for detail in receipt_data.pop(0)[1:]]
+        total_details = [(detail[0], detail[1]) for detail in receipt_data.pop(0) if len(detail) == 2]
+
+        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
+                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
+
+        receipts.append(Receipt(message_date, receipt_details, total_details, negate))
+
+    if len(receipts) == 0:
+        raise NoReceiptsFoundException("Did not find any receipts")
+
+    return receipts

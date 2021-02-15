@@ -38,8 +38,10 @@ class GmailImporter(ImporterProtocol):
                                                             'from:service@paypal.co.uk', self._secrets_directory)
 
         dates = sorted({date_or_datetime(transaction) for transaction in transactions
-                 if isinstance(transaction, Transaction)})
-        receipts = [receipt for email in retriever.get_messages_for_date_range(min(dates), max(dates) + timedelta(days=1))
+                        if isinstance(transaction, Transaction)})
+
+        receipts = [receipt for email in
+                    retriever.get_messages_for_date_range(min(dates), max(dates) + timedelta(days=1))
                     for receipt in extract_receipts(email)]
 
         for transaction in transactions:

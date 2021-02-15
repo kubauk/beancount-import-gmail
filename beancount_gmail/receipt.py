@@ -7,6 +7,16 @@ from beancount_gmail.uk_paypal_email.common_re import POSTAGE_AND_PACKAGING_RE
 
 ZERO_GBP = Amount(ZERO, "GBP")
 
+POSTAGE_AND_PACKAGING = "Postage and Packaging"
+DESCRIPTION = "Description"
+UNIT_PRICE = "Unit Price"
+QUANTITY = "Quantity"
+AMOUNT = "Amount"
+
+RECEIPT_DETAILS = [
+    (POSTAGE_AND_PACKAGING, lambda t: POSTAGE_AND_PACKAGING_RE.match(t))
+]
+
 
 def _strip_newlines(description):
     return description.replace('\n', ' ')
@@ -24,8 +34,13 @@ def _posting(account, amount):
     return data.Posting(account, amount, None, None, None, dict())
 
 
-class Receipt(object):
+def _with_meta(amount, description):
+    posting = _posting("ReplaceWithAccount", amount)
+    posting.meta['description'] = _sanitise_description(description)
+    return posting
 
+
+class Receipt(object):
     def __init__(self, message_date, receipt_details, totals, negate):
         self.total = None
         self.postage_and_packing = None
@@ -55,13 +70,8 @@ class Receipt(object):
             self.postage_and_packing = Amount(ZERO, self.total.currency)
 
     def _receipt_details_postings(self):
-        return [self._with_meta(amount, description) for description, amount in
+        return [_with_meta(amount, description) for description, amount in
                 self.receipt_details]
-
-    def _with_meta(self, amount, description):
-        posting = _posting("ReplaceWithAccount", amount)
-        posting.meta['description'] = _sanitise_description(description)
-        return posting
 
     def _postage_and_packing_posting(self, postage_account):
         return _posting(postage_account, self.postage_and_packing)
