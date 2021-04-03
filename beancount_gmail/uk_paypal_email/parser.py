@@ -2,7 +2,7 @@ import re
 
 from bs4 import NavigableString
 
-import receipt
+import beancount_gmail.receipt as receipt
 from beancount_gmail.uk_paypal_email.common_re import DONATION_DETAILS_RE, UUID_PATTERN
 
 
