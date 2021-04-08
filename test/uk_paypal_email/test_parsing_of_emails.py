@@ -126,6 +126,20 @@ def test_nov_2020_payment_processes_receipt(soup):
                                                         "✅UK Made ✅Letterbox Friendly [90]121738405227", "7.99")
 
 
+def test_jan_2021_payment_in_pln_processes_receipt(soup):
+    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/jan-2021-01-PLN.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "6.00", "Trip authorization request", "6.00", currency="PLN")
+
+
+def test_mar_2021_payment_processes_receipt(soup):
+    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/mar-2021.html"))
+
+    assert_that(len(receipts), equal_to(1))
+    assert_receipt_with_one_detail(receipts[0], "14.95", "Purchase amount", "14.95")
+
+
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
     assert_receipt_totals(receipt, total, postage, currency)
     assert_that(receipt.receipt_details[0][0],

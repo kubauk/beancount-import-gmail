@@ -1,0 +1,621 @@
+<html dir="ltr">
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+<meta content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,height=device-height,target-densitydpi=device-dpi,user-scalable=no" name="viewport"/>
+<title>You've authorised a payment to eBay</title>
+<style type="text/css">
+      /**
+ * PayPal Fonts
+ */
+      @font-face {
+        font-family: PayPal-Sans;
+        font-style: normal;
+        font-weight: 400;
+        src: local('PayPalSansSmall-Regular'), url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Regular.eot');
+        /* IE9 Compat Modes */
+        src: local('PayPalSansSmall-Regular'),
+          url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Regular.woff2') format('woff2'),
+          /* Moderner Browsers */
+          url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Regular.woff') format('woff'),
+          /* Modern Browsers */
+          url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Regular.svg#69ac2c9fc1e0803e59e06e93859bed03') format('svg');
+        /* Legacy iOS */
+        /* Fallback font for - MS Outlook older versions (2007,13, 16)*/
+        mso-font-alt: 'Calibri';
+      }
+
+      @font-face {
+        font-family: PayPal-Sans;
+        font-style: normal;
+        font-weight: 500;
+
+        src: local('PayPalSansSmall-Medium'), url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Medium.eot');
+        /* IE9 Compat Modes */
+        src: local('PayPalSansSmall-Medium'), url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Medium.woff2') format('woff2'),
+          /* Moderner Browsers */
+          url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Medium.woff') format('woff'),
+          /* Modern Browsers */
+          url('https://www.paypalobjects.com/ui-web/paypal-sans-small/1-0-0/PayPalSansSmall-Medium.svg#69ac2c9fc1e0803e59e06e93859bed03') format('svg');
+        /* Legacy iOS */
+        /* Fallback font for - MS Outlook older versions (2007,13, 16)*/
+        mso-font-alt: 'Calibri';
+      }
+
+      /* End - PayPal Fonts */
+
+      /**
+ * VX-LIB Styles
+ * Import only the styles required for Email templates.
+ */
+      @charset "UTF-8";
+
+      html {
+        box-sizing: border-box;
+      }
+
+      *,
+      *:before,
+      *:after {
+        box-sizing: inherit;
+      }
+
+      /* Setting these elements to height of 100% ensures that
+ * .vx_foreground-container fully covers the whole viewport
+ */
+      html,
+      body {
+        height: 100%;
+      }
+
+      /**
+ * @fileOverview Contains type treatment for PayPal's new VX Patterns
+ * @name type-vxPtrn
+ * @author jlowery
+ * @notes The below styles are mobile first
+ */
+      body {
+        font-size: inherit !important;
+        font-family: 'PayPal-Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-smoothing: antialiased;
+      }
+
+      a,
+      a:visited {
+        color: #0070ba;
+        text-decoration: none;
+        font-weight: 500;
+        font-family: 'PayPal-Sans', Calibri, Trebuchet, Arial, sans-serif;
+      }
+
+      a:active,
+      a:focus,
+      a:hover {
+        color: #005ea6;
+        text-decoration: underline;
+      }
+
+      p,
+      li,
+      dd,
+      dt,
+      label,
+      input,
+      textarea,
+      pre,
+      code {
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        font-weight: 400;
+        text-transform: none;
+        font-family: 'PayPal-Sans', Calibri, Trebuchet, Arial, sans-serif;
+      }
+
+      .vx_legal-text {
+        font-size: 0.8125rem;
+        line-height: 1.38461538;
+        font-weight: 400;
+        text-transform: none;
+        font-family: 'PayPal-Sans', sans-serif;
+        color: #6c7378;
+      }
+
+      /* End - VX-LIB Styles */
+
+      /**
+ * Styles from Neptune
+ */
+      /* prevent iOS font upsizing */
+      * {
+        -webkit-text-size-adjust: none;
+      }
+
+      /* force Outlook.com to honor line-height */
+      .ExternalClass * {
+        line-height: 100%;
+      }
+
+      td {
+        mso-line-height-rule: exactly;
+      }
+
+      /* prevent iOS auto-linking */
+      /* Android margin fix */
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'PayPal-Sans', Calibri, Trebuchet, Arial, sans-serif !important;
+        background: "#f2f2f2";
+        color: '#2c2e2f';
+      }
+
+      div[style*="margin: 16px 0"] {
+        margin: 0 !important;
+      }
+
+      /** Prevent Outlook Purple Links **/
+      .greyLink a:link {
+        color: #949595;
+      }
+
+      /* prevent iOS auto-linking */
+      .applefix a {
+        /* use on a span around the text */
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .ppsans {
+        font-family: 'PayPal-Sans', Calibri, Trebuchet, Arial, sans-serif !important;
+      }
+
+      /* use to make image scale to 100 percent */
+      .mpidiv img {
+        width: 100%;
+        height: auto;
+        min-width: 100%;
+        max-width: 100%;
+      }
+
+      .stackTbl {
+        width: 100%;
+        display: table;
+      }
+
+      .greetingText {
+        padding: 0px 20px;
+      }
+
+      /* Responsive CSS */
+      @media screen and (max-width: 640px) {
+
+        /*** Image Width Styles ***/
+        .imgWidth {
+          width: 20px !important;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+
+        /*** Image Width Styles ***/
+        .imgWidth {
+          width: 10px !important;
+        }
+
+        .greetingText {
+          padding: 0;
+        }
+      }
+
+      /* End - Responsive CSS */
+
+      /* Fix for Neptune partner logo */
+      .partner_image {
+        max-width: 250px;
+        max-height: 90px;
+        display: block;
+      }
+
+      /* End - Styles from Neptune */
+    </style>
+</head>
+<body>
+<h4 id="preHeader" style="display:none;color:#fff;font-size:0px;line-height:0px">Jakub Jamro, thanks for using PayPal.</h4>
+<table border="0" cellpadding="0" cellspacing="0" class="marginFix" width="100%">
+<tbody>
+<tr>
+<td bgcolor="#ffffff" class="mobMargin" style="font-size:0px"></td>
+<td align="center" bgcolor="#ffffff" class="mobContent" width="660">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" width="100%">
+<tbody>
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td align="center" class="greetingText" colspan="3" width="600">
+<table bgcolor="#f5f7fa" border="0" cellpadding="0" cellspacing="0" dir="ltr" width="100%">
+<tbody>
+<tr>
+<td align="center" style="font-size:14px;line-height:18px;color:#687173;padding:20px">Hi Jakub Jamro,</td>
+</tr>
+<tr>
+<td align="center" valign="bottom"><img alt="" border="0" data-testid="circletop-image" height="16" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/pplogo-circletop-sm.png" style="display:block" width="116"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td class="mobMargin"></td>
+<td align="center" width="600"><img alt="PayPal" border="0" height="71" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/pp-logo.png" style="display:block" title="PayPal" width="116"/></td>
+<td class="mobMargin"></td>
+</tr>
+<tr>
+<td align="center" bgcolor="#004f9b" class="mobMargin" style="min-width:10px" valign="top"><img alt="" border="0" class="imgWidth" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/header-sidebar-left-top.jpg" style="display:block" width="100%"/></td>
+<td align="center" width="600">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td align="center" valign="top" width="12"><img alt="" border="0" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/header-left-corner.png" style="display:block" width="12"/></td>
+<td align="center" valign="top" width="229"><img alt="" border="0" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/header-left.png" style="display:block" width="100%"/></td>
+<td align="center" valign="top" width="118"><img alt="" border="0" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/header-center-circle.png" style="display:block" width="118"/></td>
+<td align="center" valign="top" width="229"><img alt="" border="0" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/header-right.png" style="display:block" width="100%"/></td>
+<td align="center" valign="top" width="12"><img alt="" border="0" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/header-right-corner.png" style="display:block" width="12"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align="center" bgcolor="#004f9b" class="mobMargin" style="min-width:10px" valign="top"><img alt="" border="0" class="imgWidth" height="81" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/header-sidebar-right-top.jpg" style="display:block" width="100%"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" class="ppsans" dir="ltr" width="100%">
+<tbody>
+<tr>
+<td align="left" class="mobMargin" style="min-width:10px" valign="top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td align="center" bgcolor="#004f9b" valign="top"><img alt="" border="0" class="imgWidth" height="96" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/header-sidebar-left-bottom.jpg" style="display:block" width="100%"/></td>
+</tr>
+<tr>
+<td align="right" valign="top"><img alt="" height="100" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/sidebar-gradient.png" style="display:block" width="1"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align="center" valign="top" width="600"><br/>
+<table border="0" cellpadding="0" cellspacing="0" style="padding:0px 20px 30px 20px;word-break:break-word" width="100%">
+<tbody>
+<tr>
+<td align="center">
+<p class="ppsans" dir="ltr" style="font-size:32px;line-height:40px;color:#2c2e2f;margin:0"><span>You authorised a payment of £14.95 GBP to eBay</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td style="padding:0px 10px 20px 10px">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" id="cartDetails" style="font-size:16px" width="100%">
+<tbody>
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 10px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:24px;color:#2c2e2f;margin:0;word-break:break-word"><span>Your money will be transferred when the seller processes your payment. <br/><br/>Thanks for using PayPal. To see the full transaction details, log in to your PayPal account.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td style="padding:0px 10px 20px 10px">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" id="cartDetails" style="font-size:16px" width="100%">
+<tbody>
+<tr>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Transaction ID</strong></span><br><a href="https://www.paypal.com/myaccount/transaction/details/4ER34778U7706101D?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;calc=fa245f256dfc1&amp;unp_tpcid=null&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" target="_blank">4ER34778U7706101D</a></br></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Transaction date</strong></span><br><span>28 Mar 2021 15:12:10 BST</span></br></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr></tr>
+<tr>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Seller</strong></span><br/><span>eBay<br/></span><span>http://ebay.co.uk/help<br/></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Instructions to seller</strong></span><br/><span>You haven't entered any instructions.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Invoice ID</strong></span><br/><span>36105c48-cd76-4629-8456-3b1a8cbe7690</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><b>Delivery address</b></span><br/>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:24px;color:#2c2e2f;margin:0;word-break:break-word"><span>Jakub Jamro<br/>179 Hillcross Avenue<br/>Morden<br/>SURREY<br/>SM4 4AZ<br/>United Kingdom</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td style="padding:0px 10px;text-align:left;border-top:0px;width:50%;vertical-align:top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 0px 20px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:25px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Delivery details</strong></span><br/><span style="font-size:16px;color:#2c2e2f"><span>The seller hasn't provided any delivery details yet.</span></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td style="padding:0px 10px 20px 10px">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" id="cartDetails" style="font-size:16px" width="100%">
+<tbody>
+<tr>
+<th style="border-bottom:1px solid #B7BCBF;padding:15px 10px;text-align:left;border-top:1px solid #B7BCBF;background-color:#F5F7FA"><span>Description</span></th>
+<th style="border-bottom:1px solid #B7BCBF;padding:15px 10px;text-align:left;border-top:1px solid #B7BCBF;background-color:#F5F7FA;width:100px"><span>Unit price</span></th>
+<th style="border-bottom:1px solid #B7BCBF;padding:15px 10px;text-align:left;border-top:1px solid #B7BCBF;background-color:#F5F7FA"><span>Qty</span></th>
+<th style="border-bottom:1px solid #B7BCBF;padding:15px 10px;text-align:right;border-top:1px solid #B7BCBF;background-color:#F5F7FA;width:135px"><span>Amount</span></th>
+</tr>
+<tr>
+<td style="border-bottom:1px solid #CBD2D6;padding:10px 10px;text-align:left;border-top:0px;line-height:22px"><span style="font-size:16px;color:#2c2e2f"><span>Purchase amount </span></span></td>
+<td style="border-bottom:1px solid #CBD2D6;padding:10px 10px;text-align:left;border-top:0px"><span>£14.95 GBP</span></td>
+<td style="border-bottom:1px solid #CBD2D6;padding:10px 10px;text-align:left;border-top:0px"><span>1</span></td>
+<td style="border-bottom:1px solid #CBD2D6;padding:10px 10px;text-align:right;border-top:0px"><span>£14.95 GBP</span></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td style="padding:0px 10px 20px 10px">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" id="cartDetails" style="font-size:16px" width="100%">
+<tbody>
+<tr>
+<td colspan="1" style="text-align:right;padding:5px 10px 0px 0px"><span><strong>Subtotal</strong></span></td>
+<td style="text-align:right;padding:5px 10px 0px 0px;width:135px"><span>£14.95 GBP</span></td>
+</tr>
+<tr>
+<td colspan="1" style="text-align:right;padding:5px 10px 0px 0px"><span><strong>Total</strong></span></td>
+<td style="text-align:right;padding:5px 10px 0px 0px;width:135px"><span>£14.95 GBP</span></td>
+</tr>
+<tr>
+<td colspan="1" style="text-align:right;padding:5px 10px 0px 0px;padding-top:15px;padding-bottom:10px"><span><strong>Payment</strong></span></td>
+<td style="text-align:right;padding:5px 10px 0px 0px;width:135px;padding-top:15px;padding-bottom:10px"><span>£14.95 GBP</span></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:0px 20px 20px 20px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:24px;color:#2c2e2f;margin:0;word-break:break-word"><span><strong>Issues with this transaction?</strong></span>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td class="ppsans" style="padding:5px 0px">
+<p class="ppsans" dir="ltr" style="font-size:16px;line-height:24px;color:#2c2e2f;margin:0;word-break:break-word"><span>You have 180 days from the date of the transaction to open a dispute in the Resolution Centre.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td align="left" class="mobMargin" style="min-width:10px" valign="top">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td align="center" bgcolor="#004f9b" valign="top"><img border="0" class="imgWidth" height="96" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/header-sidebar-right-bottom.jpg" style="display:block" width="100%"/></td>
+</tr>
+<tr>
+<td align="left" valign="top"><img height="100" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/sidebar-gradient.png" style="display:block" width="1"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td class="mobMargin"></td>
+<td align="center" width="600">
+<table border="0" cellpadding="0" cellspacing="0" dir="ltr" width="100%">
+<tbody>
+<tr>
+<td>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td align="center" valign="top" width="12"><img alt="" border="0" height="141" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/footer-left-corner.png" style="display:block" width="12"/></td>
+<td align="center" valign="top"><img alt="" border="0" height="141" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/footer-left-stroke.png" style="display:block" width="100%"/></td>
+<td align="center" valign="top" width="120"><img alt="PayPal" border="0" height="141" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/footer-pp-logo.png" style="display:block" width="120"/></td>
+<td align="center" valign="top"><img alt="" border="0" height="141" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/footer-right-stroke.png" style="display:block" width="100%"/></td>
+<td align="center" valign="top" width="12"><img alt="" border="0" height="141" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/footer-right-corner.png" style="display:block" width="12"/></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" id="body_footer_links" width="100%">
+<tbody>
+<tr>
+<td align="center" class="ppsans" style="font-size:15px;line-height:22px;color:#444444;padding:20px"><a alt="Help &amp; Contact" class="ppsans" href="https://www.paypal.com/gb/smarthelp/home?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Help &amp; Contact</a><span> | </span><a alt="Security" class="ppsans" href="https://www.paypal.com/gb/webapps/mpp/paypal-safety-and-security?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Security</a><span> | </span><a alt="Apps" class="ppsans" href="https://www.paypal.com/gb/webapps/mpp/mobile-apps?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Apps</a></td>
+</tr>
+<tr>
+<td align="center" style="padding-bottom:20px">
+<table align="center" border="0" cellpadding="0" cellspacing="0">
+<tbody>
+<tr>
+<td align="center" valign="middle" width="50"><a href="https://twitter.com/PayPal?v=1%2C0.1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" id="twitter" target="_blank"><img alt="Twitter" border="0" height="28" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/icon-tw.png" style="display:block" width="28"/></a></td>
+<td align="center" valign="middle" width="50"><a href="https://www.instagram.com/paypal/?v=1%2C0.1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" id="instagram" target="_blank"><img alt="Instagram" border="0" height="28" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/icon-ig.png" style="display:block" width="28"/></a></td>
+<td align="center" valign="middle" width="50"><a href="https://www.facebook.com/PayPalUSA?v=1%2C0.1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" id="facebook" target="_blank"><img alt="Facebook" border="0" height="28" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/icon-fb.png" style="display:block" width="28"/></a></td>
+<td align="center" valign="middle" width="50"><a href="http://www.linkedin.com/company/1482?trk=tyah&amp;v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" id="linkedin" target="_blank"><img alt="LinkedIn" border="0" height="28" src="https://www.paypalobjects.com/digitalassets/c/system-triggered-email/n/layout/images/dark-mode/icon-li.png" style="display:block" width="28"/></a></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td class="mobMargin"></td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" style="padding-bottom:20px" width="100%">
+<tbody>
+<tr>
+<td class="hide"> </td>
+<td align="center" class="ppsans" width="600">
+<table border="0" cellpadding="0" cellspacing="0" id="hideForTextFooter" width="100%">
+<tbody>
+<tr>
+<td style="font-size:13px;line-height:20px;color:#687173;padding:10px 30px 10px 30px">
+<p class="ppsans" dir="ltr" style="font-size:13px;margin:0"><span>PayPal is committed to preventing fraudulent emails. Emails from PayPal will always contain your full name. <a href="https://www.paypal.com/uk/webapps/mpp/phishing?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Learn to identify phishing</a></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" id="hideForTextFooter" width="100%">
+<tbody>
+<tr>
+<td style="font-size:13px;line-height:20px;color:#687173;padding:10px 30px 10px 30px">
+<p class="ppsans" dir="ltr" style="font-size:13px;margin:0"><span>Please don't reply to this email. To get in touch with us, click <strong><a href="https://www.paypal.com/selfhelp/home?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Help &amp; Contact</a></strong>.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" id="" width="100%">
+<tbody>
+<tr>
+<td style="font-size:13px;line-height:20px;color:#687173;padding:10px 30px 10px 30px">
+<p class="ppsans" dir="ltr" style="font-size:13px;margin:0"><span>Not sure why you received this email? <a href="https://www.paypal.com/gb/smarthelp/article/why-am-i-receiving-emails-from-paypal-when-i-dont-have-an-account-faq4172?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=cl&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" style="color:#0070ba;text-decoration:none" target="_blank">Find out more</a></span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody>
+<tr>
+<td style="font-size:13px;line-height:20px;color:#687173;padding:10px 30px 10px 30px">
+<p class="ppsans" dir="ltr" style="font-size:13px;margin:0">
+<div dir="ltr" style="font-size:13px"><span>Copyright © 1999-2021 PayPal. All rights reserved.<br/><br/>PayPal (Europe) S.à r.l. et Cie, S.C.A. Société en Commandite par Actions Registered Office: 22–24 Boulevard Royal, L-2449 Luxembourg RCS Luxembourg B 118 349</span></div>
+<p dir="ltr" style="font-size:13px"><span>PayPal (Europe) S.à.r.l et Cie, S.C.A is duly licensed as a Luxembourg credit institution and is under the prudential supervision of the Luxembourg supervisory authority, the Commission de Surveillance du Secteur Financier.<br/><br/>PayPal is deemed authorised and regulated by the Financial Conduct Authority. The nature and extent of consumer protections may differ from those for firms based in the UK. Details of the Temporary Permissions Regime, which allows EEA-based firms to operate in the UK for a limited period while seeking full authorisation, are available on the Financial Conduct Authority's website. Some PayPal products including PayPal Pay in 3, Pay After Delivery and PayPal Working Capital are not regulated by the Financial Conduct Authority.</span></p>
+<p dir="ltr" style="font-size:13px">PayPal RT000063:en_GB(en-GB):1.0.0:fa245f256dfc1</p><img alt="" border="0" height="1" src="https://tracking.paypal.com/webapps/tracking/ts?v=1&amp;utm_source=unp&amp;utm_medium=email&amp;utm_campaign=RT000063&amp;utm_unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;ppid=RT000063&amp;cnac=GB&amp;rsta=en_GB%28en-GB%29&amp;cust=KNZCZSG4SRQKW&amp;unptid=99bd7924-8fcf-11eb-81af-b875c018446c&amp;calc=fa245f256dfc1&amp;unp_tpcid=email-receipt-xclick-payment&amp;page=main%3Aemail%3ART000063&amp;pgrp=main%3Aemail&amp;e=op&amp;mchn=em&amp;s=ci&amp;mail=sys&amp;appVersion=1.36.1&amp;xt=104038" width="1"/></p>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td class="hide"> </td>
+</tr>
+</tbody>
+</table>
+</td>
+<td bgcolor="#ffffff" class="mobMargin" style="font-size:0px"></td>
+</tr>
+</tbody>
+</table>
+</body>
+</html>
