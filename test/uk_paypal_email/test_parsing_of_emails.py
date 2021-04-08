@@ -7,7 +7,7 @@ from beancount.core.number import D
 from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
 
-from uk_paypal_email.parser import find_receipts
+from beancount_gmail.uk_paypal_email.parser import find_receipts
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
