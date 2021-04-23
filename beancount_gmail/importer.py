@@ -34,15 +34,18 @@ class GmailImporter(ImporterProtocol):
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
 
-        retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail-paypal', self._gmail_address,
-                                                            'from:service@paypal.co.uk', self._secrets_directory)
-
         dates = sorted({date_or_datetime(transaction) for transaction in transactions
                         if isinstance(transaction, Transaction)})
 
-        receipts = [receipt for email in
-                    retriever.get_messages_for_date_range(min(dates), max(dates) + timedelta(days=1))
-                    for receipt in extract_receipts(email)]
+        receipts = []
+
+        retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail', self._gmail_address,
+                                                            self._secrets_directory)
+
+        receipts.extend([receipt for email in
+                         retriever.get_messages_for_date_range('from:service@paypal.co.uk',
+                                                               min(dates), max(dates) + timedelta(days=1))
+                         for receipt in extract_receipts(email)])
 
         for transaction in transactions:
             for receipt in receipts.copy():
