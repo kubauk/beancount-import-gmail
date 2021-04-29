@@ -23,6 +23,16 @@ def date_or_datetime(transaction):
     return transaction.date
 
 
+def download_email_receipts(transactions, retriever):
+    dates = sorted({date_or_datetime(transaction) for transaction in transactions
+                    if isinstance(transaction, Transaction)})
+
+    return [receipt for email in
+            retriever.get_messages_for_date_range('from:service@paypal.co.uk',
+                                                  min(dates), max(dates) + timedelta(days=1))
+            for receipt in extract_receipts(email)]
+
+
 class GmailImporter(ImporterProtocol):
     def __init__(self, delegate, postage_account, gmail_address,
                  secrets_directory=os.path.dirname(os.path.realpath(__file__))):
@@ -34,18 +44,12 @@ class GmailImporter(ImporterProtocol):
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
 
-        dates = sorted({date_or_datetime(transaction) for transaction in transactions
-                        if isinstance(transaction, Transaction)})
-
-        receipts = []
-
         retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail', self._gmail_address,
                                                             self._secrets_directory)
 
-        receipts.extend([receipt for email in
-                         retriever.get_messages_for_date_range('from:service@paypal.co.uk',
-                                                               min(dates), max(dates) + timedelta(days=1))
-                         for receipt in extract_receipts(email)])
+        receipts = []
+
+        receipts.extend(download_email_receipts(transactions, retriever))
 
         for transaction in transactions:
             for receipt in receipts.copy():
