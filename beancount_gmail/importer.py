@@ -6,7 +6,7 @@ import gmailmessagessearch.retriever
 from beancount.core.data import Transaction
 from beangulp.importer import ImporterProtocol
 
-from beancount_gmail.email_parser import extract_receipts
+from beancount_gmail.email_processing import extract_receipts
 
 
 def pairs_match(transaction, receipt):
