@@ -1,6 +1,11 @@
+import datetime
+
 import jsonpickle
 import os
 from mailbox import Message
+
+from beancount_gmail.email_parser_protocol import EmailParser
+from beancount_gmail.receipt import Receipt
 
 DEBUGGING_DATA_DIR = "debugging"
 
@@ -36,11 +41,12 @@ def write_data_to_file(reason, extension, message_date, data_handler, file_dir):
         data_handler(out)
 
 
-def maybe_write_debugging(fn, extension, message_date, message):
+def maybe_write_debugging(fn, extension: str, parser: EmailParser,
+                          message_date: datetime.datetime, message: Message) -> list[Receipt]:
     if WRITE_DEBUG:
         write_email_to_file(None, extension, message_date, message, os.path.join(os.getcwd(), DEBUGGING_DATA_DIR))
 
-    receipts = write_email_file_on_exception(fn, extension, message_date, message)
+    receipts = write_email_file_on_exception(fn, extension, parser, message_date, message)
 
     if WRITE_DEBUG:
         write_receipts_to_file(receipts, message_date)
@@ -48,9 +54,10 @@ def maybe_write_debugging(fn, extension, message_date, message):
     return receipts
 
 
-def write_email_file_on_exception(fn, extension, message_date, message):
+def write_email_file_on_exception(fn, extension: str, parser: EmailParser,
+                                  message_date: datetime.datetime, message: Message) -> list[Receipt]:
     try:
-        return fn(message_date, message)
+        return fn(parser, message_date, message)
     except Exception as e:
         write_email_to_file(e.__class__.__name__, extension, message_date, message,
                             os.path.join(os.getcwd(), EXCLUDED_DATA_DIR))

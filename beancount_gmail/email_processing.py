@@ -1,10 +1,12 @@
 import datetime
+from mailbox import Message
 
 import bs4
 import pytz
 
 from beancount_gmail.debug_handling import maybe_write_debugging
-from beancount_gmail.uk_paypal_email import PayPalUKParser
+from beancount_gmail.email_parser_protocol import EmailParser
+from beancount_gmail.receipt import Receipt
 
 TIMEZONE = pytz.timezone("Europe/London")
 
@@ -13,14 +15,13 @@ class NoCharsetException(Exception):
     pass
 
 
-def extract_receipts_from_email(message_date, message_body):
+def extract_receipts_from_email(parser: EmailParser, message_date: datetime, message_body: bs4.BeautifulSoup):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
 
-    parser = PayPalUKParser()
     return parser.extract_receipts(message_date, soup)
 
 
-def get_charset(message):
+def get_charset(message: Message) -> str:
     if message.get_charset():
         return message.get_charset()
 
@@ -30,32 +31,32 @@ def get_charset(message):
     raise NoCharsetException()
 
 
-def process_message_text(message_date, message):
+def process_message_text(parser: EmailParser, message_date: datetime, message: Message) -> list[Receipt]:
     if message.get_content_type() == "text/html":
-        return maybe_write_debugging(extract_receipts_from_email, "html", message_date,
+        return maybe_write_debugging(extract_receipts_from_email, "html", parser, message_date,
                                      message.get_payload(decode=True).decode(get_charset(message)))
     elif message.get_content_type == "text/plain:":
-        return maybe_write_debugging(extract_receipts_from_email, "txt", message_date, message)
+        return maybe_write_debugging(extract_receipts_from_email, "txt", parser, message_date, message)
     else:
-        return list()
+        return []
 
 
-def process_message_payload(message_date, message):
+def process_message_payload(parser: EmailParser, message_date: datetime, message: Message) -> list[Receipt]:
     if message.is_multipart():
         for part in message.get_payload():
-            receipts = process_message_text(message_date, part)
+            receipts = process_message_text(parser, message_date, part)
             if receipts:
                 return receipts
-        return list()
+        return []
     else:
-        return process_message_text(message_date, message)
+        return process_message_text(parser, message_date, message)
 
 
-def extract_receipts(message):
+def extract_receipts(parser: EmailParser, message: Message) -> list[Receipt]:
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = TIMEZONE.normalize(local_message_date.astimezone(TIMEZONE))
 
     try:
-        return process_message_payload(message_date, message)
+        return process_message_payload(parser, message_date, message)
     except Exception:
         return []

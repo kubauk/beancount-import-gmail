@@ -6,7 +6,10 @@ import gmailmessagessearch.retriever
 from beancount.core.data import Transaction
 from beangulp.importer import ImporterProtocol
 
+from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.email_processing import extract_receipts
+from beancount_gmail.receipt import Receipt
+from beancount_gmail.uk_paypal_email import PayPalUKParser
 
 
 def pairs_match(transaction, receipt):
@@ -23,14 +26,15 @@ def date_or_datetime(transaction):
     return transaction.date
 
 
-def download_email_receipts(transactions, retriever):
+def download_email_receipts(parser: EmailParser, transactions: list[Transaction],
+                            retriever: gmailmessagessearch.retriever.Retriever) -> list[Receipt]:
     dates = sorted({date_or_datetime(transaction) for transaction in transactions
                     if isinstance(transaction, Transaction)})
 
     return [receipt for email in
             retriever.get_messages_for_date_range('from:service@paypal.co.uk',
                                                   min(dates), max(dates) + timedelta(days=1))
-            for receipt in extract_receipts(email)]
+            for receipt in extract_receipts(parser, email)]
 
 
 class GmailImporter(ImporterProtocol):
@@ -47,9 +51,11 @@ class GmailImporter(ImporterProtocol):
         retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail', self._gmail_address,
                                                             self._secrets_directory)
 
+        parser = PayPalUKParser()
+
         receipts = []
 
-        receipts.extend(download_email_receipts(transactions, retriever))
+        receipts.extend(download_email_receipts(parser, transactions, retriever))
 
         for transaction in transactions:
             for receipt in receipts.copy():

@@ -155,6 +155,3 @@ def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
 def _find_receipts(message_date, soup):
     return PayPalUKParser().extract_receipts(message_date, soup)
 
-
-if __name__ == "__name__":
-    pytest.main(sys.argv)

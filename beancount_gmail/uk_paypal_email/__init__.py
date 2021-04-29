@@ -4,7 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 from beancount_gmail import receipt as receipt
-from beancount_gmail.email_parse_protocol import EmailParser
+from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.uk_paypal_email.parsing import extract_receipt_details_from_donation, \
     extract_receipt_data_from_tables
