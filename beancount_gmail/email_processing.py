@@ -8,8 +8,6 @@ import pytz
 
 from beancount_gmail.uk_paypal_email.parser import find_receipts
 
-CUT_OFF_DATE = datetime.datetime(2009, 1, 1, tzinfo=pytz.utc)
-
 EXCLUDED_DATA_DIR = "./excluded"
 
 DEBUGGING_DATA_DIR = "./debugging"
@@ -90,14 +88,10 @@ def extract_receipts(message):
     local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
     message_date = TIMEZONE.normalize(local_message_date.astimezone(TIMEZONE))
 
-    if message_date < CUT_OFF_DATE:
-        write_email_to_file("TooOld", "eml", message_date, message, EXCLUDED_DATA_DIR)
-        return list()
-
     try:
         return process_message_payload(message_date, message)
     except Exception:
-        return list()
+        return []
 
 
 def maybe_write_debugging(fn, extension, message_date, message):
