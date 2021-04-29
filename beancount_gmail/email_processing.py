@@ -4,7 +4,7 @@ import bs4
 import pytz
 
 from beancount_gmail.debug_handling import maybe_write_debugging
-from beancount_gmail.uk_paypal_email.parser import find_receipts
+from beancount_gmail.uk_paypal_email import PayPalUKParser
 
 TIMEZONE = pytz.timezone("Europe/London")
 
@@ -15,7 +15,9 @@ class NoCharsetException(Exception):
 
 def extract_receipts_from_email(message_date, message_body):
     soup = bs4.BeautifulSoup(message_body, "html.parser")
-    return find_receipts(message_date, soup)
+
+    parser = PayPalUKParser()
+    return parser.extract_receipts(message_date, soup)
 
 
 def get_charset(message):

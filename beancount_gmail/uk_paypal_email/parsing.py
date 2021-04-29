@@ -1,7 +1,6 @@
 import re
 
 from bs4 import NavigableString
-
 import beancount_gmail.receipt as receipt
 from beancount_gmail.uk_paypal_email.common_re import DONATION_DETAILS_RE, UUID_PATTERN
 
@@ -88,25 +87,3 @@ def extract_receipt_data_from_tables(soup):
                         receipt_table_data.append(extracted_text)
             receipt_data.extend(post_process_for_alternate_format(receipt_table_data))
     return receipt_data
-
-
-def find_receipts(message_date, soup):
-    receipt_data = extract_receipt_details_from_donation(soup) \
-        if soup.title is not None and \
-           soup.title.find(text=re.compile(r"Receipt for your donation", re.UNICODE)) is not None \
-        else extract_receipt_data_from_tables(soup)
-
-    receipts = []
-    while len(receipt_data) > 0:
-        receipt_details = [(detail[0], detail[3]) for detail in receipt_data.pop(0)[1:]]
-        total_details = [(detail[0], detail[1]) for detail in receipt_data.pop(0) if len(detail) == 2]
-
-        negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
-                 soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
-
-        receipts.append(receipt.Receipt(message_date, receipt_details, total_details, negate))
-
-    if len(receipts) == 0:
-        raise receipt.NoReceiptsFoundException("Did not find any receipts")
-
-    return receipts

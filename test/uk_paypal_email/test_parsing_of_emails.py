@@ -1,19 +1,19 @@
 import datetime
 import sys
 
-import pytest
 from beancount.core.amount import Amount
 from beancount.core.number import D
 from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
+import pytest
 
-from beancount_gmail.uk_paypal_email.parser import find_receipts
+from beancount_gmail.uk_paypal_email import PayPalUKParser
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
 
 def test_refund_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/refund-nov-2015.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/refund-nov-2015.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "12.98", "Electronic C TWIST Shisha Variable Voltage 1300mah Battery "
@@ -22,7 +22,7 @@ def test_refund_email_produces_correct_receipt(soup):
 
 
 def test_merchant_purchase_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/merchant-purchase-nov-2015.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/merchant-purchase-nov-2015.html"))
 
     assert_that(len(receipts), equal_to(1))
 
@@ -33,7 +33,7 @@ def test_merchant_purchase_produces_correct_receipt(soup):
 
 
 def test_mar_2019_selling_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/mar-2019-selling.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/mar-2019-selling.html"))
 
     assert_that(len(receipts), equal_to(1))
 
@@ -44,7 +44,7 @@ def test_mar_2019_selling_produces_correct_receipt(soup):
 
 
 def test_new_format_dec_2015_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/new-format-dec-2015.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/new-format-dec-2015.html"))
 
     assert_that(len(receipts), equal_to(3))
 
@@ -63,7 +63,7 @@ def test_new_format_dec_2015_email_produces_correct_receipt(soup):
 
 
 def test_new_format_feb_2017_email_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/new-format-feb-2017.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/new-format-feb-2017.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "1.15",
@@ -72,14 +72,14 @@ def test_new_format_feb_2017_email_produces_correct_receipt(soup):
 
 
 def test_donation_format_dec_2017_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/donation-dec-2017.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/donation-dec-2017.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "50.00", "Anxiety UK Donation", "50.00")
 
 
 def test_format_june_2018_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/june-2018.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/june-2018.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "4.49",
@@ -88,35 +88,35 @@ def test_format_june_2018_produces_correct_receipt(soup):
 
 
 def test_dec_2018_with_suprious_postage_message_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/dec-2018-with-extra-postage-message.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/dec-2018-with-extra-postage-message.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "13.98", "Selected:", "13.98", "3.99")
 
 
 def test_nov_2020_sent_payment_produces_correct_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/nov-2020-sent-payment.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/nov-2020-sent-payment.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "5.00", "AdBlock Item No X0G0 FEOWSI wabsiec39704501", "5.00")
 
 
 def test_totals_in_usd_do_not_produce_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/totals-in-usd-2020.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/totals-in-usd-2020.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "12.71", "Porkbun.com Order ID: 657601", "12.71", "0", "USD")
 
 
 def test_facebook_donation_produces_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/facebook-donation-2020-07.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/facebook-donation-2020-07.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_totals(receipts[0], "10.00")
 
 
 def test_nov_2020_payment_processes_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/nov-2020-payment.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/nov-2020-payment.html"))
 
     assert_that(len(receipts), equal_to(2))
     assert_receipt_with_one_detail(receipts[0], "8.49", "Korean GINSENG MAX 3125mg Tablets (90) EXTRA POTENCY "
@@ -127,14 +127,14 @@ def test_nov_2020_payment_processes_receipt(soup):
 
 
 def test_jan_2021_payment_in_pln_processes_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/jan-2021-01-PLN.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/jan-2021-01-PLN.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "6.00", "Trip authorization request", "6.00", currency="PLN")
 
 
 def test_mar_2021_payment_processes_receipt(soup):
-    receipts = find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/mar-2021.html"))
+    receipts = _find_receipts(datetime.datetime.now(), soup("uk_paypal_email/samples/mar-2021.html"))
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "14.95", "Purchase amount", "14.95")
@@ -150,6 +150,10 @@ def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postag
 def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
     assert_that(receipt.total, equal_to(Amount(D(total), currency)))
     assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
+
+
+def _find_receipts(message_date, soup):
+    return PayPalUKParser().extract_receipts(message_date, soup)
 
 
 if __name__ == "__name__":
