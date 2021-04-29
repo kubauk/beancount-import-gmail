@@ -1,4 +1,6 @@
 import datetime
+from os import PathLike
+from typing import Union, AnyStr, Callable, IO
 
 import jsonpickle
 import os
@@ -14,7 +16,8 @@ EXCLUDED_DATA_DIR = "excluded"
 WRITE_DEBUG = False
 
 
-def write_email_to_file(reason, extension, message_date, message, file_dir):
+def write_email_to_file(reason: str, extension: str, message_date: datetime,
+                        message: Message, file_dir: Union[AnyStr, PathLike]) -> None:
     def data_handler(out):
         if isinstance(message, Message):
             out.write(message.as_string())
@@ -24,7 +27,7 @@ def write_email_to_file(reason, extension, message_date, message, file_dir):
     write_data_to_file(reason, extension, message_date, data_handler, file_dir)
 
 
-def write_receipts_to_file(receipts, message_date):
+def write_receipts_to_file(receipts: list[Receipt], message_date: datetime) -> None:
     def data_handler(out):
         encode = jsonpickle.encode(receipts, unpicklable=True, indent=2)
         out.write(encode)
@@ -32,7 +35,8 @@ def write_receipts_to_file(receipts, message_date):
     write_data_to_file(None, "json", message_date, data_handler, DEBUGGING_DATA_DIR)
 
 
-def write_data_to_file(reason, extension, message_date, data_handler, file_dir):
+def write_data_to_file(reason: str, extension: str, message_date: datetime,
+                       data_handler: Callable[[IO], None], file_dir: Union[AnyStr, PathLike]):
     if not os.path.exists(file_dir):
         os.mkdir(file_dir)
 
@@ -41,7 +45,8 @@ def write_data_to_file(reason, extension, message_date, data_handler, file_dir):
         data_handler(out)
 
 
-def maybe_write_debugging(fn, extension: str, parser: EmailParser,
+def maybe_write_debugging(fn: Callable[[EmailParser, datetime, Message], list[Receipt]],
+                          extension: str, parser: EmailParser,
                           message_date: datetime.datetime, message: Message) -> list[Receipt]:
     if WRITE_DEBUG:
         write_email_to_file(None, extension, message_date, message, os.path.join(os.getcwd(), DEBUGGING_DATA_DIR))
@@ -54,7 +59,8 @@ def maybe_write_debugging(fn, extension: str, parser: EmailParser,
     return receipts
 
 
-def write_email_file_on_exception(fn, extension: str, parser: EmailParser,
+def write_email_file_on_exception(fn: Callable[[EmailParser, datetime, Message], list[Receipt]],
+                                  extension: str, parser: EmailParser,
                                   message_date: datetime.datetime, message: Message) -> list[Receipt]:
     try:
         return fn(parser, message_date, message)
