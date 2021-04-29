@@ -8,9 +8,9 @@ import pytz
 
 from beancount_gmail.uk_paypal_email.parser import find_receipts
 
-EXCLUDED_DATA_DIR = "./excluded"
+EXCLUDED_DATA_DIR = "excluded"
 
-DEBUGGING_DATA_DIR = "./debugging"
+DEBUGGING_DATA_DIR = "debugging"
 
 TIMEZONE = pytz.timezone("Europe/London")
 
@@ -96,7 +96,7 @@ def extract_receipts(message):
 
 def maybe_write_debugging(fn, extension, message_date, message):
     if WRITE_DEBUG:
-        write_email_to_file(None, extension, message_date, message, DEBUGGING_DATA_DIR)
+        write_email_to_file(None, extension, message_date, message, os.path.join(os.getcwd(), DEBUGGING_DATA_DIR))
 
     receipts = write_email_file_on_exception(fn, extension, message_date, message)
 
@@ -110,5 +110,6 @@ def write_email_file_on_exception(fn, extension, message_date, message):
     try:
         return fn(message_date, message)
     except Exception as e:
-        write_email_to_file(e.__class__.__name__, extension, message_date, message, EXCLUDED_DATA_DIR)
+        write_email_to_file(e.__class__.__name__, extension, message_date, message,
+                            os.path.join(os.getcwd(), EXCLUDED_DATA_DIR))
         raise e
