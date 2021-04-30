@@ -6,8 +6,6 @@ from beancount.core import data
 from beancount.core.amount import add, Amount
 from beancount.core.number import ZERO
 
-from beancount_gmail.string_utils import money_string_to_amount
-
 ZERO_GBP = Amount(ZERO, "GBP")
 
 POSTAGE_AND_PACKAGING = "Postage and Packaging"
@@ -31,6 +29,13 @@ RECEIPT_DETAILS = [
     (SUB_TOTAL, field_value_or_none(SUB_TOTAL)),
     (TOTAL, field_value_or_none(TOTAL))
 ]
+
+
+def money_string_to_amount(money_string: str, negate: bool) -> Amount:
+    amount = Amount.from_string(re.match(r"([^-+0-9]+)?(.*)", money_string).group(2))
+    if negate:
+        amount = -amount
+    return amount
 
 
 def contain_interesting_receipt_fields(text: str) -> bool:

@@ -1,11 +1,9 @@
 import datetime
-import sys
 
 from beancount.core.amount import Amount
 from beancount.core.number import D
 from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
-import pytest
 
 from beancount_gmail.uk_paypal_email import PayPalUKParser
 
