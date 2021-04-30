@@ -1,6 +1,6 @@
 import datetime
 from os import PathLike
-from typing import Union, AnyStr, Callable, IO
+from typing import Union, AnyStr, Callable, IO, Optional
 
 import jsonpickle
 import os
@@ -16,7 +16,7 @@ EXCLUDED_DATA_DIR = "excluded"
 WRITE_DEBUG = False
 
 
-def write_email_to_file(reason: str, extension: str, message_date: datetime,
+def write_email_to_file(reason: Optional[str], extension: str, message_date: datetime,
                         message: Message, file_dir: Union[AnyStr, PathLike]) -> None:
     def data_handler(out):
         if isinstance(message, Message):
@@ -35,8 +35,8 @@ def write_receipts_to_file(receipts: list[Receipt], message_date: datetime) -> N
     write_data_to_file(None, "json", message_date, data_handler, DEBUGGING_DATA_DIR)
 
 
-def write_data_to_file(reason: str, extension: str, message_date: datetime,
-                       data_handler: Callable[[IO], None], file_dir: Union[AnyStr, PathLike]):
+def write_data_to_file(reason: Optional[str], extension: str, message_date: datetime,
+                       data_handler: Callable[[IO], None], file_dir: Union[AnyStr, PathLike]) -> None:
     if not os.path.exists(file_dir):
         os.mkdir(file_dir)
 

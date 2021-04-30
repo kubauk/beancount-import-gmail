@@ -1,6 +1,7 @@
 import datetime
 import os
-from datetime import timedelta
+from datetime import timedelta, date, datetime
+from typing import Union
 
 import gmailmessagessearch.retriever
 from beancount.core.data import Transaction
@@ -12,17 +13,17 @@ from beancount_gmail.receipt import Receipt
 from beancount_gmail.uk_paypal_email import PayPalUKParser
 
 
-def pairs_match(transaction, receipt):
+def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
     if receipt and transaction.date == receipt.receipt_date.date():
         if transaction.postings[0].units == -receipt.total:
             return True
     return False
 
 
-def date_or_datetime(transaction):
+def date_or_datetime(transaction: Transaction) -> Union[datetime, date]:
     if 'time' in transaction.meta:
-        return datetime.datetime.combine(transaction.date,
-                                         datetime.datetime.strptime(transaction.meta['time'], "%H:%M:%S").time())
+        return datetime.combine(transaction.date,
+                                datetime.strptime(transaction.meta['time'], "%H:%M:%S").time())
     return transaction.date
 
 

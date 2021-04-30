@@ -15,8 +15,9 @@ class NoCharsetException(Exception):
     pass
 
 
-def extract_receipts_from_email(parser: EmailParser, message_date: datetime, message_body: bs4.BeautifulSoup):
-    soup = bs4.BeautifulSoup(message_body, "html.parser")
+def extract_receipts_from_email(parser: EmailParser, message_date: datetime,
+                                message: Message) -> list[Receipt]:
+    soup = bs4.BeautifulSoup(message, "html.parser")
 
     return parser.extract_receipts(message_date, soup)
 
