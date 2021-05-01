@@ -1,7 +1,9 @@
 import datetime
 from typing import Any
 
-from beancount.core.data import Amount, D, Transaction
+from beancount.core.amount import Amount
+from beancount.core.data import Transaction
+from beancount.core.number import D, ONE
 from hamcrest import assert_that, is_
 
 from beancount_gmail.receipt import Receipt, TOTAL
@@ -9,7 +11,7 @@ from beancount_gmail.receipt import Receipt, TOTAL
 RECEIPT_DATETIME = datetime.datetime(2020, 3, 14, 10, 10, 0)
 NARRATION = 'Test Narration'
 POSTAGE_ACCOUNT = 'Expenses:Postage'
-ONE_POUND = Amount(D(1), 'GBP')
+ONE_POUND = Amount(ONE, 'GBP')
 TWO_POUNDS = Amount(D(2), 'GBP')
 
 

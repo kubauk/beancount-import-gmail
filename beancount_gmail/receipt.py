@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from beancount.core import data
-from beancount.core.amount import add, Amount
+from beancount.core.amount import add, Amount, A
 from beancount.core.number import ZERO
 
 ZERO_GBP = Amount(ZERO, "GBP")
@@ -32,7 +32,7 @@ RECEIPT_DETAILS = [
 
 
 def money_string_to_amount(money_string: str, negate: bool) -> Amount:
-    amount = Amount.from_string(re.match(r"([^-+0-9]+)?(.*)", money_string).group(2))
+    amount = A(re.match(r"([^-+0-9]+)?(.*)", money_string).group(2))
     if negate:
         amount = -amount
     return amount
