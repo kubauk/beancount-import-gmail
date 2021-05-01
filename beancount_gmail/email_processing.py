@@ -18,7 +18,6 @@ class NoCharsetException(Exception):
 def extract_receipts_from_email(parser: EmailParser, message_date: datetime,
                                 message: Message) -> list[Receipt]:
     soup = bs4.BeautifulSoup(message, "html.parser")
-
     return parser.extract_receipts(message_date, soup)
 
 
@@ -42,13 +41,10 @@ def process_message_text(parser: EmailParser, message_date: datetime, message: M
         return []
 
 
-def process_message_payload(parser: EmailParser, message_date: datetime, message: Message) -> list[Receipt]:
+def process_message_payload(message: Message, parser: EmailParser, message_date: datetime) -> list[Receipt]:
     if message.is_multipart():
         for part in message.get_payload():
-            receipts = process_message_text(parser, message_date, part)
-            if receipts:
-                return receipts
-        return []
+            return process_message_text(parser, message_date, part)
     else:
         return process_message_text(parser, message_date, message)
 
@@ -58,6 +54,6 @@ def extract_receipts(parser: EmailParser, message: Message) -> list[Receipt]:
     message_date = TIMEZONE.normalize(local_message_date.astimezone(TIMEZONE))
 
     try:
-        return process_message_payload(parser, message_date, message)
+        return process_message_payload(message, parser, message_date)
     except Exception:
         return []
