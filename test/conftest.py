@@ -1,5 +1,4 @@
 import email
-from email.message import Message
 
 from pytest import fixture
 

@@ -21,23 +21,13 @@ def extract_receipts_from_email(parser: EmailParser, message_date: datetime,
     return parser.extract_receipts(message_date, soup)
 
 
-def get_charset(message: Message) -> str:
-    if message.get_charset():
-        return message.get_charset()
-
-    if 'Content-Type' in message:
-        return message.get('Content-Type').split("charset=")[1]
-
-    raise NoCharsetException()
-
-
 def process_message_text(parser: EmailParser, message_date: datetime, message: Message) -> list[Receipt]:
     if message.get_content_type() == "text/html":
         return maybe_write_debugging(extract_receipts_from_email, "html", parser, message_date,
-                                     message.get_payload(decode=True).decode(get_charset(message)))
+                                     message.get_payload(decode=True).decode(message.get_content_charset()))
     elif message.get_content_type() == "text/plain":
         return maybe_write_debugging(extract_receipts_from_email, "txt", parser, message_date,
-                                     message.get_payload(decode=True).decode(get_charset(message)))
+                                     message.get_payload(decode=True).decode(message.get_content_charset()))
     else:
         return []
 
