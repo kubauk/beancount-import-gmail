@@ -86,7 +86,9 @@ class Receipt(object):
                 self.sub_total = add(self.sub_total, receipt_detail_amount)
 
         for description, amount_string in totals:
-            if description.startswith("From amount") or TOTAL in description or SUB_TOTAL in description:
+            if description.startswith("From amount") or \
+                    TOTAL in description or \
+                    SUB_TOTAL in description:
                 self.total = money_string_to_amount(amount_string, negate)
             if POSTAGE_AND_PACKAGING_RE.match(description):
                 self.postage_and_packing = money_string_to_amount(amount_string, negate)
