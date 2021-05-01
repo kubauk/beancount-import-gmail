@@ -80,7 +80,7 @@ class Receipt(object):
             receipt_detail_amount = money_string_to_amount(amount, negate)
             self.receipt_details.append((description, receipt_detail_amount))
             if not self._currencies_match(self.sub_total, receipt_detail_amount) \
-                    and self._amount_is_zero(self.sub_total):
+                    and not self.sub_total:
                 self.sub_total = receipt_detail_amount
             else:
                 self.sub_total = add(self.sub_total, receipt_detail_amount)
@@ -108,13 +108,9 @@ class Receipt(object):
     def _currencies_match(sub_total: Amount, receipt_details_total: Amount) -> bool:
         return sub_total.currency == receipt_details_total.currency
 
-    @staticmethod
-    def _amount_is_zero(sub_total: Amount) -> bool:
-        return sub_total is ZERO_GBP
-
     def append_postings(self, transaction: data.Transaction, postage_account: str):
         transaction.postings.extend(self._receipt_details_postings())
-        if self.postage_and_packing != ZERO_GBP:
+        if self.postage_and_packing:
             transaction.postings.append(self._postage_and_packing_posting(postage_account))
         return transaction
 
