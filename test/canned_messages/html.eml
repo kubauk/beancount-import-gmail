@@ -1,0 +1,19 @@
+MIME-Version: 1.0
+Date: Sat, 1 May 2021 21:45:08 +0100
+Message-ID: <CA+CGoMf1GY4RUVnG2Jgaq6-xSj4Qi-C4EnBy0S-Y8vQKstF47g@mail.gmail.com>
+Subject: Test HTML email
+From: Mrs White <white@gmail.com>
+To: Mr Brown <brown@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000e97dc105c14acd84"
+
+--000000000000e97dc105c14acd84
+Content-Type: text/plain; charset="UTF-8"
+
+This is a test HTML email
+
+--000000000000e97dc105c14acd84
+Content-Type: text/html; charset="UTF-8"
+
+<div dir="ltr">This is a test HTML email</div>
+
+--000000000000e97dc105c14acd84--

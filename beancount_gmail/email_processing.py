@@ -35,16 +35,20 @@ def process_message_text(parser: EmailParser, message_date: datetime, message: M
     if message.get_content_type() == "text/html":
         return maybe_write_debugging(extract_receipts_from_email, "html", parser, message_date,
                                      message.get_payload(decode=True).decode(get_charset(message)))
-    elif message.get_content_type == "text/plain:":
-        return maybe_write_debugging(extract_receipts_from_email, "txt", parser, message_date, message)
+    elif message.get_content_type() == "text/plain":
+        return maybe_write_debugging(extract_receipts_from_email, "txt", parser, message_date,
+                                     message.get_payload(decode=True).decode(get_charset(message)))
     else:
         return []
 
 
 def process_message_payload(message: Message, parser: EmailParser, message_date: datetime) -> list[Receipt]:
     if message.is_multipart():
-        for part in message.get_payload():
-            return process_message_text(parser, message_date, part)
+        receipts = []
+        [receipts.extend(process_message_text(parser, message_date, part))
+         for part in message.get_payload()
+         if "text/html" in part.get_content_type()]
+        return receipts
     else:
         return process_message_text(parser, message_date, message)
 
