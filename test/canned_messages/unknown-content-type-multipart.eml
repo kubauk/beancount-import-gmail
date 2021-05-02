@@ -1,0 +1,17 @@
+MIME-Version: 1.0
+Date: Sun, 2 May 2021 13:50:18 +0100
+Message-ID: <CA-CGoMf26Cq8R_pj0OtKZ+7uxO2X2fnH9i57gnJ801hyxJYFhg@mail.gmail.com>
+Subject: Test Content-Type Email
+From: Mrs White <white@gmail.com>
+To: Mr Brown <brown@gmail.com>
+Content-Type: multipart/mixed; boundary="00000000000093883805c15849a5"
+
+--00000000000093883805c15849a5
+Content-Type: application/zip; name="README.zip"
+Content-Disposition: attachment; filename="README.zip"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_ko768Uki0
+Content-ID: <f_ko768Uki0>
+
+
+--00000000000093883805c15849a5--
