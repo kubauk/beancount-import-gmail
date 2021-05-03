@@ -3,7 +3,7 @@ import os
 from datetime import timedelta, date, datetime
 from typing import Union
 
-import gmailmessagessearch.retriever
+import gmails.retriever
 from beancount.core.data import Transaction
 from beangulp.importer import ImporterProtocol
 
@@ -28,7 +28,7 @@ def date_or_datetime(transaction: Transaction) -> Union[datetime, date]:
 
 
 def download_email_receipts(parser: EmailParser, transactions: list[Transaction],
-                            retriever: gmailmessagessearch.retriever.Retriever) -> list[Receipt]:
+                            retriever: gmails.retriever.Retriever) -> list[Receipt]:
     dates = sorted({date_or_datetime(transaction) for transaction in transactions
                     if isinstance(transaction, Transaction)})
 
@@ -49,8 +49,8 @@ class GmailImporter(ImporterProtocol):
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
 
-        retriever = gmailmessagessearch.retriever.Retriever('beancount-import-gmail', self._gmail_address,
-                                                            self._secrets_directory)
+        retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address,
+                                               self._secrets_directory)
 
         parser = PayPalUKParser()
 
