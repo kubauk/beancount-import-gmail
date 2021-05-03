@@ -29,13 +29,18 @@ def date_or_datetime(transaction: Transaction) -> Union[datetime, date]:
 
 def download_email_receipts(parser: EmailParser, transactions: list[Transaction],
                             retriever: gmails.retriever.Retriever) -> list[Receipt]:
-    dates = sorted({date_or_datetime(transaction) for transaction in transactions
-                    if isinstance(transaction, Transaction)})
+    min_date, max_date = get_search_dates(transactions)
 
     return [receipt for email in
             retriever.get_messages_for_date_range('from:service@paypal.co.uk',
-                                                  min(dates), max(dates) + timedelta(days=1))
+                                                  min_date, max_date)
             for receipt in extract_receipts(parser, email)]
+
+
+def get_search_dates(transactions):
+    dates = sorted({date_or_datetime(transaction) for transaction in transactions
+                    if isinstance(transaction, Transaction)})
+    return min(dates), max(dates) + timedelta(days=1)
 
 
 class GmailImporter(ImporterProtocol):
@@ -45,18 +50,17 @@ class GmailImporter(ImporterProtocol):
         self._postage_account = postage_account
         self._gmail_address = gmail_address
         self._secrets_directory = secrets_directory
+        self._retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address,
+                                                     self._secrets_directory)
 
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
-
-        retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address,
-                                               self._secrets_directory)
 
         parser = PayPalUKParser()
 
         receipts = []
 
-        receipts.extend(download_email_receipts(parser, transactions, retriever))
+        receipts.extend(download_email_receipts(parser, transactions, self._retriever))
 
         for transaction in transactions:
             for receipt in receipts.copy():
