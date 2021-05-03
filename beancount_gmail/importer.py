@@ -27,13 +27,10 @@ def date_or_datetime(transaction: Transaction) -> Union[datetime, date]:
     return transaction.date
 
 
-def download_email_receipts(parser: EmailParser, transactions: list[Transaction],
-                            retriever: gmails.retriever.Retriever) -> list[Receipt]:
-    min_date, max_date = get_search_dates(transactions)
-
+def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Retriever,
+                            min_date: Union[date, datetime], max_date: Union[datetime, date]) -> list[Receipt]:
     return [receipt for email in
-            retriever.get_messages_for_date_range('from:service@paypal.co.uk',
-                                                  min_date, max_date)
+            retriever.get_messages_for_date_range('from:service@paypal.co.uk', min_date, max_date)
             for receipt in extract_receipts(parser, email)]
 
 
@@ -55,12 +52,13 @@ class GmailImporter(ImporterProtocol):
 
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
+        min_date, max_date = get_search_dates(transactions)
 
         parser = PayPalUKParser()
 
         receipts = []
 
-        receipts.extend(download_email_receipts(parser, transactions, self._retriever))
+        receipts.extend(download_email_receipts(parser, self._retriever, min_date, max_date))
 
         for transaction in transactions:
             for receipt in receipts.copy():
