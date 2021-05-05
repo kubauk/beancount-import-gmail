@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 
 import gmails.retriever
 import pytz as pytz
-from beancount.core.data import Transaction
+from beancount.core.data import Account, Entries, Transaction
 from beangulp.importer import ImporterProtocol
 
 from beancount_gmail.email_parser_protocol import EmailParser
@@ -28,21 +28,21 @@ def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Ret
             for receipt in extract_receipts(parser, email)]
 
 
-def get_search_dates(transactions):
+def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, datetime.date]:
     dates = sorted({transaction.date for transaction in transactions
                     if isinstance(transaction, Transaction)})
     return min(dates), max(dates) + timedelta(days=1)
 
 
 class GmailImporter(ImporterProtocol):
-    def __init__(self, delegate, postage_account, gmail_address,
-                 secrets_directory=os.path.dirname(os.path.realpath(__file__))):
+    def __init__(self, delegate: ImporterProtocol, postage_account: str, gmail_address: str,
+                 secrets_directory: str = os.path.dirname(os.path.realpath(__file__))) -> None:
         self._delegate = delegate
         self._postage_account = postage_account
         self._gmail_address = gmail_address
         self._retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address, secrets_directory)
 
-    def extract(self, file, existing_entries=None):
+    def extract(self, file, existing_entries: Entries = None) -> Entries:
         transactions = self._delegate.extract(file, existing_entries)
         min_date, max_date = get_search_dates(transactions)
 
@@ -66,5 +66,5 @@ class GmailImporter(ImporterProtocol):
     def identify(self, file):
         return self._delegate.identify(file)
 
-    def file_account(self, file):
+    def file_account(self, file) -> Account:
         return self._delegate.file_account(file)
