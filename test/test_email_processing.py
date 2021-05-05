@@ -11,7 +11,7 @@ RECEIPTS = [RECEIPT_ONE, RECEIPT_TWO]
 
 
 def test_html_is_favoured_over_text_and_parser_is_called_once(email_message):
-    message = email_message("test_emails/html.eml")
+    message = email_message("sample_emails/html.eml")
     parser = Mock(spec=EmailParser)
     parser.extract_receipts.return_value = RECEIPTS
 
@@ -23,7 +23,7 @@ def test_html_is_favoured_over_text_and_parser_is_called_once(email_message):
 
 
 def test_text_is_given_to_parse_in_absence_of_html(email_message):
-    message = email_message("test_emails/text.eml")
+    message = email_message("sample_emails/text.eml")
     parser = Mock(spec=EmailParser)
     parser.extract_receipts.return_value = RECEIPTS
 
@@ -35,7 +35,7 @@ def test_text_is_given_to_parse_in_absence_of_html(email_message):
 
 
 def test_when_parsing_fails_no_receipts_are_returned(email_message):
-    message = email_message("test_emails/html.eml")
+    message = email_message("sample_emails/html.eml")
     parser = Mock(spec=EmailParser)
     parser.extract_receipts.side_effect = Exception("test")
 
@@ -46,7 +46,7 @@ def test_when_parsing_fails_no_receipts_are_returned(email_message):
 
 
 def test_multipart_message_with_no_text_or_html_content_type_returns_no_receipts(email_message):
-    message = email_message('test_emails/unknown-content-type-multipart.eml')
+    message = email_message('sample_emails/unknown-content-type-multipart.eml')
     parser = Mock(spec=EmailParser)
 
     receipts = extract_receipts(parser, message)
@@ -56,7 +56,7 @@ def test_multipart_message_with_no_text_or_html_content_type_returns_no_receipts
 
 
 def test_message_with_no_text_or_html_content_type_returns_no_receipts(email_message):
-    message = email_message('test_emails/unknown-content-type.eml')
+    message = email_message('sample_emails/unknown-content-type.eml')
     parser = Mock(spec=EmailParser)
 
     receipts = extract_receipts(parser, message)
