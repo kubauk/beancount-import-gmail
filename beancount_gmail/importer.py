@@ -1,9 +1,8 @@
-import datetime
 import os
-from datetime import timedelta, date, datetime
-from typing import Union
+from datetime import timedelta, datetime
 
 import gmails.retriever
+import pytz as pytz
 from beancount.core.data import Transaction
 from beangulp.importer import ImporterProtocol
 
@@ -11,6 +10,8 @@ from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.email_processing import extract_receipts
 from beancount_gmail.receipt import Receipt
 from beancount_gmail.uk_paypal_email import PayPalUKParser
+
+_EUROPE_LONDON_TZ = pytz.timezone('Europe/London')
 
 
 def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
@@ -20,22 +21,15 @@ def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
     return False
 
 
-def date_or_datetime(transaction: Transaction) -> Union[datetime, date]:
-    if 'time' in transaction.meta:
-        return datetime.combine(transaction.date,
-                                datetime.strptime(transaction.meta['time'], "%H:%M:%S").time())
-    return transaction.date
-
-
 def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Retriever,
-                            min_date: Union[date, datetime], max_date: Union[datetime, date]) -> list[Receipt]:
+                            min_date: datetime, max_date: datetime) -> list[Receipt]:
     return [receipt for email in
-            retriever.get_messages_for_date_range('from:service@paypal.co.uk', min_date, max_date)
+            retriever.get_messages_for_date_range('from:service@paypal.co.uk', min_date, max_date, _EUROPE_LONDON_TZ)
             for receipt in extract_receipts(parser, email)]
 
 
 def get_search_dates(transactions):
-    dates = sorted({date_or_datetime(transaction) for transaction in transactions
+    dates = sorted({transaction.date for transaction in transactions
                     if isinstance(transaction, Transaction)})
     return min(dates), max(dates) + timedelta(days=1)
 
@@ -46,9 +40,7 @@ class GmailImporter(ImporterProtocol):
         self._delegate = delegate
         self._postage_account = postage_account
         self._gmail_address = gmail_address
-        self._secrets_directory = secrets_directory
-        self._retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address,
-                                                     self._secrets_directory)
+        self._retriever = gmails.retriever.Retriever('beancount-import-gmail', self._gmail_address, secrets_directory)
 
     def extract(self, file, existing_entries=None):
         transactions = self._delegate.extract(file, existing_entries)
