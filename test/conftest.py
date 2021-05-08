@@ -1,4 +1,5 @@
 import email
+import os
 
 from pytest import fixture
 
@@ -15,4 +16,5 @@ def test_file(request):
 
 @fixture
 def email_message(test_file):
-    return lambda file_name: email.message_from_string(test_file(file_name).read())
+    return lambda file_name: email.message_from_string(
+        test_file(os.path.join(os.path.dirname(__file__), file_name)).read())
