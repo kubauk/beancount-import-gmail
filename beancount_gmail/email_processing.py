@@ -43,9 +43,12 @@ def process_message_payload(message: Message, parser: EmailParser, message_date:
         return process_message_text(parser, message_date, message)
 
 
+def get_message_date(message):
+    return datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
+
+
 def extract_receipts(parser: EmailParser, message: Message) -> list[Receipt]:
-    local_message_date = datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
-    message_date = TIMEZONE.normalize(local_message_date.astimezone(TIMEZONE))
+    message_date = get_message_date(message)
 
     try:
         return process_message_payload(message, parser, message_date)
