@@ -2,29 +2,34 @@ import datetime
 from unittest.mock import Mock, call
 
 import gmails.retriever
-from beancount.core.data import Transaction, Open, Balance, Account
+import pytest
+from beancount.core.data import Transaction, Open, Balance, Account, Amount, create_simple_posting, D
 from beangulp.importer import ImporterProtocol
 from hamcrest import assert_that, instance_of, is_
 
 from beancount_gmail import GmailImporter
 from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.email_processing import get_message_date
-from beancount_gmail.importer import get_search_dates, download_email_receipts
+from beancount_gmail.importer import get_search_dates, download_email_receipts, pairs_match
+from beancount_gmail.receipt import Receipt
 from test.matchers import _, beautiful_soup_containing_text
+
+ACCOUNT = "ACCOUNT"
+CURRENCY = "CURRENCY"
 
 
 def test_search_date_return_correct_range_for_single_transaction():
-    min_date, max_date = get_search_dates([_mock_directive(datetime.date(2020, 3, 14), Transaction)])
+    min_date, max_date = get_search_dates([_mock_transaction(datetime.date(2020, 3, 14))])
     assert_that(min_date, is_(datetime.date(2020, 3, 14)))
     assert_that(max_date, is_(datetime.date(2020, 3, 15)))
 
 
 def test_search_date_return_correct_range_for_multiple_transaction():
     min_date, max_date = get_search_dates([
-        _mock_directive(datetime.date(2020, 3, 14), Transaction),
-        _mock_directive(datetime.date(2019, 1, 2), Transaction),
-        _mock_directive(datetime.date(2020, 2, 3), Transaction),
-        _mock_directive(datetime.date(2019, 12, 15), Transaction),
+        _mock_transaction(datetime.date(2020, 3, 14)),
+        _mock_transaction(datetime.date(2019, 1, 2)),
+        _mock_transaction(datetime.date(2020, 2, 3)),
+        _mock_transaction(datetime.date(2019, 12, 15)),
     ])
     assert_that(min_date, is_(datetime.date(2019, 1, 2)))
     assert_that(max_date, is_(datetime.date(2020, 3, 15)))
@@ -87,8 +92,46 @@ def test_support_functions_call_delegate():
     delegate.file_account.assert_called_with('file2')
 
 
+def _mock_receipt(date: datetime, number: str = None) -> Receipt:
+    receipt = Mock(spec=Receipt)
+    receipt.receipt_date = date
+    if number:
+        receipt.total = Amount(D(number), CURRENCY)
+    return receipt
+
+
 def _mock_directive(date, z):
     transaction = Mock(spec=z)
     transaction.date = date
     transaction.meta = {}
     return transaction
+
+
+def _mock_transaction(date: datetime.date) -> Transaction:
+    transaction = _mock_directive(date, Transaction)
+    transaction.postings = []
+    return transaction
+
+
+def _mock_transaction_with_posting(date: datetime.date, number: str) -> Transaction:
+    transaction = _mock_transaction(date)
+    create_simple_posting(transaction, ACCOUNT, number, CURRENCY)
+    return transaction
+
+
+@pytest.mark.parametrize("transaction, receipt, result",
+                         [(_mock_transaction(datetime.date(2020, 12, 23)),
+                           _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20)), False),
+                          (_mock_transaction_with_posting(datetime.date(2020, 12, 23), "-1.00"),
+                           _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
+                          (_mock_transaction(datetime.date(2021, 12, 23)),
+                           _mock_receipt(datetime.datetime(2021, 12, 23, 12, 32, 20), "1.00"), False),
+                          (_mock_transaction(datetime.datetime(2020, 12, 23, 1, 2, 3)),
+                           _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 3, 14), "-2.00"),
+                           _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 3, 14), "-1.00"),
+                           _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), True)]
+                         )
+def test_transaction_and_receipt_pairs_match(transaction, receipt, result):
+    assert_that(pairs_match(transaction, receipt), is_(result))

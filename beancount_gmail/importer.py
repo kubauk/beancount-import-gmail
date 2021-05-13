@@ -16,8 +16,8 @@ _EUROPE_LONDON_TZ = pytz.timezone('Europe/London')
 
 
 def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
-    if receipt and transaction.date == receipt.receipt_date.date():
-        if transaction.postings[0].units == -receipt.total:
+    if transaction.date == receipt.receipt_date.date():
+        if transaction.postings and transaction.postings[0].units == -receipt.total:
             return True
     return False
 
