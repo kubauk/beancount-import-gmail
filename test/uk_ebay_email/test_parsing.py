@@ -1,3 +1,5 @@
+import datetime
+
 from hamcrest import assert_that, is_
 
 from beancount_gmail.uk_ebay_email.parsing import first_price, extract_receipt, replace_with_currency_code
@@ -23,27 +25,21 @@ def test_first_price_is_extracted():
 
 
 def test_ebay_2019_produces_receipt(soup):
-    html = soup("sample_html/ebay-2019.eml.html")
-
-    receipt = extract_receipt(html)
+    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2019.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '2.99',
                                    'G9 Halogen 28w 370 Lumen Capsule Bulb Long Life Dimmable Energy Saving', '2.99')
 
 
 def test_ebay_2021_produces_receipt(soup):
-    html = soup("sample_html/ebay-2021.eml.html")
-
-    receipt = extract_receipt(html)
+    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '13.50',
                                    'ZURU ROBO ALIVE Robo Alive Snake Battery Robotic Toy Grey', '13.50')
 
 
 def test_ebay_2021_2_produces_receipt(soup):
-    html = soup("sample_html/ebay-2021-2.eml.html")
-
-    receipt = extract_receipt(html)
+    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021-2.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '8.89',
                                    'Electric Aroma Diffuser Essential Oil 7 Colour Changing Air Humidifier L...',

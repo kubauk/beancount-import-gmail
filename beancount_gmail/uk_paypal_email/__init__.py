@@ -32,3 +32,6 @@ class PayPalUKParser(EmailParser):
             raise receipt.NoReceiptsFoundException("Did not find any receipts")
 
         return receipts
+
+    def search_query(self):
+        return 'from:service@paypal.co.uk'

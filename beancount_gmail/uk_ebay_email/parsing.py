@@ -29,12 +29,12 @@ def first_price(rows):
     return None if len(prices) == 0 else prices[0]
 
 
-def extract_receipt(html):
-    remove_comments(html)
-    table_text = [replace_with_currency_code(extract_row_text(table)) for table in html.find_all('table')
+def extract_receipt(message_date, soup):
+    remove_comments(soup)
+    table_text = [replace_with_currency_code(extract_row_text(table)) for table in soup.find_all('table')
                   if table.find('table') is None]
     descriptions, totals = description_and_total_details(list(filter(interesting_row, table_text)))
-    return Receipt(datetime.datetime.now(), [descriptions], totals, False)
+    return Receipt(message_date, [descriptions], totals, False)
 
 
 def replace_with_currency_code(rows):

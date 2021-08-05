@@ -48,6 +48,7 @@ def test_search_date_ignores_non_transactions():
 
 def test_parser_is_called_for_every_retrieved_email(email_message):
     parser = Mock(spec=EmailParser)
+    parser.search_query.return_value = 'from:service@paypal.co.uk'
 
     email1 = email_message('sample_emails/html.eml')
     email2 = email_message('sample_emails/html2.eml')

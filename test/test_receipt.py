@@ -73,7 +73,7 @@ def _assert_posting_details(transaction: Transaction, posting_details: list[dict
 def _simple_transaction() -> Transaction:
     return Transaction(dict(), RECEIPT_DATETIME, '*', None, NARRATION, set(), set(), list())
 
-`
+
 def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
     assert_that(receipt.total, equal_to(Amount(D(total), currency)))
     assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))

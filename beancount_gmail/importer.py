@@ -25,7 +25,7 @@ def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
 def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Retriever,
                             min_date: Union[date, datetime], max_date: Union[date, datetime]) -> list[Receipt]:
     return [receipt for email in
-            retriever.get_messages_for_date_range('from:service@paypal.co.uk', min_date, max_date, _EUROPE_LONDON_TZ)
+            retriever.get_messages_for_date_range(parser.search_query(), min_date, max_date, _EUROPE_LONDON_TZ)
             for receipt in extract_receipts(parser, email)]
 
 
