@@ -6,6 +6,7 @@ from hamcrest import assert_that
 from hamcrest.core.core.isequal import equal_to
 
 from beancount_gmail.uk_paypal_email import PayPalUKParser
+from test.test_receipt import assert_receipt_totals, assert_receipt_with_one_detail
 
 ZERO_GBP = Amount(D("0.00"), "GBP")
 
@@ -136,18 +137,6 @@ def test_mar_2021_payment_processes_receipt(soup):
 
     assert_that(len(receipts), equal_to(1))
     assert_receipt_with_one_detail(receipts[0], "14.95", "Purchase amount", "14.95")
-
-
-def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
-    assert_receipt_totals(receipt, total, postage, currency)
-    assert_that(receipt.receipt_details[0][0],
-                equal_to(detail))
-    assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), currency)))
-
-
-def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
-    assert_that(receipt.total, equal_to(Amount(D(total), currency)))
-    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
 
 
 def _find_receipts(message_date, soup):

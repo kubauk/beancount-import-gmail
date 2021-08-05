@@ -4,7 +4,7 @@ from typing import Any
 from beancount.core.amount import Amount
 from beancount.core.data import Transaction
 from beancount.core.number import D, ONE
-from hamcrest import assert_that, is_
+from hamcrest import assert_that, is_, equal_to
 
 from beancount_gmail.receipt import Receipt, TOTAL
 
@@ -72,3 +72,15 @@ def _assert_posting_details(transaction: Transaction, posting_details: list[dict
 
 def _simple_transaction() -> Transaction:
     return Transaction(dict(), RECEIPT_DATETIME, '*', None, NARRATION, set(), set(), list())
+
+`
+def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
+    assert_that(receipt.total, equal_to(Amount(D(total), currency)))
+    assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
+
+
+def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
+    assert_receipt_totals(receipt, total, postage, currency)
+    assert_that(receipt.receipt_details[0][0],
+                equal_to(detail))
+    assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), currency)))
