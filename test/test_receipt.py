@@ -79,8 +79,13 @@ def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
     assert_that(receipt.postage_and_packing, equal_to(Amount(D(postage), currency)))
 
 
-def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency="GBP"):
+def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency='GBP'):
+    assert_receipt_with_details(receipt, total, [(detail, detail_amount)], postage, currency)
+
+
+def assert_receipt_with_details(receipt, total, details, postage='0', currency='GBP'):
     assert_receipt_totals(receipt, total, postage, currency)
-    assert_that(receipt.receipt_details[0][0],
-                equal_to(detail))
-    assert_that(receipt.receipt_details[0][1], equal_to(Amount(D(detail_amount), currency)))
+    assert_that(len(receipt.receipt_details), is_(len(details)))
+    for i, detail in enumerate(details):
+        assert_that(receipt.receipt_details[i][0], equal_to(detail[0]))
+        assert_that(receipt.receipt_details[i][1], equal_to(Amount(D(detail[1]), currency)))

@@ -1,9 +1,7 @@
-import datetime
-
 from bs4.element import Comment
 
-from beancount_gmail.receipt import Receipt
 from beancount_gmail.common.parsing import extract_row_text
+from beancount_gmail.receipt import Receipt
 
 
 def remove_comments(tag):
@@ -21,7 +19,9 @@ def total_details(rows):
 
 
 def description_and_total_details(details):
-    return description_details(details[0]), total_details(details[1])
+    totals = details.pop()
+
+    return [description_details(detail) for detail in details], total_details(totals)
 
 
 def first_price(rows):
@@ -34,7 +34,7 @@ def extract_receipt(message_date, soup):
     table_text = [replace_with_currency_code(extract_row_text(table)) for table in soup.find_all('table')
                   if table.find('table') is None]
     descriptions, totals = description_and_total_details(list(filter(interesting_row, table_text)))
-    return Receipt(message_date, [descriptions], totals, False)
+    return Receipt(message_date, descriptions, totals, False)
 
 
 def replace_with_currency_code(rows):

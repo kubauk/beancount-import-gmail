@@ -3,7 +3,7 @@ import datetime
 from hamcrest import assert_that, is_
 
 from beancount_gmail.uk_ebay_email.parsing import first_price, extract_receipt, replace_with_currency_code
-from test.test_receipt import assert_receipt_with_one_detail
+from test.test_receipt import assert_receipt_with_one_detail, assert_receipt_with_details
 
 
 def test_append_iso_currency_replaces_pound_symbol():
@@ -44,6 +44,16 @@ def test_ebay_2021_2_produces_receipt(soup):
     assert_receipt_with_one_detail(receipt, '8.89',
                                    'Electric Aroma Diffuser Essential Oil 7 Colour Changing Air Humidifier L...',
                                    '8.89')
+
+
+def test_ebay_2021_may_produces_receipt(soup):
+    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021-05.eml.html"))
+
+    assert_receipt_with_details(receipt, '7.94',
+                                [('Saint St Michael angel pendant silver gift protection amulet keyring',
+                                  '4.95'),
+                                 ('Archangel Gabriel Keyring Holy Angel Gavri\'el Gaḇrîʼēl Key Ring',
+                                  '2.99')])
 
 # def tables_without_presentation_role(tag: Tag) -> bool:
 #     if tag.name == 'table':
