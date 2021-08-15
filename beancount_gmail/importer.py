@@ -35,6 +35,20 @@ def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, da
     return min(dates), max(dates) + timedelta(days=1)
 
 
+def download_and_match_transactions(parser: EmailParser, retriever: gmails.retriever.Retriever,
+                                    transactions: list[Transaction], postage_account: str):
+    min_date, max_date = get_search_dates(transactions)
+
+    receipts = download_email_receipts(parser, retriever, min_date, max_date)
+    for transaction in transactions:
+        for receipt in receipts.copy():
+            if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
+                receipts.remove(receipt)
+                receipt.append_postings(transaction, postage_account)
+
+    return transactions
+
+
 class GmailImporter(ImporterProtocol):
     def __init__(self, delegate: ImporterProtocol, postage_account: str, gmail_address: str,
                  secrets_directory: str = os.path.dirname(os.path.realpath(__file__))) -> None:
@@ -45,21 +59,8 @@ class GmailImporter(ImporterProtocol):
 
     def extract(self, file, existing_entries: Entries = None) -> Entries:
         transactions = self._delegate.extract(file, existing_entries)
-        min_date, max_date = get_search_dates(transactions)
 
-        parser = PayPalUKParser()
-
-        receipts = []
-
-        receipts.extend(download_email_receipts(parser, self._retriever, min_date, max_date))
-
-        for transaction in transactions:
-            for receipt in receipts.copy():
-                if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
-                    receipts.remove(receipt)
-                    receipt.append_postings(transaction, self._postage_account)
-
-        return transactions
+        return download_and_match_transactions(PayPalUKParser(), self._retriever, transactions, self._postage_account)
 
     def name(self):
         return self._delegate.name()
