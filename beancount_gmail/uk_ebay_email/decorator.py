@@ -8,7 +8,7 @@ from beancount_gmail.uk_ebay_email import UKeBayParser
 
 
 def _interesting_transaction(transaction: Transaction):
-    return 'Luxembourg, eBay' in transaction.narration
+    return isinstance(transaction, Transaction) and 'Luxembourg, eBay' in transaction.narration
 
 
 _retriever = gmails.retriever.Retriever('beancount-import-gmail',
@@ -16,7 +16,8 @@ _retriever = gmails.retriever.Retriever('beancount-import-gmail',
 
 
 def _extract_email(transactions):
-    return download_and_match_transactions(UKeBayParser(), _retriever, transactions, "Postage")
+    return download_and_match_transactions(UKeBayParser(), _retriever,
+                                           list(filter(_interesting_transaction, transactions)), "Postage")
 
 
 def gmail_import(func):
