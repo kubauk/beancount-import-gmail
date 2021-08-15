@@ -37,10 +37,11 @@ def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, da
 
 def download_and_match_transactions(parser: EmailParser, retriever: gmails.retriever.Retriever,
                                     transactions: list[Transaction], postage_account: str):
-    min_date, max_date = get_search_dates(transactions)
+    filtered_transactions = list(filter(parser.transaction_filter, transactions))
+    min_date, max_date = get_search_dates(filtered_transactions)
 
     receipts = download_email_receipts(parser, retriever, min_date, max_date)
-    for transaction in transactions:
+    for transaction in filtered_transactions:
         for receipt in receipts.copy():
             if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
                 receipts.remove(receipt)

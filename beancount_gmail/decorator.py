@@ -1,19 +1,13 @@
 from functools import wraps
 
 import gmails
-from beancount.core.data import Transaction
 
 from beancount_gmail.importer import download_and_match_transactions
 
 
-def _interesting_transaction(transaction: Transaction):
-    return isinstance(transaction, Transaction) and 'Luxembourg, eBay' in transaction.narration
-
-
 def _add_email_details(parser, email_address, credentials_directory, postage_account, transactions):
     retriever = gmails.retriever.Retriever('beancount-import-gmail', email_address, credentials_directory)
-    return download_and_match_transactions(parser, retriever,
-                                           list(filter(_interesting_transaction, transactions)), postage_account)
+    return download_and_match_transactions(parser, retriever, transactions, postage_account)
 
 
 def gmail_import(parser, email_address, credentials_directory, postage_account):
