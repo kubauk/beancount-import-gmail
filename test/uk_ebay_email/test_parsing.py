@@ -2,7 +2,7 @@ import datetime
 
 from hamcrest import assert_that, is_
 
-from beancount_gmail.uk_ebay_email.parsing import first_price, extract_receipt, replace_with_currency_code
+from beancount_gmail.uk_ebay_email.parsing import first_price, extract_receipts, replace_with_currency_code
 from test.test_receipt import assert_receipt_with_one_detail, assert_receipt_with_details
 
 
@@ -25,21 +25,21 @@ def test_first_price_is_extracted():
 
 
 def test_ebay_2019_produces_receipt(soup):
-    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2019.eml.html"))
+    receipt = extract_receipts(datetime.datetime.now(), soup("sample_html/ebay-2019.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '2.99',
                                    'G9 Halogen 28w 370 Lumen Capsule Bulb Long Life Dimmable Energy Saving', '2.99')
 
 
 def test_ebay_2021_produces_receipt(soup):
-    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021.eml.html"))
+    receipt = extract_receipts(datetime.datetime.now(), soup("sample_html/ebay-2021.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '13.50',
                                    'ZURU ROBO ALIVE Robo Alive Snake Battery Robotic Toy Grey', '13.50')
 
 
 def test_ebay_2021_2_produces_receipt(soup):
-    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021-2.eml.html"))
+    receipt = extract_receipts(datetime.datetime.now(), soup("sample_html/ebay-2021-2.eml.html"))
 
     assert_receipt_with_one_detail(receipt, '8.89',
                                    'Electric Aroma Diffuser Essential Oil 7 Colour Changing Air Humidifier L...',
@@ -47,13 +47,22 @@ def test_ebay_2021_2_produces_receipt(soup):
 
 
 def test_ebay_2021_may_produces_receipt(soup):
-    receipt = extract_receipt(datetime.datetime.now(), soup("sample_html/ebay-2021-05.eml.html"))
+    receipts = extract_receipts(datetime.datetime.now(), soup("sample_html/ebay-2021-05.eml.html"))
 
-    assert_receipt_with_details(receipt, '7.94',
-                                [('Saint St Michael angel pendant silver gift protection amulet keyring',
-                                  '4.95'),
-                                 ('Archangel Gabriel Keyring Holy Angel Gavri\'el Gaḇrîʼēl Key Ring',
-                                  '2.99')])
+    assert_receipt_with_one_detail(receipts[0], '4.95',
+                                   'Saint St Michael angel pendant silver gift protection amulet keyring', '4.95')
+    assert_receipt_with_one_detail(receipts[1], '2.99',
+                                   'Archangel Gabriel Keyring Holy Angel Gavri\'el Gaḇrîʼēl Key Ring', '2.99')
+
+
+def test_ebay_2021_two_receipts_produces_two_receipts(soup):
+    receipts = extract_receipts(datetime.datetime.now(), soup("sample_html/ebay-2021-two-receipts.eml.html"))
+
+    assert_receipt_with_details(receipts[0], '5.10',
+                                [('Teen Titans Go Stickers', '2.55'),
+                                 ('Pokemon Pikachu Stickers Cute Pikachu', '2.55')])
+    assert_receipt_with_one_detail(receipts[1], '8.90',
+                                   'PEDAL BIN 3 LITRE LID RUBBISH WASTE DUST LITTER PAPER SMALL BLAC...', '8.90')
 
 # def tables_without_presentation_role(tag: Tag) -> bool:
 #     if tag.name == 'table':

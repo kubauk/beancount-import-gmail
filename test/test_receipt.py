@@ -18,7 +18,7 @@ TWO_POUNDS = Amount(D(2), 'GBP')
 def test_simple_receipt_details_are_added_as_postings() -> None:
     transaction = _simple_transaction()
 
-    receipt = Receipt(RECEIPT_DATETIME, [('Detail 1', '1.00 GBP')], [(TOTAL, '1.00 GBP')], False)
+    receipt = Receipt(RECEIPT_DATETIME, [('Detail 1', '1.00 GBP')], [(TOTAL, '1.00 GBP')], negate=False)
     receipt.append_postings(transaction, POSTAGE_ACCOUNT)
 
     _assert_posting_details(transaction, [{'description': 'Detail 1', 'unit': ONE_POUND}])
@@ -29,7 +29,7 @@ def test_multiple_receipt_details_are_added_as_postings() -> None:
 
     receipt_details = [('Detail 1', '1.00 GBP'), ('Detail 2', '2.00 GBP'), ('Detail 3', '1.00 GBP')]
 
-    receipt = Receipt(RECEIPT_DATETIME, receipt_details, [(TOTAL, '1.00 GBP')], False)
+    receipt = Receipt(RECEIPT_DATETIME, receipt_details, [(TOTAL, '1.00 GBP')], negate=False)
     receipt.append_postings(transaction, POSTAGE_ACCOUNT)
 
     _assert_posting_details(transaction,
@@ -46,7 +46,7 @@ def test_postage_posting_is_added() -> None:
     receipt_details = [('Detail 1', '1.00 GBP'), ('Detail 2', '2.00 GBP')]
     totals = [('Postage and packaging', '1.00 GBP'), (TOTAL, '3.00 GBP')]
 
-    receipt = Receipt(RECEIPT_DATETIME, receipt_details, totals, False)
+    receipt = Receipt(RECEIPT_DATETIME, receipt_details, totals, negate=False)
     receipt.append_postings(transaction, POSTAGE_ACCOUNT)
 
     _assert_posting_details(transaction,
@@ -80,6 +80,10 @@ def assert_receipt_totals(receipt, total, postage='0', currency="GBP"):
 
 
 def assert_receipt_with_one_detail(receipt, total, detail, detail_amount, postage='0', currency='GBP'):
+    if isinstance(receipt, list):
+        if len(receipt) != 1:
+            raise Exception("Passed a list, but expecting only one Receipt")
+        receipt = receipt[0]
     assert_receipt_with_details(receipt, total, [(detail, detail_amount)], postage, currency)
 
 

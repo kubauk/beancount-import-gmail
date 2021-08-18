@@ -26,7 +26,7 @@ class PayPalUKParser(EmailParser):
             negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
                      soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
 
-            receipts.append(receipt.Receipt(message_date, receipt_details, total_details, negate))
+            receipts.append(receipt.Receipt(message_date, receipt_details, total_details, negate=negate))
 
         if len(receipts) == 0:
             raise receipt.NoReceiptsFoundException("Did not find any receipts")
