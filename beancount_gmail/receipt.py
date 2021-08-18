@@ -67,31 +67,59 @@ def _with_meta(amount: Amount, description: str) -> data.Posting:
     return posting
 
 
+def _currencies_match(sub_total: Amount, receipt_details_total: Amount) -> bool:
+    return sub_total.currency == receipt_details_total.currency
+
+
+def _sum_up_sub_total(receipt_details: list[tuple[str, str]], negate: bool) -> Amount:
+    sub_total = ZERO_GBP
+
+    for description, amount in receipt_details:
+        receipt_detail_amount = money_string_to_amount(amount, negate)
+        if not _currencies_match(sub_total, receipt_detail_amount) \
+                and not sub_total:
+            sub_total = receipt_detail_amount
+        else:
+            sub_total = add(sub_total, receipt_detail_amount)
+
+    return sub_total
+
+
+def _sum_up_total_and_postage(totals: list[tuple[str, str]], negate: bool) -> tuple[Amount, Amount]:
+    total = None
+    postage_and_packing = None
+
+    for description, amount_string in totals:
+        if description.startswith("From amount") or \
+                TOTAL in description or \
+                SUB_TOTAL in description:
+            total = money_string_to_amount(amount_string, negate)
+        if POSTAGE_AND_PACKAGING_RE.match(description):
+            postage_and_packing = money_string_to_amount(amount_string, negate)
+
+    return total, postage_and_packing
+
+
 class Receipt(object):
-    def __init__(self, receipt_date: datetime, receipt_details: list[tuple[str, str]],
-                 totals: list[tuple[str, str]], negate: bool) -> None:
+    def __init__(self, receipt_date: datetime,
+                 receipt_details: list[tuple[str, str]], totals: list[tuple[str, str]] = None,
+                 total: Amount = None, postage_and_packing: Amount = None, negate: bool = False) -> None:
         self.total = None
         self.postage_and_packing = None
         self.receipt_date = receipt_date
         self.receipt_details = list()
 
-        self.sub_total = ZERO_GBP
         for description, amount in receipt_details:
             receipt_detail_amount = money_string_to_amount(amount, negate)
             self.receipt_details.append((description, receipt_detail_amount))
-            if not self._currencies_match(self.sub_total, receipt_detail_amount) \
-                    and not self.sub_total:
-                self.sub_total = receipt_detail_amount
-            else:
-                self.sub_total = add(self.sub_total, receipt_detail_amount)
 
-        for description, amount_string in totals:
-            if description.startswith("From amount") or \
-                    TOTAL in description or \
-                    SUB_TOTAL in description:
-                self.total = money_string_to_amount(amount_string, negate)
-            if POSTAGE_AND_PACKAGING_RE.match(description):
-                self.postage_and_packing = money_string_to_amount(amount_string, negate)
+        self.sub_total = _sum_up_sub_total(receipt_details, negate)
+
+        if totals is not None:
+            self.total, self.postage_and_packing = _sum_up_total_and_postage(totals, negate)
+        else:
+            self.total = total
+            self.postage_and_packing = postage_and_packing
 
         if self.total is None:
             raise Exception("Failed to find total in receipt")
@@ -105,10 +133,6 @@ class Receipt(object):
 
     def _postage_and_packing_posting(self, postage_account: str) -> data.Posting:
         return _posting(postage_account, self.postage_and_packing)
-
-    @staticmethod
-    def _currencies_match(sub_total: Amount, receipt_details_total: Amount) -> bool:
-        return sub_total.currency == receipt_details_total.currency
 
     def append_postings(self, transaction: data.Transaction, postage_account: str):
         transaction.postings.extend(self._receipt_details_postings())
