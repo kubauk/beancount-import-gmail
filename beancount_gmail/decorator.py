@@ -2,7 +2,7 @@ from functools import wraps
 
 import gmails
 
-from beancount_gmail.importer import download_and_match_transactions
+from beancount_gmail.downloading_and_matching import download_and_match_transactions
 
 
 def _add_email_details(parser, email_address, credentials_directory, postage_account, transactions):

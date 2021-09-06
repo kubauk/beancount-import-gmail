@@ -1,53 +1,11 @@
 import os
-from datetime import timedelta, datetime, date
-from typing import Union
 
 import gmails.retriever
-import pytz as pytz
-from beancount.core.data import Account, Entries, Transaction
+from beancount.core.data import Account, Entries
 from beangulp.importer import ImporterProtocol
 
-from beancount_gmail.email_parser_protocol import EmailParser
-from beancount_gmail.email_processing import extract_receipts
-from beancount_gmail.receipt import Receipt
+from beancount_gmail.downloading_and_matching import download_and_match_transactions
 from beancount_gmail.uk_paypal_email import PayPalUKParser
-
-_EUROPE_LONDON_TZ = pytz.timezone('Europe/London')
-
-
-def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:
-    if transaction.date == receipt.receipt_date.date():
-        if transaction.postings and transaction.postings[0].units == -receipt.total:
-            return True
-    return False
-
-
-def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Retriever,
-                            min_date: Union[date, datetime], max_date: Union[date, datetime]) -> list[Receipt]:
-    return [receipt for email in
-            retriever.get_messages_for_date_range(parser.search_query(), min_date, max_date, _EUROPE_LONDON_TZ)
-            for receipt in extract_receipts(parser, email)]
-
-
-def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, datetime.date]:
-    dates = sorted({transaction.date for transaction in transactions
-                    if isinstance(transaction, Transaction)})
-    return min(dates), max(dates) + timedelta(days=1)
-
-
-def download_and_match_transactions(parser: EmailParser, retriever: gmails.retriever.Retriever,
-                                    transactions: list[Transaction], postage_account: str):
-    filtered_transactions = list(filter(parser.transaction_filter, transactions))
-    min_date, max_date = get_search_dates(filtered_transactions)
-
-    receipts = download_email_receipts(parser, retriever, min_date, max_date)
-    for transaction in filtered_transactions:
-        for receipt in receipts.copy():
-            if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
-                receipts.remove(receipt)
-                receipt.append_postings(transaction, postage_account)
-
-    return transactions
 
 
 class GmailImporter(ImporterProtocol):
