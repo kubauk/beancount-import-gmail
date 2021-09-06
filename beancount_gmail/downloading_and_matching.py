@@ -11,10 +11,10 @@ from beancount_gmail.receipt import Receipt
 
 
 def download_and_match_transactions(parser: EmailParser, retriever: gmails.retriever.Retriever,
-                                    transactions: list[Transaction], postage_account: str):
+                                    transactions: list[Transaction], postage_account: str) -> None:
     filtered_transactions = list(filter(parser.transaction_filter, transactions))
     if len(filtered_transactions) == 0:
-        return transactions
+        return
 
     min_date, max_date = get_search_dates(filtered_transactions)
 
@@ -24,8 +24,6 @@ def download_and_match_transactions(parser: EmailParser, retriever: gmails.retri
             if isinstance(transaction, Transaction) and pairs_match(transaction, receipt):
                 receipts.remove(receipt)
                 receipt.append_postings(transaction, postage_account)
-
-    return transactions
 
 
 def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, datetime.date]:

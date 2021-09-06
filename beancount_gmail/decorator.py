@@ -5,9 +5,9 @@ import gmails
 from beancount_gmail.downloading_and_matching import download_and_match_transactions
 
 
-def _add_email_details(parser, email_address, credentials_directory, postage_account, transactions):
+def _add_email_details(parser, email_address, credentials_directory, postage_account, transactions) -> None:
     retriever = gmails.retriever.Retriever('beancount-import-gmail', email_address, credentials_directory)
-    return download_and_match_transactions(parser, retriever, transactions, postage_account)
+    download_and_match_transactions(parser, retriever, transactions, postage_account)
 
 
 def gmail_import(parser, email_address, credentials_directory, postage_account):

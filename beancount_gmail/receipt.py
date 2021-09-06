@@ -134,11 +134,10 @@ class Receipt(object):
     def _postage_and_packing_posting(self, postage_account: str) -> data.Posting:
         return _posting(postage_account, self.postage_and_packing)
 
-    def append_postings(self, transaction: data.Transaction, postage_account: str):
+    def append_postings(self, transaction: data.Transaction, postage_account: str) -> None:
         transaction.postings.extend(self._receipt_details_postings())
         if self.postage_and_packing:
             transaction.postings.append(self._postage_and_packing_posting(postage_account))
-        return transaction
 
 
 class NoReceiptsFoundException(Exception):

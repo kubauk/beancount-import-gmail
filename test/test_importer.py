@@ -6,6 +6,7 @@ from beangulp.importer import ImporterProtocol
 from hamcrest import assert_that, is_
 
 from beancount_gmail import GmailImporter
+from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.receipt import Receipt
 
 ACCOUNT = "ACCOUNT"
@@ -14,8 +15,9 @@ CURRENCY = "CURRENCY"
 
 def test_support_functions_call_delegate():
     delegate = Mock(spec=ImporterProtocol)
+    parser = Mock(spec=EmailParser)
 
-    importer = GmailImporter(delegate, 'POSTAGE', 'EMAIL')
+    importer = GmailImporter(delegate, parser, 'POSTAGE', 'EMAIL')
 
     delegate.name.return_value = 'delegate_name'
     assert_that(importer.name(), is_('delegate_name'))
