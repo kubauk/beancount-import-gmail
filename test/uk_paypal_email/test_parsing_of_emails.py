@@ -141,4 +141,3 @@ def test_mar_2021_payment_processes_receipt(soup):
 
 def _find_receipts(message_date, soup):
     return PayPalUKParser().extract_receipts(message_date, soup)
-
