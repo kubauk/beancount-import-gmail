@@ -24,7 +24,7 @@ class PayPalUKParser(EmailParser):
             total_details = [(detail[0], detail[1]) for detail in receipt_data.pop(0) if len(detail) == 2]
 
             negate = soup.find(text=re.compile(".*refund .*", re.IGNORECASE)) is not None or \
-                     soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
+                soup.find(text=re.compile(".*You received a payment.*", re.IGNORECASE)) is not None
 
             receipts.append(receipt.Receipt(message_date, receipt_details, total_details, negate=negate))
 

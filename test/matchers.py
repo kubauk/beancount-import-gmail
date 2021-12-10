@@ -38,4 +38,3 @@ def beautiful_soup_containing_text(text: str) -> BaseMatcher[BeautifulSoup]:
             description.append_description_of("BeautifulSoup text containing {}".format(self._text))
 
     return BeautifulSoupWithText()
-
