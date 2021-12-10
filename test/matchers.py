@@ -14,7 +14,7 @@ class _(object):
         return self.matcher.matches(o, StringDescription())
 
     def __ne__(self, o: object) -> bool:
-        return not __eq__(o)
+        return not self.__eq__(o)
 
     def __repr__(self) -> str:
         return self.__str__()
