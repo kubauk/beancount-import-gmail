@@ -14,7 +14,7 @@ def extract_text(element: Tag) -> str:
     text = ''
     to_append = None
 
-    def remove_unwanted_white_spaces(s):
+    def remove_unwanted_white_spaces(s: str) -> str:
         return re.sub(r' {2,}', ' ', re.sub(r'[\n\t]', r' ', re.sub(u'\xa0', ' ', s.strip())))
 
     for elem in element.children:

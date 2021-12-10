@@ -11,5 +11,5 @@ class UKeBayParser(EmailParser):
     def extract_receipts(self, message_date: datetime, soup: BeautifulSoup) -> list[Receipt]:
         return extract_receipts(message_date, soup)
 
-    def search_query(self):
+    def search_query(self) -> str:
         return 'from:ebay@ebay.com'
