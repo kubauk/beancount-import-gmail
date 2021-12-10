@@ -28,7 +28,7 @@ def description_and_total_details(details: list[list[str]]) -> tuple[list[tuple[
     return [description_details(detail) for detail in details], total_details(totals)
 
 
-def first_price(rows: list[str]) -> str:
+def first_price(rows: list[str]) -> Optional[str]:
     prices = [row for row in rows if 'GBP' in row]
     return None if len(prices) == 0 else prices[0]
 

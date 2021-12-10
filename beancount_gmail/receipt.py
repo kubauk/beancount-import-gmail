@@ -2,19 +2,19 @@ import re
 from datetime import datetime
 from typing import Any, Optional
 
-from beancount.core import data
+from beancount.core.data import Transaction, Posting
 from beancount.core.amount import add, Amount, A
 from beancount.core.number import ZERO
 
-ZERO_GBP = Amount(ZERO, "GBP")
+ZERO_GBP: Amount = Amount(ZERO, "GBP")
 
-POSTAGE_AND_PACKAGING = "Postage and Packaging"
-DESCRIPTION = "Description"
-UNIT_PRICE = "Unit Price"
-QUANTITY = "Quantity"
-AMOUNT = "Amount"
-SUB_TOTAL = "Subtotal"
-TOTAL = "Total"
+POSTAGE_AND_PACKAGING: str = "Postage and Packaging"
+DESCRIPTION: str = "Description"
+UNIT_PRICE: str = "Unit Price"
+QUANTITY: str = "Quantity"
+AMOUNT: str = "Amount"
+SUB_TOTAL: str = "Subtotal"
+TOTAL: str = "Total"
 
 POSTAGE_AND_PACKAGING_RE = re.compile("Postage and packaging(?! .)")
 
@@ -57,11 +57,11 @@ def _sanitise_description(description: str) -> str:
     return _escape_double_quotes(_strip_newlines(description))
 
 
-def _posting(account: str, amount: Amount) -> data.Posting:
-    return data.Posting(account, amount, None, None, None, dict())
+def _posting(account: str, amount: Amount) -> Posting:
+    return Posting(account, amount, None, None, None, dict())
 
 
-def _with_meta(amount: Amount, description: str) -> data.Posting:
+def _with_meta(amount: Amount, description: str) -> Posting:
     posting = _posting("ReplaceWithAccount", amount)
     posting.meta['description'] = _sanitise_description(description)
     return posting
@@ -127,14 +127,14 @@ class Receipt(object):
         if self.postage_and_packing is None:
             self.postage_and_packing = Amount(ZERO, self.total.currency)
 
-    def _receipt_details_postings(self) -> list[data.Posting]:
+    def _receipt_details_postings(self) -> list[Posting]:
         return [_with_meta(amount, description) for description, amount in
                 self.receipt_details]
 
-    def _postage_and_packing_posting(self, postage_account: str) -> data.Posting:
+    def _postage_and_packing_posting(self, postage_account: str) -> Posting:
         return _posting(postage_account, self.postage_and_packing)
 
-    def append_postings(self, transaction: data.Transaction, postage_account: str) -> None:
+    def append_postings(self, transaction: Transaction, postage_account: str) -> None:
         transaction.postings.extend(self._receipt_details_postings())
         if self.postage_and_packing:
             transaction.postings.append(self._postage_and_packing_posting(postage_account))

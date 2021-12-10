@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
-from typing import Any, Union, Callable
+from typing import Any, Union, Callable, Optional
 
 from beancount.core.data import Transaction
 from bs4 import BeautifulSoup
@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from beancount_gmail.receipt import Receipt
 
 
-def _transaction_filter(filter_param: Union[str, Callable], transaction: Transaction) -> Any:
+def transaction_filter(filter_param: Optional[Union[str, Callable]], transaction: Optional[Transaction]) -> Any:
     if not isinstance(transaction, Transaction):
         return False
 
@@ -33,8 +33,8 @@ class EmailParser(ABC):
         """ Given a soup instance, the parser is responsible for returning a list of Receipts """
 
     @abstractmethod
-    def search_query(self):
+    def search_query(self) -> str:
         """ Returns the GMail search string """
 
     def transaction_filter(self, transaction: Transaction) -> Any:
-        return _transaction_filter(self._filter_param, transaction)
+        return transaction_filter(self._filter_param, transaction)

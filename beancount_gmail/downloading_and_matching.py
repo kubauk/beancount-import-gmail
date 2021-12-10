@@ -39,7 +39,7 @@ def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Ret
             for receipt in extract_receipts(parser, email)]
 
 
-_EUROPE_LONDON_TZ = pytz.timezone('Europe/London')
+_EUROPE_LONDON_TZ: pytz.tzinfo = pytz.timezone('Europe/London')
 
 
 def pairs_match(transaction: Transaction, receipt: Receipt) -> bool:

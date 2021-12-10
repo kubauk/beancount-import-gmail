@@ -9,11 +9,11 @@ from mailbox import Message
 from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.receipt import Receipt
 
-DEBUGGING_DATA_DIR = "debugging"
+DEBUGGING_DATA_DIR: str = "debugging"
 
-EXCLUDED_DATA_DIR = "excluded"
+EXCLUDED_DATA_DIR: str = "excluded"
 
-WRITE_DEBUG = False
+WRITE_DEBUG: bool = False
 
 
 def write_email_to_file(reason: Optional[str], extension: str, message_date: datetime,

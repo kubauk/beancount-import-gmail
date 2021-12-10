@@ -1,3 +1,10 @@
+New style:
+- "08-07181-73189" and "09-07250-36065" and "13-07261-01148" and "04-07342-90493" not found. Possibly need tolerance in date matching
+- itunes parser?
+- amazon parser?
+- next parser?
+- "21-07262-42326" shows entries twice
+
 - Handle currency conversion as purchases made in USD do not get matched correctly
 - Handle subscription emails (text emails?)
 - Handle email classification from subject rather than by gmail label

@@ -22,10 +22,10 @@ class GmailImporter(ImporterProtocol):
         download_and_match_transactions(self.parser, self._retriever, transactions, self._postage_account)
         return transactions
 
-    def name(self):
+    def name(self) -> str:
         return self._delegate.name()
 
-    def identify(self, file):
+    def identify(self, file) -> bool:
         return self._delegate.identify(file)
 
     def file_account(self, file) -> Account:

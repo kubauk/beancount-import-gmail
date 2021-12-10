@@ -1,4 +1,5 @@
 import datetime
+from datetime import tzinfo
 from mailbox import Message
 
 import bs4
@@ -8,7 +9,7 @@ from beancount_gmail.debug_handling import maybe_write_debugging
 from beancount_gmail.email_parser_protocol import EmailParser
 from beancount_gmail.receipt import Receipt
 
-TIMEZONE = pytz.timezone("Europe/London")
+TIMEZONE: tzinfo = pytz.timezone("Europe/London")
 
 
 class NoCharsetException(Exception):
@@ -17,8 +18,7 @@ class NoCharsetException(Exception):
 
 def extract_receipts_from_email(parser: EmailParser, message_date: datetime,
                                 message: Message) -> list[Receipt]:
-    soup = bs4.BeautifulSoup(message, "html.parser")
-    return parser.extract_receipts(message_date, soup)
+    return parser.extract_receipts(message_date, bs4.BeautifulSoup(message, "html.parser"))
 
 
 def process_message_text(parser: EmailParser, message_date: datetime, message: Message) -> list[Receipt]:
@@ -43,7 +43,7 @@ def process_message_payload(message: Message, parser: EmailParser, message_date:
         return process_message_text(parser, message_date, message)
 
 
-def get_message_date(message):
+def get_message_date(message: Message) -> datetime:
     return datetime.datetime.strptime(message.get("Date"), "%a, %d %b %Y %H:%M:%S %z")
 
 
