@@ -2,7 +2,7 @@ import datetime
 from unittest.mock import Mock
 
 from beancount.core.data import Transaction, Account, Amount, create_simple_posting, D
-from beangulp.importer import ImporterProtocol
+from beangulp.importer import Importer
 from hamcrest import assert_that, is_
 
 from beancount_gmail import GmailImporter
@@ -14,21 +14,18 @@ CURRENCY = "CURRENCY"
 
 
 def test_support_functions_call_delegate():
-    delegate = Mock(spec=ImporterProtocol)
+    delegate = Mock(spec=Importer)
     parser = Mock(spec=EmailParser)
 
     importer = GmailImporter(delegate, parser, 'POSTAGE', 'EMAIL')
 
-    delegate.name.return_value = 'delegate_name'
-    assert_that(importer.name(), is_('delegate_name'))
+    delegate.account.return_value = 'delegate_account'
+    assert_that(importer.account('filepath'), is_('delegate_account'))
+    delegate.account.assert_called_with('filepath')
 
     delegate.identify.return_value = True
-    assert_that(importer.identify('file'), is_(True))
-    delegate.identify.assert_called_with('file')
-
-    delegate.file_account.return_value = Account('EXPENSE')
-    assert_that(importer.file_account('file2'), is_(Account('EXPENSE')))
-    delegate.file_account.assert_called_with('file2')
+    assert_that(importer.identify('filepath'), is_(True))
+    delegate.identify.assert_called_with('filepath')
 
 
 def _mock_receipt(date: datetime, number: str = None) -> Receipt:
