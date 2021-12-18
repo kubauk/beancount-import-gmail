@@ -1,7 +1,8 @@
 from datetime import datetime
+from hamcrest import assert_that, is_
 
 from beancount_gmail.uk_amazon_email.parsing import extract_receipts
-from test.test_receipt import assert_receipt_with_one_detail
+from test.test_receipt import assert_receipt_with_one_detail, assert_receipt_with_details
 
 
 def test_parse_amazon_order_2021_11_24(soup):
@@ -10,12 +11,30 @@ def test_parse_amazon_order_2021_11_24(soup):
 
     assert_receipt_with_one_detail(receipts[0],
                                    "28.98",
-                                   "Moongiantgo Coffee Grinder Manual Compact & Effortless, Stainless Steel & Glass, "\
-                                   "Adjustable Coarseness Ceramic Burr - 5 Precise Levels, with Spoon & Brush | Make "\
-                                   "Fresh Coffee Anytime & Anywhere Condition: NewSold by:Moongiantgo-Eu Fulfilled by "\
+                                   "Moongiantgo Coffee Grinder Manual Compact & Effortless, Stainless Steel & Glass, " \
+                                   "Adjustable Coarseness Ceramic Burr - 5 Precise Levels, with Spoon & Brush | Make " \
+                                   "Fresh Coffee Anytime & Anywhere Condition: NewSold by:Moongiantgo-Eu Fulfilled by " \
                                    "Amazon",
-                                   "31.50",
-                                   currency="GBP")
+                                   "31.50")
+
+
+def test_parse_amazon_order_2021_11_24_multiple(soup):
+    beautiful_soup = soup("sample_html/amazon-order-2021-11-24-multiple.html")
+    receipts = extract_receipts(datetime.now(), beautiful_soup)
+
+    assert_that(len(receipts), is_(2))
+
+    assert_receipt_with_one_detail(receipts[0],
+                                   "3.99",
+                                   'Chrome 1/2" BSP Thread Female Blanking End Cap Radiator Chrome Plug Water Pipe ' \
+                                   'Condition: NewSold by:Stevenson Plumbing and Electrical Supplies',
+                                   "3.99")
+
+    assert_receipt_with_one_detail(receipts[1],
+                                   "7.29",
+                                   'Metal Adaptor Reduction Water Faucet Tap 24mm Male to 1/2" BSP Male Joiner ' \
+                                   'Condition: NewSold by:plumbing4home',
+                                   "7.29")
 
 
 def test_parse_amazon_order_2021_11_30(soup):
@@ -24,8 +43,8 @@ def test_parse_amazon_order_2021_11_30(soup):
 
     assert_receipt_with_one_detail(receipts[0],
                                    "8.99",
-                                   "Gukasxi Tabletop Christmas Tree,Mini Artificial Christmas Pine Trees with Plastic "\
-                                   "Base Season Ornaments Tabletop Trees for Xmas Holiday Party Home Decor,with 2M "\
+                                   "Gukasxi Tabletop Christmas Tree,Mini Artificial Christmas Pine Trees with Plastic " \
+                                   "Base Season Ornaments Tabletop Trees for Xmas Holiday Party Home Decor,with 2M " \
                                    "String Lights and Ornaments Condition: NewSold by:Feng_x Fulfilled by Amazon",
                                    "8.99",
                                    currency="GBP")

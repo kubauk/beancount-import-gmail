@@ -10,6 +10,12 @@ def extract_receipts(message_date: datetime, beautiful_soup: bs4.BeautifulSoup) 
     table_text = [extract_row_text(table) for table in beautiful_soup.find_all('table')
                   if table.find('table') is None]
 
-    return [Receipt(message_date,
-                    [(table_text[6][1], "{} GBP".format(table_text[6][2]))],
-                    [(TOTAL, "{} GBP".format(table_text[4][1]))])]
+    receipts = list()
+
+    interesting = (row for row in table_text if len([entry for entry in row if '£' in entry]) > 0)
+    for t, d in zip(interesting, interesting):
+        receipts.append(Receipt(message_date,
+                                [(d[1], "{} GBP".format(d[2]))],
+                                [(TOTAL, "{} GBP".format(t[1]))]))
+
+    return receipts
