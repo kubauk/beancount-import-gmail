@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 from unittest.mock import Mock, call
 
 import gmails.retriever
@@ -78,7 +79,7 @@ def test_parser_is_called_for_every_retrieved_email(email_message):
                            _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
                           (_mock_transaction(datetime.date(2021, 12, 23)),
                            _mock_receipt(datetime.datetime(2021, 12, 23, 12, 32, 20), "1.00"), False),
-                          (_mock_transaction(datetime.datetime(2020, 12, 23, 1, 2, 3)),
+                          (_mock_transaction(datetime.date(2020, 12, 23)),
                            _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
                           (_mock_transaction_with_posting(datetime.date(2021, 3, 14), "-2.00"),
                            _mock_receipt(datetime.datetime(2021, 3, 14, 12, 32, 20), "1.00"), False),
@@ -87,3 +88,33 @@ def test_parser_is_called_for_every_retrieved_email(email_message):
                          )
 def test_transaction_and_receipt_pairs_match(transaction, receipt, result):
     assert_that(pairs_match(transaction, receipt), is_(result))
+
+
+@pytest.mark.parametrize("transaction, receipt, delta, result",
+                         [(_mock_transaction_with_posting(datetime.date(2020, 1, 1), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 22, 12, 32, 20), '1.00'),
+                           timedelta(days=1), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 24), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 22, 12, 32, 20), '1.00'),
+                           timedelta(days=1), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 24), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 21, 12, 32, 20), '1.00'),
+                           timedelta(days=2), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 24), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 21, 12, 32, 20), '1.00'),
+                           timedelta(days=3), True),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 21), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 22, 12, 32, 20), '1.00'),
+                           timedelta(days=1), True),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 21), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 23, 12, 32, 20), '1.00'),
+                           timedelta(days=1), False),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 20), '-1.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 25, 12, 32, 20), '1.00'),
+                           timedelta(days=5), True),
+                          (_mock_transaction_with_posting(datetime.date(2021, 12, 20), '-3.00'),
+                           _mock_receipt(datetime.datetime(2021, 12, 25, 12, 32, 20), '1.00'),
+                           timedelta(days=5), False),
+                          ])
+def test_transaction_and_receipt_pairs_match_with_delta(transaction, receipt, delta, result):
+    assert_that(pairs_match(transaction, receipt, delta), is_(result))
