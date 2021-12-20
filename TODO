@@ -3,7 +3,6 @@ New style:
 - itunes parser?
 - amazon parser?
 - next parser?
-- "21-07262-42326" shows entries twice
 
 - Handle currency conversion as purchases made in USD do not get matched correctly
 - Handle subscription emails (text emails?)
