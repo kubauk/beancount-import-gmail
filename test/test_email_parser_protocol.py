@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from beancount.core.data import Transaction
 from hamcrest import assert_that, is_
 
-from beancount_gmail.email_parser_protocol import transaction_filter
+from beancount_gmail.email_parser_protocol import transaction_filter, re_filter
 
 mock_transaction = Mock(spec=Transaction)
 
@@ -34,3 +34,10 @@ def test_transaction_filter_uses_callable_when_set():
 
     assert_that(transaction_filter(filter_param_false, mock_transaction), is_(False))
     filter_param_false.assert_called_once()
+
+
+def test_re_filter():
+    mock_transaction.narration = 'A needle in a haystack'
+    assert_that(re_filter('Do not found')(mock_transaction), is_(False))
+    assert_that(re_filter('needle')(mock_transaction), is_(True))
+    assert_that(re_filter('thimble|needle')(mock_transaction), is_(True))

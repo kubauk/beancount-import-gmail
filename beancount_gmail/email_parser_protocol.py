@@ -1,3 +1,4 @@
+import re
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Union, Callable, Optional
@@ -6,6 +7,10 @@ from beancount.core.data import Transaction
 from bs4 import BeautifulSoup
 
 from beancount_gmail.receipt import Receipt
+
+
+def re_filter(expression: str) -> Callable:
+    return lambda transaction: re.search(expression, transaction.narration) is not None
 
 
 def transaction_filter(filter_param: Optional[Union[str, Callable]], transaction: Optional[Transaction]) -> Any:
