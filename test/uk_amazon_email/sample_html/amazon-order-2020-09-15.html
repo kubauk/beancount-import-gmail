@@ -1,0 +1,875 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head> 
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+  <style type="text/css">
+body {
+    background-color: #ffffff;
+	margin:0;
+	font:12px/16px Arial, sans-serif;
+}
+
+a {
+	text-decoration:none;
+	color:#006699;
+	font:12px/16px Arial, sans-serif;
+}
+
+a img {
+	border:0;
+}
+
+h2 {
+	font-size:20px;
+	line-height:24px;
+	margin:0;
+	padding:0;
+	font-weight:normal;
+	color:#000 !important;
+}
+
+h3 {
+	font-size: 18px;
+	color:#cc6600;
+	margin:15px 0 0 0;
+	font-weight: normal;
+}
+
+h4 {
+	font-size:14px;
+	margin:0;
+	font-weight:normal;
+}
+
+p {
+	margin:4px 0 0 0;
+	font:12px/16px Arial, sans-serif;
+}
+
+table {
+	border-collapse:collapse;
+}
+
+td {
+	vertical-align: top;
+	font-size: 12px;
+	line-height: 16px;
+	font-family: Arial, sans-serif;
+}
+
+/* container */
+#container {
+	width:640px;
+	color:#333;
+	margin:0 auto;
+}
+
+#container .frame {
+	padding:0 20px 20px 20px;
+}
+
+/* content tables */
+#main, #header, #summary, #desiredInformation, #orderDetails, #itemDetails, #costBreakdown, #costBreakdownNoAsin,
+#selfService, #closing, #marketingContent, #legalCopy {
+	width:100%;
+}
+
+/* header */
+#header .logo {
+	width:115px;
+	padding:18px 0 0 0;
+}
+
+#header .navigation {
+	text-align:right;
+	padding:5px 0;
+	border-bottom:1px solid #ccc;
+	white-space:nowrap;
+}
+
+#header .navigation a {
+	border-right:0px solid #CCC;
+	margin-right:0px;
+	padding-right:0px;
+}
+
+#header .navigation span {
+	text-decoration:none;
+	color:#CCC;
+	font-size:15px;
+	font-family:Arial, sans-serif;
+}
+
+#header .navigation a.last {
+	border:0;
+	margin:0;
+	padding:0;
+}
+
+#header .title {
+	text-align:right;
+	padding:7px 0 5px 0;
+}
+
+#header .title img {
+	padding:0 4px 0 0;
+}
+
+/* summary */
+#summary a{
+	text-decoration:none;
+	color:#006699;
+}
+
+#summary p {
+	margin:5px 0 0 0;
+}
+
+/* critical info */
+#criticalInfo {
+	border-top:3px solid #2d3741;
+	width: 95%;
+}
+
+#criticalInfo td {
+	font-size:14px;
+	padding:11px 18px 18px 18px;
+	width:50%;
+}
+
+#criticalInfo .detailsContent {
+    background-color:#efefef;
+}
+
+#criticalInfo .label {
+	color:#666;
+}
+
+#criticalInfo p {
+	margin:2px 0 9px 0;
+}
+
+#criticalInfo span {
+	color:#666;
+}
+
+#criticalInfo a {
+	font-size:11px;
+	color:#006699;
+	text-decoration:none;
+}
+
+#cancelOrder p {
+    font: 11px/ 16px Arial, sans-serif;
+    color: rgb(51, 51, 51);
+}
+/* desiredInformation */
+#desiredInformation a {
+	text-decoration:none;
+	color:#006699;
+}
+
+/* buttons */
+.button {
+	text-decoration:none !important;
+	display:block;
+	height:26px;
+	display:inline-block;
+	margin:0 0 2px 0;
+}
+
+.button.small {
+	height:20px;
+}
+
+.button .expandable {
+	float:left;
+	overflow:hidden;
+}
+
+.button .text {
+	color:#000f68;
+	font-size:12px;
+	position:relative;
+	z-index:10;
+	top:-22px;
+	left:-12px;
+	text-align:center;
+}
+
+.button.secondary .text {
+	left:0;
+}
+
+.button.small .text {
+	top:-20px;
+	left:0;
+	font-size:11px;
+}
+
+/* supporting details */
+#supportingDetails {
+	font-size:11px;
+	color:#666;
+	line-height:14px;
+	margin:10px 20px;
+}
+
+#supportingDetails {
+	margin:0 18px 0 18px;
+}
+
+/* order details */
+#orderDetails h3 {
+	border-bottom:1px solid #ccc;
+	margin:0 0 3px 0;
+	padding:0 0 3px 0;
+}
+
+#orderDetails .frame {
+	padding:16px 20px 6px 20px;
+}
+
+#orderDetails .orderDate {
+	color:#666666;
+	font-size:12px;
+}
+
+#orderDetails span {
+	font-size:12px;
+	color:#666;
+}
+
+#orderDetails p {
+	margin:2px 0 9px 0;
+}
+
+/* item details */
+#itemDetails {
+	width: 95%;
+}
+
+#itemDetails .photo {
+	width:150px;
+	text-align:center;
+	padding:16px 0 10px 0;
+}
+
+#itemDetails .photo .play img {
+	margin:3px 0 0 0;
+}
+
+#itemDetails .name {
+	color:#666;
+	padding:10px 0 0 0;
+}
+
+#itemDetails ul {
+	margin:0;
+	padding:0;
+}
+
+#itemDetails ul li {
+	list-style-type:none;
+	line-height:14px;
+	padding:0 0 4px 0;
+}
+
+#itemDetails ul li a {
+	font-size:14px;
+}
+
+#itemDetails .name p {
+	margin:0;
+	padding:10px 0 0 0;
+	font-size:12px;
+	line-height:14px;
+}
+
+#itemDetails .name p a {
+	text-decoration:none;
+    color:#006699;
+}
+
+
+#itemDetails .name .share {
+	margin:3px 0 15px 0;
+}
+
+#itemDetails .name .share a {
+	margin: 4px 5px 0 0;
+	font-size:0;
+}
+
+#itemDetails .name .supportingDetails,
+#itemDetails .name .supportingDetails a {
+	margin:8px 0 0 0;
+	font-size:12px;
+}
+
+#itemDetails .price {
+	text-align:right;
+	font-size:14px;
+	padding:10px 10px 0 10px;
+	white-space:nowrap;
+}
+
+#itemDetails .price a {
+	text-decoration:none;
+    color:#006699;
+}
+
+#itemDetails .divider {
+	border-top:1px solid #eaeaea;
+	padding:0 0 16px 0;
+}
+
+#itemDetails .name table {
+border-collapse: separate;
+}
+
+/* cost breakdown */
+#costBreakdow {
+	width:95%;
+}
+
+#costBreakdown td {
+	text-align:right;
+	line-height:18px;
+	padding:0 10px 0 0;
+}
+
+#costBreakdownNoAsin td {
+    text-align: left !important;
+    line-height: 18px;
+    padding: 0 10px 0 0;
+}
+
+#costBreakdown .divider, #costBreakdownNoAsin .divider {
+	border-top:1px solid #eaeaea;
+	padding:0 0 16px 0;
+}
+
+#costBreakdown .end, #costBreakdownNoAsin .end {
+	padding:0 0 16px 0;
+}
+
+#costBreakdown .start, #costBreakdownNoAsin .start {
+	padding: 0 0 16px 0;
+}
+
+#costBreakdown .price {
+	width:150px;
+}
+
+#costBreakdownNoAsin .price {
+	width: 70%;
+}
+
+#costBreakdown .total, #costBreakdownNoAsin .total {
+	font-size:14px;
+	font-weight:bold;
+	font: 12px/ 16px Arial, sans-serif;
+}
+
+#costBreakdown .disclaimer, #costBreakdownNoAsin .disclaimer {
+	text-align:right;
+	font: 12px
+}
+
+.deferred-payments-separator {
+    border: 1px solid #cbcfd4;
+}
+
+/* additional shipments */
+#additionalShipments {
+	font-size:11px;
+}
+
+#additionalShipments h3 {
+	margin:10px 0 0 0;
+}
+
+#additionalShipments p {
+	margin:10px 20px 0px 20px;
+}
+
+#additionalShipments .orderDate {
+	color:#666666;
+	font-size:12px;
+}
+
+#additionalShipments .details {
+	padding:10px 20px 10px 20px;
+}
+
+#additionalShipments .details .label {
+	color:#666666;
+	font-weight:bold;
+}
+
+#additionalShipments .details .edd, #additionalShipments .details .quantity {
+	font-weight:bold;
+}
+
+/* self service */
+#selfService .divider {
+	border-top:1px solid #ccc;
+	padding:0 0 16px 0;
+}
+
+#selfService a{
+	text-decoration:none;
+	color:#006699;
+}
+
+/* closing */
+#closing {
+	padding:0 0 0 0;
+	border-collapse:collapse;
+}
+
+#closing p {
+	padding:0 0 20px 0;
+	border-bottom:1px solid #eaeaea;
+	margin:10px 0 0 0;
+}
+
+#closing .signature {
+	font-size:16px;
+	font-weight:bold;
+}
+
+#closing a{
+	text-decoration:none;
+	color:#006699;
+}
+
+/* marketing content */
+#marketingContent {
+	border-bottom:1px solid #eaeaea;
+	border-collapse:collapse;
+	padding:0;
+}
+
+#marketingContent td.recs {
+	padding:10px 0;
+}
+
+#marketingContent td.right {
+	padding:10px 15px 10px 0;
+}
+
+#marketingContent td.left {
+	padding:10px 0 10px 15px;
+}
+
+#middleCenterMC {
+	text-align:center;
+}
+
+#middleCenterMC img {
+	width:85%;
+}
+
+/* legal copy */
+#legalCopy td {
+	padding:20px 0 0 0;
+}
+
+#legalCopy p {
+	font-size:11px;
+	color:#666;
+	line-height:16px;
+	margin:0 0 10px 0;
+        font:11px;
+}
+
+#legalCopy a {
+	font:11px/16px Arial, sans-serif;
+	text-decoration:none;
+	color:#006699;
+}
+
+#legalExceptionsList li{
+	padding-left: 10px;
+}
+
+#extendedLegalInfoBlock {
+	font-size:11px;
+	color:#666;
+	line-height:16px;
+	margin:0 0 10px 0;
+}
+
+/* reg fee */
+#regFee td {
+	colspan: "2";
+	border-top:1px solid #ccc;
+}
+
+/* html button */
+
+.link {
+    color: rgb(17, 17, 17) !important;
+    text-decoration: none !important;
+    font: 16px/ 18px Arial, sans-serif !important;
+    padding: 10px 12px;
+    line-height: 1.5;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: #000000;
+    border-width: 1px;
+    background: #F0C14B linear-gradient(#F7DFA5, #F0C14B) repeat scroll 0% 0%;
+    background-color: #F0C14B;
+    white-space: nowrap;
+}
+
+.a-icon-info, .a-icon-small {
+    background-position: -166px -130px;
+    height: 13px;
+    width: 14px;
+}
+
+.a-icon {
+    background-image: url(https://m.media-amazon.com/images/G/01/AUIClients/AmazonUIBaseCSS-sprite_1x-28bd59af93d9b1c745bb0aca4de58763b54df7cf._V2_.png);
+    -webkit-background-size: 400px 670px;
+    display: inline-block;
+}
+
+.a-text-italic {
+    font-style: italic !important;
+}
+
+.a-size-small {
+    font-size: 12px !important;
+    line-height: 1.5 !important;
+}
+.inline-block{
+    display: inline-block;
+}
+
+/* Styling for Top Amabot Banner */
+#topAmabotBannerTextArea #topAmabotBannerHeaderText {
+    font: bold 14px Arial, sans-serif;
+    color: #333;
+}
+
+#topAmabotBannerTextArea #topAmabotBannerHeaderTextClickable {
+    font: bold 14px Arial, sans-serif;
+    color: #069;
+}
+
+#topAmabotBannerTextArea #topAmabotBannerBodyPrefix {
+    font: 14px Arial, sans-serif;
+    color: #333;
+}
+
+#topAmabotBannerTextArea #topAmabotBannerBodyPrefixClickable {
+    font: bold 14px Arial, sans-serif;
+    color: #069;
+}
+
+#topAmabotBannerTextArea #topAmabotBannerBody {
+    font: 14px Georgia, serif;
+    line-height: 1.2;
+    color: #333;
+}
+
+#topAmabotBannerTextArea #topAmabotBannerBodyEmphasized {
+    font: 14px Georgia, serif;
+    line-height: 1.2;
+    font-style: italic;
+    color: #333;
+}
+
+/* To fix the blue href links in gmail clients */
+.noColorAndTextDecoration a {
+    color:#000 !important;
+    text-decoration:none !important;
+}
+
+    .buttonComponent {
+    border-collapse: separate;
+    text-decoration: none !important;
+    line-height: 47px;
+    border-radius: 3px;
+    border-style: solid;
+    border-color: #CBA957;
+    border-width: 1px;
+    background: #F0C354 linear-gradient(#F7DEA2, #F0C354) repeat scroll 0% 0%;
+    background-color: #ffa723;
+    white-space: nowrap;
+    min-width: 222px;
+    min-height: 45px;
+    }
+
+    .buttonComponentLink {
+    color: rgb(27, 27, 27) !important;
+    font: 16px/ 18px Arial, sans-serif !important;
+    display: table-cell;
+    margin: auto 0;
+    vertical-align: middle;
+
+    min-width: 222px;
+    height: 45px;
+    }
+
+
+</style> 
+  <title>
+Your Amazon.co.uk order of &quot;Pro Elec 15298pl 2 m 2 Gang...&quot;  </title> 
+ </head> 
+ <body style="background-color: rgb(255, 255, 255); margin: 0; font: 12px/ 16px Arial, sans-serif"><img width="1" height="1" src="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=FB29K72XE5RK&T=O&U=https%3A%2F%2Fimages-eu.ssl-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.gif&H=NPYM0VS9ESIQYBZYVW9RXLGC6KIA&ref_=pe_3187911_185740111_opens" /> 
+  <table id="container" dir="ltr" style="width: 640px; color: rgb(51, 51, 51); margin: 0 auto; border-collapse: collapse"> 
+   <tbody>
+    <tr> 
+     <td class="frame" style="padding: 0 20px 20px 20px; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+      <table id="main" style="width: 100%; border-collapse: collapse"> 
+       <tbody>
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="header" style="width: 100%; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td rowspan="2" class="logo" style="width: 115px; padding: 18px 0 0 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=3K3MDIACLIVUG&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fref%3Dpe_3187911_185740111_TE_logo&H=F5KVTMT2KBJCI7H7NJXR99VZEZ0A&ref_=pe_3187911_185740111_TE_logo" title="Visit Amazon.co.uk" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif"> <img alt="Amazon.co.uk" src="http://g-ec2.images-amazon.com/images/G/01/e-mail/logos/a_co-uk_prime_logo_48.gif" style="border: 0; width: 115px" /> </a> </td> 
+             <td class="navigation" style="text-align: right; padding: 5px 0; border-bottom: 1px solid rgb(204, 204, 204); white-space: nowrap; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> </td>
+             <td style="width: 100%; padding: 7px 5px 0; text-align: right; border-bottom: 1px solid rgb(204, 204, 204); white-space: nowrap; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif" class="navigation"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=1EJ8PL1H07XYY&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fyour-orders-access%3Fref_%3Dpe_3187911_185740111_TE_yo&H=ROCY14HWUEBQJPTHWAB0O1HW3WOA&ref_=pe_3187911_185740111_TE_yo" style="border-right: 0px solid rgb(204, 204, 204); margin-right: 0px; padding-right: 0px; text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">Your Orders</a> </td> 
+             <td class="navigation" style="text-align: right; padding: 5px 0; border-bottom: 1px solid rgb(204, 204, 204); white-space: nowrap; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="text-decoration: none; color: rgb(204, 204, 204); font-size: 15px; font-family: Arial, sans-serif">&nbsp;|&nbsp;</span> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=S2C56QISKEHC&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fyour-account-access%3Fref_%3Dpe_3187911_185740111_TE_ya&H=VFRDVFZL2JREQGPIUARDKVM5JHAA&ref_=pe_3187911_185740111_TE_ya" style="border-right: 0px solid rgb(204, 204, 204); margin-right: 0px; padding-right: 0px; text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">Your Account</a> <span style="text-decoration: none; color: rgb(204, 204, 204); font-size: 15px; font-family: Arial, sans-serif">&nbsp;|&nbsp;</span> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=2TZLUXUFVG27H&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fref%3Dpe_3187911_185740111_TE_cn&H=I6HI48BNJOYTAAB9BYFRZGWNKFEA&ref_=pe_3187911_185740111_TE_cn" style="border-right: 0px solid rgb(204, 204, 204); margin-right: 0px; padding-right: 0px; text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">Amazon.co.uk</a> </td>  
+            </tr> 
+            <tr> 
+             <td colspan="3" class="title" style="text-align: right; padding: 7px 0 5px 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <h2 style="font-size: 20px; line-height: 24px; margin: 0; padding: 0; font-weight: normal; color: rgb(0, 0, 0) !important"> Order Confirmation </h2> Order # <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=20ZI99X7RUEPW&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fsummary%2Fedit.html%3Fie%3DUTF8%26orderID%3D202-4472916-7978729%26ref_%3Dpe_3187911_185740111_TE_order&H=WWA5846WZ75PATHT81U9NELSW8IA&ref_=pe_3187911_185740111_TE_order" class="inline-block" style="display: inline-block; text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">202-4472916-7978729 </a> <br /> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="summary" style="width: 100%; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <h3 style="font-size: 18px; color: rgb(204, 102, 0); margin: 15px 0 0 0; font-weight: normal"> Hello, </h3> <p style="margin: 5px 0 0 0; font: 12px/ 16px Arial, sans-serif"> Thanks for your order. We’ll let you know once your item(s) have dispatched. Your estimated delivery date is indicated below. You can view the status of your order or make changes to it by visiting <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=LTPKONMO0J4G&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fyour-orders-access%3Fref_%3Dpe_3187911_185740111_TE_gs&H=YEVNIJAJAVM9YBZFG3DMDWIQYMQA&ref_=pe_3187911_185740111_TE_gs" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">Your Orders</a> on Amazon.co.uk. </p> </td> 
+            </tr> 
+            <tr> 
+             <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="desiredInformation" style="width: 100%; border-collapse: collapse"> 
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table style="width: 100%; border-top: 3px solid rgb(45, 55, 65); border-collapse: collapse" id="criticalInfo"> 
+           <tbody>
+            <tr class="detailsContent" style="background-color: rgb(239, 239, 239)"> 
+             <td style="font-size: 14px; padding: 11px 18px 18px 18px; width: 50%; vertical-align: top; line-height: 16px; font-family: Arial, sans-serif"> <p style="margin: 2px 0 9px 0; font: 12px/ 16px Arial, sans-serif"> <span style="color: rgb(102, 102, 102)">Arriving:</span> <br /> <b style="color:#009900;"> Wednesday, September 16 </b> </p> <p style="margin: 2px 0 9px 0; font: 12px/ 16px Arial, sans-serif"> <span style="color: rgb(102, 102, 102)">Your delivery option:</span> <br /> <b> <img src="https://m.media-amazon.com/images/G/30/email/logos/prime_39x10.png" /> Premium Delivery </b> </p> <p style="margin: 2px 0 9px 0; font: 12px/ 16px Arial, sans-serif"> <span style="color: rgb(102, 102, 102)">Your delivery preference:</span> <br /> <b>Dispatch item(s) as soon as they become available.</b> </p> <br /> <a target="_blank" class="link" href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=2B70PUDW57KZ&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fsummary%2Fedit.html%3Fie%3DUTF8%26orderID%3D202-4472916-7978729%26ref_%3Dpe_3187911_185740111_TE_on_sh&H=DIOXNS23HHWZAGN0Z6FWZXK9QIGA&ref_=pe_3187911_185740111_TE_on_sh" style="font-size: 11px; color: rgb(17, 17, 17) !important; text-decoration: none !important; font: 16px/ 18px Arial, sans-serif !important; padding: 10px 12px; line-height: 1.5; border-radius: 10px; border-style: solid; border-color: rgb(0, 0, 0); border-width: 1px; background: rgb(240, 193, 75) linear-gradient(rgb(247,223,165),rgb(240,193,75)) repeat scroll 0% 0%; background-color: rgb(240, 193, 75); white-space: nowrap">Order Details</a> </td> 
+             <td style="font-size: 14px; padding: 11px 18px 18px 18px; width: 50%; vertical-align: top; line-height: 16px; font-family: Arial, sans-serif"> <p style="margin: 2px 0 9px 0; font: 12px/ 16px Arial, sans-serif"> <span style="color: rgb(102, 102, 102)">Your order will be sent to:</span> <br /> <b> Jakub <br /> MORDEN <br /> United Kingdom </b> </p> </td>
+            </tr> 
+            <tr> 
+             <td colspan="2" id="topAmabotBannerWrapper" style="padding: 0px 0px 0px 0px; border-top: 2px solid white; font-size: 14px; width: 50%; vertical-align: top; line-height: 16px; font-family: Arial, sans-serif"> <span class="noColorAndTextDecoration" style="color: rgb(102, 102, 102)"> 
+               <table id="topAmabotBannerBackgroundTable" style="width: 100%; background-color: rgb(239, 239, 239); border-collapse: collapse"> 
+                <tbody>
+                 <tr> 
+                  <td id="topAmabotBannerLeftImage" style="width: 0%; padding: 9px 8px 9px 15px; vertical-align: middle; font-size: 14px; line-height: 16px; font-family: Arial, sans-serif"> <img width="28" src="https://m.media-amazon.com/images/G/02/aShop/Alexa-Email.png" alt="" /> </td> 
+                  <td id="topAmabotBannerTextArea" style="width: 100%; padding: 9px 0px 9px 0px; vertical-align: middle; font-size: 14px; line-height: 16px; font-family: Arial, sans-serif"> 
+                   <table style="border-collapse: collapse"> 
+                    <tbody>
+                     <tr> 
+                      <td style="padding: 0px 0px 0px 0px; font-size: 14px; width: 50%; vertical-align: top; line-height: 16px; font-family: Arial, sans-serif"> <span id="topAmabotBannerBodyPrefix" style="font: 14px Arial, sans-serif; color: rgb(51, 51, 51)">Just ask:</span> <span id="topAmabotBannerBodyEmphasized" style="font: 14px Georgia, serif; line-height: 1.2; font-style: italic; color: rgb(51, 51, 51)">&quot;Alexa, where's my stuff?&quot;</span> </td> 
+                     </tr> 
+                    </tbody>
+                   </table> </td> 
+                 </tr> 
+                </tbody>
+               </table> </span> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="border-bottom: 1px solid rgb(204, 204, 204); vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <h3 style="font-size: 18px; color: rgb(204, 102, 0); margin: 15px 0 0 0; font-weight: normal">Order summary</h3> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="orderDetails" style="width: 100%; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> Order #<a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=QJR08ULG2IC5&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fcss%2Fsummary%2Fedit.html%3Fie%3DUTF8%26orderID%3D202-4472916-7978729%26ref_%3Dpe_3187911_185740111_TE_order&H=JDALAECDCXQIOQLS5TYQCILJSB4A&ref_=pe_3187911_185740111_TE_order" class="inline-block" style="display: inline-block; text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">202-4472916-7978729</a> <br /> <span style="font-size: 12px; color: rgb(102, 102, 102)">Placed on September 15, 2020</span> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="padding-left: 2px; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table style="width: 95%; border-collapse: collapse" id="costBreakdownNoAsin"> 
+           <tbody>
+            <tr> 
+             <td colspan="2" class="start" style="padding: 0 0 16px 0; text-align: left !important; line-height: 18px; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"></td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> Item Subtotal: </td> 
+             <td class="price" style="width: 70%; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> &pound;4.57 </td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> Postage &amp; Packing: </td> 
+             <td class="price" style="width: 70%; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> &pound;0.00 </td> 
+            </tr> 
+            <tr> 
+             <td colspan="2" style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"></p> </td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> Total before VAT: </td> 
+             <td class="price" style="width: 70%; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> &pound;4.57 </td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> VAT: </td> 
+             <td class="price" style="width: 70%; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> &pound;0.92 </td> 
+            </tr> 
+            <tr> 
+             <td colspan="2" style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"></p> </td> 
+            </tr> 
+            <tr> 
+             <td colspan="2" style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"></p> </td> 
+            </tr> 
+            <tr> 
+             <td class="total" style="font-size: 14px; font-weight: bold; font: 12px/ 16px Arial, sans-serif; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-family: Arial, sans-serif"> <strong> Order Total: </strong> </td> 
+             <td class="total" style="font-size: 14px; font-weight: bold; font: 12px/ 16px Arial, sans-serif; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-family: Arial, sans-serif"> <strong>&pound;5.49</strong> </td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"></p> </td> 
+            </tr> 
+            <tr> 
+             <td style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"></p> </td> 
+            </tr> 
+            <tr> 
+             <td rowspan="2" style="text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> Selected Payment Method: </td> 
+             <td class="price" style="width: 70%; text-align: left !important; line-height: 18px; padding: 0 10px 0 0; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"> Mastercard </td> 
+            </tr> 
+            <tr></tr> 
+            <tr> 
+             <td colspan="2" class="end" style="padding: 0 0 16px 0; text-align: left !important; line-height: 18px; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"></td> 
+            </tr> 
+            <tr> 
+             <td colspan="2" class="divider" style="border-top: 1px solid rgb(234, 234, 234); padding: 0 0 16px 0; text-align: left !important; line-height: 18px; vertical-align: top; font-size: 12px; font-family: Arial, sans-serif"></td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="selfService" style="width: 100%; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <p style="margin: 4px 0 0 0; font: 12px/ 16px Arial, sans-serif"> If you use a mobile device, you can receive notifications about the delivery of your package and track it from our free <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=353KK8O7P7EEZ&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fb%3Fnode%3D4816518031%26ref%3DTE_%26ref_%3Dpe_3187911_185740111&H=ZWALTTMNQ24CONJZAAJVUBQNAZMA&ref_=pe_3187911_185740111" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif">Amazon app</a>. </p> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="closing" style="width: 100%; padding: 0 0 0 0; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <p style="padding: 0 0 20px 0; border-bottom: 1px solid rgb(234, 234, 234); margin: 10px 0 0 0; font: 12px/ 16px Arial, sans-serif"> We hope to see you again soon. <br /> <span class="signature" style="font-size: 16px; font-weight: bold"> <strong>Amazon.co.uk</strong> </span> </p> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="marketingContent" style="width: 100%; border-bottom: 1px solid rgb(234, 234, 234); border-collapse: collapse; padding: 0"> 
+           <tbody>
+            <tr> 
+             <td class="recs" style="padding: 10px 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif">
+              <table width="640" cellspacing="0" cellpadding="0" border="0" align="left" class="deviceWidth" style="vertical-align: central; background: white; border-collapse: collapse">
+               <tbody>
+                <tr>
+                 <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+                  <table width="640" class="devicewidth" cellspacing="0" cellpadding="0" align="inherit" bgcolor="#FFFFFF" style="border-collapse: collapse"> 
+                   <tbody>
+                    <tr> 
+                     <td style="font: 18px Arial, sans-serif; text-decoration: none; color: rgb(204, 102, 0); text-align: left; padding: 6px 0 5px 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> Customers who bought this also bought </td> 
+                    </tr> 
+                   </tbody>
+                  </table> </td>
+                </tr>
+                <tr>
+                 <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+                  <table width="640" cellspacing="0" cellpadding="0" border="0" align="left" class="deviceWidth p13n-te-widget-recs" style="vertical-align: central; background: white; border-collapse: collapse"> 
+                   <tbody>
+                    <tr> 
+                     <td width="30%" bgcolor="#ffffff" align="left" class="asin_3col" style="font: 13px Arial, sans-serif; text-decoration: none; vertical-align: top; padding: 6px 16px 0 6px; line-height: 18px; font-size: 12px; font-family: Arial, sans-serif"> 
+                      <table width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="border-collapse: collapse"> 
+                       <tbody>
+                        <tr> 
+                         <td valign="bottom" align="left" style="vertical-align: left; padding: 4px 6px 4px 6px; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif" class="p13n-te-asin-image"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=2T9EJLMYEZ68L&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB07TWFZLD6%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_im%3F_encoding%3DUTF8%26pd_rd_i%3DB07TWFZLD6%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=02TK5T80YWTWPRYYTF8BAI9XGOQA&ref_=pe_3187911_185740111_pd_te_o_mr_im" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif"> <img src="https://images-eu.ssl-images-amazon.com/images/I/61nuCmPNRXL._AC_SR115,115_.jpg" width="115" height="115" class="pr_image_115 pr_image_desktop" alt="ExtraStar 2 Way Extension Lead, 13A Fused UK Plug Adapter, 1 Metre Extension Cable Power Strip - White" border="0" style="border: 0" /> </a> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px"> 
+                         <td align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686;" class="p13n-te-asin-title"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=16DJ7Q0LZ1QQB&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB07TWFZLD6%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_ti%3F_encoding%3DUTF8%26pd_rd_i%3DB07TWFZLD6%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=58YA1GRHZBOQM0GJQYBVHM3IZ9GA&ref_=pe_3187911_185740111_pd_te_o_mr_ti" style="font: 13px Arial, sans-serif; text-decoration: none; color: rgb(134, 134, 134)">ExtraStar 2 Way Extension Lead, 13A Fused UK...</a> </span> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px" class="pr_title"> 
+                         <td valign="middle" align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686; vertical-align:3px"> &pound;7.29 </span> <span style="vertical-align:0px"><img src="https://images-eu.ssl-images-amazon.com/images/G/02/tea/prime-badge._CB485933846_.gif" width="45" height="17" border="0" /></span> </td> 
+                        </tr> 
+                       </tbody>
+                      </table> </td> 
+                     <td width="30%" bgcolor="#ffffff" align="left" class="asin_3col" style="font: 13px Arial, sans-serif; text-decoration: none; vertical-align: top; padding: 6px 16px 0 6px; line-height: 18px; font-size: 12px; font-family: Arial, sans-serif"> 
+                      <table width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="border-collapse: collapse"> 
+                       <tbody>
+                        <tr> 
+                         <td valign="bottom" align="left" style="vertical-align: left; padding: 4px 6px 4px 6px; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif" class="p13n-te-asin-image"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=3N7R9MVW9C5D4&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB0833MZ43D%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_im%3F_encoding%3DUTF8%26pd_rd_i%3DB0833MZ43D%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=DD0DBTQVW3GXJXWBBRTVHWOSPBYA&ref_=pe_3187911_185740111_pd_te_o_mr_im" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif"> <img src="https://images-eu.ssl-images-amazon.com/images/I/41Ar5qgaSTL._AC_SR115,115_.jpg" width="115" height="115" class="pr_image_115 pr_image_desktop" alt="Pro Elec PEL01260 2-Gang mains Extension Lead, 3 m, White" border="0" style="border: 0" /> </a> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px"> 
+                         <td align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686;" class="p13n-te-asin-title"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=2CYX05T4IAM54&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB0833MZ43D%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_ti%3F_encoding%3DUTF8%26pd_rd_i%3DB0833MZ43D%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=J95TTIPWGPDG5GA7OQGAMYDZV7SA&ref_=pe_3187911_185740111_pd_te_o_mr_ti" style="font: 13px Arial, sans-serif; text-decoration: none; color: rgb(134, 134, 134)">Pro Elec PEL01260 2-Gang mains Extension Lead...</a> </span> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px" class="pr_title"> 
+                         <td valign="middle" align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686; vertical-align:3px"> &pound;6.79 </span> <span style="vertical-align:0px"><img src="https://images-eu.ssl-images-amazon.com/images/G/02/tea/prime-badge._CB485933846_.gif" width="45" height="17" border="0" /></span> </td> 
+                        </tr> 
+                       </tbody>
+                      </table> </td> 
+                     <td width="30%" bgcolor="#ffffff" align="left" class="asin_3col" style="font: 13px Arial, sans-serif; text-decoration: none; vertical-align: top; padding: 6px 16px 0 6px; line-height: 18px; font-size: 12px; font-family: Arial, sans-serif"> 
+                      <table width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="border-collapse: collapse"> 
+                       <tbody>
+                        <tr> 
+                         <td valign="bottom" align="left" style="vertical-align: left; padding: 4px 6px 4px 6px; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif" class="p13n-te-asin-image"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=32C3WPF3H915W&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB081C2SP5M%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_im%3F_encoding%3DUTF8%26pd_rd_i%3DB081C2SP5M%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=SGHUNSOE0GHSFFRPOVJAUHKHLDGA&ref_=pe_3187911_185740111_pd_te_o_mr_im" style="text-decoration: none; color: rgb(0, 102, 153); font: 12px/ 16px Arial, sans-serif"> <img src="https://images-eu.ssl-images-amazon.com/images/I/51m9zqz4Q2L._AC_SR115,115_.jpg" width="115" height="115" class="pr_image_115 pr_image_desktop" alt="50pcs Adhesive Cable Clips, Wire Clips, Car Cable Organizer,Cable Holder,Cable Wire Management,Cable Holder for Car,Office and Home（Included S Size M Size and L Size Cable Clips)" border="0" style="border: 0" /> </a> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px"> 
+                         <td align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686;" class="p13n-te-asin-title"> <a href="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=2I4T7ZLTATJYP&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2Fgp%2Fproduct%2FB081C2SP5M%2Fref%3Dpe_3187911_185740111_pd_te_o_mr_ti%3F_encoding%3DUTF8%26pd_rd_i%3DB081C2SP5M%26pd_rd_r%3DNDH5MJDENZDMRENVWN09%26pd_rd_w%3DSh0MQ%26pd_rd_wg%3DhkPjq&H=AKKNEHU1NGEQE3E7QSL1P64OEUMA&ref_=pe_3187911_185740111_pd_te_o_mr_ti" style="font: 13px Arial, sans-serif; text-decoration: none; color: rgb(134, 134, 134)">50pcs Adhesive Cable Clips, Wire Clips, Car...</a> </span> </td> 
+                        </tr> 
+                        <tr align="left" style="padding:0; display:block; line-height:16px" class="pr_title"> 
+                         <td valign="middle" align="left" style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <span style="font:13px Arial,sans-serif; text-decoration:none; color: #868686; vertical-align:3px"> &pound;5.99 </span> <span style="vertical-align:0px"><img src="https://images-eu.ssl-images-amazon.com/images/G/02/tea/prime-badge._CB485933846_.gif" width="45" height="17" border="0" /></span> </td> 
+                        </tr> 
+                       </tbody>
+                      </table> </td> 
+                    </tr> 
+                   </tbody>
+                  </table> </td>
+                </tr>
+               </tbody>
+              </table></td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+        <tr> 
+         <td style="vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> 
+          <table id="legalCopy" style="width: 100%; border-collapse: collapse"> 
+           <tbody>
+            <tr> 
+             <td style="padding: 20px 0 0 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <p style="font-size: 11px; color: rgb(102, 102, 102); line-height: 16px; margin: 0 0 10px 0; font: 11px"> Unless otherwise noted, items sold by Amazon EU Sarl are subject to Value Added Tax based on country of delivery in accordance with the EU laws on distance selling. If your order contains one or more items from a seller other than Amazon EU Sarl, it may also be subject to VAT, depending upon the seller's business policies and the location of their operations. Learn more about <a href="https://www.amazon.co.uk/gp/f.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=V07US1W3MBU4&T=C&U=https%3A%2F%2Fwww.amazon.co.uk%2FVatSellerInfo%3Fref%3DTE_vat%26ref_%3Dpe_3187911_185740111&H=VQC2A52PNAXWUJ5Y1DIKABT5KCAA&ref_=pe_3187911_185740111" style="font: 11px/ 16px Arial, sans-serif; text-decoration: none; color: rgb(0, 102, 153)">VAT and seller information</a>. </p> </td> 
+            </tr> 
+            <tr> 
+             <td style="padding: 0; vertical-align: top; font-size: 12px; line-height: 16px; font-family: Arial, sans-serif"> <p style="font-size: 11px; color: rgb(102, 102, 102); line-height: 16px; margin: 0 0 10px 0; font: 11px">This e-mail is only an acknowledgement of receipt of your order. Your contract to purchase these items is not complete until we send you an e-mail notifying you that the items have been dispatched.</p> <p style="font-size: 11px; color: rgb(102, 102, 102); line-height: 16px; margin: 0 0 10px 0; font: 11px">Please note: This e-mail was sent from a notification-only address that can't accept incoming e-mail. Please do not reply to this message.</p> </td> 
+            </tr> 
+           </tbody>
+          </table> </td> 
+        </tr> 
+       </tbody>
+      </table> </td> 
+    </tr> 
+   </tbody>
+  </table>  
+ <img width="1" height="1" src="https://www.amazon.co.uk/gp/r.html?C=1VAYFMVJ4YLY6&K=2KQIJM0G5TSKG&M=urn:rtn:msg:202009151942496316338128e1451c823c90c78b50p0eu&R=3JDSBJ313BCVI&T=E&U=https%3A%2F%2Fimages-eu.ssl-images-amazon.com%2Fimages%2FG%2F01%2Fnav%2Ftransp.gif&H=XOAQSQJL3LW3LPRHOCAYSPMVAWUA&ref_=pe_3187911_185740111_open" /></body>
+</html>

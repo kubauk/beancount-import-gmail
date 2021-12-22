@@ -5,16 +5,30 @@ from beancount_gmail.uk_amazon_email.parsing import extract_receipts
 from test.test_receipt import assert_receipt_with_one_detail, assert_receipt_with_details
 
 
+def test_parse_amazon_order_2020_09_15(soup):
+    beautiful_soup = soup("sample_html/amazon-order-2020-09-15.html")
+    receipts = extract_receipts(datetime(2020, 9, 15), beautiful_soup)
+
+    assert_that(len(receipts), is_(0))
+
+
+def test_parse_amazon_order_2020_09_28(soup):
+    beautiful_soup = soup("sample_html/amazon-order-2020-09-28.html")
+    receipts = extract_receipts(datetime(2020, 9, 28), beautiful_soup)
+
+    assert_that(len(receipts), is_(0))
+
+
 def test_parse_amazon_order_2021_03_11_no_order_details(soup):
     beautiful_soup = soup("sample_html/amazon-order-2021-03-11-no-order-details.html")
-    receipts = extract_receipts(datetime.now(), beautiful_soup)
+    receipts = extract_receipts(datetime(2021, 3, 11), beautiful_soup)
 
     assert_that(len(receipts), is_(0))
 
 
 def test_parse_amazon_order_2021_11_24(soup):
     beautiful_soup = soup("sample_html/amazon-order-2021-11-24.html")
-    receipts = extract_receipts(datetime.now(), beautiful_soup)
+    receipts = extract_receipts(datetime(2021, 11, 24), beautiful_soup)
 
     assert_receipt_with_one_detail(receipts[0],
                                    "28.98",
@@ -27,7 +41,7 @@ def test_parse_amazon_order_2021_11_24(soup):
 
 def test_parse_amazon_order_2021_11_24_multiple(soup):
     beautiful_soup = soup("sample_html/amazon-order-2021-11-24-multiple.html")
-    receipts = extract_receipts(datetime.now(), beautiful_soup)
+    receipts = extract_receipts(datetime(2021, 11, 24), beautiful_soup)
 
     assert_that(len(receipts), is_(2))
 
@@ -46,7 +60,7 @@ def test_parse_amazon_order_2021_11_24_multiple(soup):
 
 def test_parse_amazon_order_2021_11_30(soup):
     beautiful_soup = soup("sample_html/amazon-order-2021-11-30.html")
-    receipts = extract_receipts(datetime.now(), beautiful_soup)
+    receipts = extract_receipts(datetime(2021, 11, 30), beautiful_soup)
 
     assert_receipt_with_one_detail(receipts[0],
                                    "8.99",
