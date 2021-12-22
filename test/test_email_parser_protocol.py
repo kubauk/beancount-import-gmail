@@ -1,3 +1,4 @@
+import re
 from typing import Callable
 from unittest.mock import Mock
 
@@ -41,3 +42,5 @@ def test_re_filter():
     assert_that(re_filter('Do not found')(mock_transaction), is_(False))
     assert_that(re_filter('needle')(mock_transaction), is_(True))
     assert_that(re_filter('thimble|needle')(mock_transaction), is_(True))
+
+    assert_that(re_filter('NEEDLE', re.IGNORECASE)(mock_transaction), is_(True))
