@@ -1,3 +1,4 @@
+from builtins import isinstance
 from datetime import datetime, timedelta, date
 from typing import Union
 
@@ -10,11 +11,23 @@ from beancount_gmail.email_processing import extract_receipts
 from beancount_gmail.receipt import Receipt
 
 
-def download_and_match_transactions(parser: EmailParser,
+def download_and_match_transactions(parsers: Union[EmailParser, list[EmailParser]],
                                     retriever: gmails.retriever.Retriever,
                                     transactions: list[Transaction],
                                     postage_account: str,
-                                    search_delta: timedelta()) -> None:
+                                    search_delta: timedelta = timedelta()) -> None:
+    if isinstance(parsers, list):
+        for parser in parsers:
+            download_and_match_transactions_for_parser(parser, retriever, transactions, postage_account, search_delta)
+    elif isinstance(parsers, EmailParser):
+        download_and_match_transactions_for_parser(parsers, retriever, transactions, postage_account, search_delta)
+
+
+def download_and_match_transactions_for_parser(parser: EmailParser,
+                                               retriever: gmails.retriever.Retriever,
+                                               transactions: list[Transaction],
+                                               postage_account: str,
+                                               search_delta: timedelta = timedelta()) -> None:
     filtered_transactions = list(filter(parser.transaction_filter, transactions))
     if len(filtered_transactions) == 0:
         return
