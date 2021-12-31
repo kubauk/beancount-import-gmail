@@ -3,6 +3,8 @@ New style:
 - amazon parser?
 - next parser?
 
+- Parsers should throw exceptions for unparsed emails so that they are saved for debugging
+
 - Handle currency conversion as purchases made in USD do not get matched correctly
 - Handle subscription emails (text emails?)
 - Handle email classification from subject rather than by gmail label
