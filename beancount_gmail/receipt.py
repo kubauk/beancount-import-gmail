@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from beancount.core.data import Transaction, Posting
 from beancount.core.amount import add, Amount, A
@@ -103,7 +103,8 @@ def _sum_up_total_and_postage(totals: list[tuple[str, str]], negate: bool) -> tu
 class Receipt(object):
     def __init__(self, receipt_date: datetime,
                  receipt_details: list[tuple[str, str]], totals: list[tuple[str, str]] = None,
-                 total: Amount = None, postage_and_packing: Amount = None, negate: bool = False) -> None:
+                 total: Union[str, Amount] = None, postage_and_packing: Union[str, Amount] = None,
+                 negate: bool = False) -> None:
         self.total = None
         self.postage_and_packing = None
         self.receipt_date = receipt_date
@@ -118,8 +119,10 @@ class Receipt(object):
         if totals is not None:
             self.total, self.postage_and_packing = _sum_up_total_and_postage(totals, negate)
         else:
-            self.total = total
-            self.postage_and_packing = postage_and_packing
+            self.total = total if isinstance(total, Amount) else money_string_to_amount(total, False)
+            self.postage_and_packing = None if postage_and_packing is None else postage_and_packing \
+                if isinstance(postage_and_packing, Amount) \
+                else money_string_to_amount(postage_and_packing, False)
 
         if self.total is None:
             raise Exception("Failed to find total in receipt")

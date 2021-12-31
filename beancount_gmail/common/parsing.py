@@ -1,11 +1,14 @@
 import re
 
+from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString
 
 
 def extract_row_text(row: Tag) -> list[str]:
+    copy = BeautifulSoup(str(row), "html.parser")
     cell_text = []
-    for cell in row.find_all(['td', 'th']):
+    for cell in copy.find_all(['td', 'th']):
+        [table.decompose() for table in cell.find_all('table')]
         cell_text.append(extract_text(cell))
     return cell_text
 
