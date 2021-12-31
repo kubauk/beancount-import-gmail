@@ -44,8 +44,9 @@ def download_and_match_transactions_for_parser(parser: EmailParser,
     if len(receipts) > 0:
         print("Warning: Failed to match {} receipts".format(len(receipts)))
         for receipt in receipts:
-            print('{} ({})'.format(receipt.receipt_date, ",".join(
-                [receipt_details[0] for receipt_details in receipt.receipt_details])))
+            print('{} ({})'.format(receipt.receipt_date, ";".join(
+                ["; ".join([str(detail) for detail in receipt_details])
+                 for receipt_details in receipt.receipt_details])))
 
 
 def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, datetime.date]:
