@@ -5,6 +5,9 @@ from beancount.core.amount import Amount
 from beancount.core.data import Transaction
 from beancount.core.number import D, ONE
 from hamcrest import assert_that, is_, equal_to
+from hamcrest.core.base_matcher import BaseMatcher, T
+from hamcrest.core.description import Description
+from hamcrest.core.string_description import StringDescription
 
 from beancount_gmail.receipt import Receipt, TOTAL
 
@@ -93,3 +96,36 @@ def assert_receipt_with_details(receipt, total, details, postage='0', currency='
     for i, detail in enumerate(details):
         assert_that(receipt.receipt_details[i][0], equal_to(detail[0]))
         assert_that(receipt.receipt_details[i][1], equal_to(Amount(D(detail[1]), currency)))
+
+
+def receipt_with_one_detail(param: dict):
+    class ReceiptWithDetailMatcher(BaseMatcher):
+        def _matches(self, item: T) -> bool:
+            return self.check_receipt(item, StringDescription())
+
+        def describe_to(self, description: Description) -> None:
+            description.append_text(
+                "Receipt with description {} and total {}".format(param['description'], param['total']))
+
+        def describe_mismatch(self, item: T, mismatch_description: Description) -> None:
+            self.check_receipt(item, mismatch_description)
+
+        @staticmethod
+        def check_receipt(item: T, mismatch_description: Description) -> bool:
+            if not isinstance(item, Receipt):
+                mismatch_description.append_text("But item was not a Receipt.")
+                return False
+            if Amount(D(param['total']), "GBP") != item.total:
+                mismatch_description.append_text("But total was {}".format(item.total))
+                return False
+            if param['description'][0] != item.receipt_details[0][0]:
+                mismatch_description.append_text("But description was {}".format(item.receipt_details[0][0]))
+                return False
+            if Amount(D(param['description'][1]), "GBP") != item.receipt_details[0][1]:
+                mismatch_description.append_text(
+                    "But the description total was {}\nfor description {}".format(item.receipt_details[0][1],
+                                                                                  item.receipt_details[0][0]))
+                return False
+            return True
+
+    return ReceiptWithDetailMatcher()
