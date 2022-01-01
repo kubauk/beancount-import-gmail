@@ -49,6 +49,9 @@ def extract_receipts(message_date: datetime, beautiful_soup: bs4.BeautifulSoup) 
                 return other.add_total(string)
             else:
                 self.total = self.amount_string(string)
+                if len(self.descriptions):
+                    return PotentialReceipt()
+
                 return self
 
         def add_postage(self, string) -> PotentialReceipt:

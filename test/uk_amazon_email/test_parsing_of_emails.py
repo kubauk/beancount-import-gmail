@@ -4,6 +4,7 @@ from beancount.core.data import Amount, D
 from hamcrest import assert_that, calling, raises, is_
 from hamcrest.core.base_matcher import BaseMatcher, T
 from hamcrest.core.description import Description
+from hamcrest.core.string_description import StringDescription
 from hamcrest.library.collection import contains_inanyorder
 
 from beancount_gmail.receipt import Receipt, NoReceiptsFoundException
@@ -20,6 +21,24 @@ def test_parse_amazon_order_2018_02_10(soup):
                                    "Forthglade 100% Natural Complete Meal Senior Dog Pet Food Chicken, Brown Rice & "
                                    "Vegetables 395g (18 Pack) Sold by Amazon EU S.a.r.L.",
                                    "21.20")
+
+
+def test_parse_amazon_order_2018_12_11(soup):
+    beautiful_soup = soup("sample_html/amazon-order-2018-12-11-multiple.html")
+    receipts = extract_receipts(datetime(2018, 12, 11), beautiful_soup)
+
+    assert_that(len(receipts), is_(2))
+
+    assert_that(receipts, contains_inanyorder(
+        receipt_with_one_detail(
+            {'total': '69.95',
+             'description': (
+             'Sylvanian Families Beechwood Hall Gift Set Condition: NewSold by:Jadlam Toys & Models', '69.95')}),
+        receipt_with_one_detail(
+            {'total': '15.99',
+             'description': (
+                 'Sylvanian Families Chocolate Rabbit Family Sylvanian FamiliesSold by: Amazon EU S.a.r.L.',
+                 '15.99')})))
 
 
 def test_parse_amazon_order_2020_09_15(soup):

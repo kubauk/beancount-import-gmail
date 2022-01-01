@@ -142,6 +142,9 @@ class Receipt(object):
         if self.postage_and_packing:
             transaction.postings.append(self._postage_and_packing_posting(postage_account))
 
+    def __str__(self) -> str:
+        return "Receipt with total {} and descriptions {}".format(self.total, self.receipt_details)
+
 
 class NoReceiptsFoundException(Exception):
     pass
