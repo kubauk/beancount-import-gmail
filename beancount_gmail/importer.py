@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 import gmails.retriever
 from beancount.core import data
-from beancount.core.data import Account, Entries
+from beancount.core.data import Entries
 from beangulp.importer import Importer
 
 from beancount_gmail.downloading_and_matching import download_and_match_transactions

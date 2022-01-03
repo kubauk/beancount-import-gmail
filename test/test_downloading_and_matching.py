@@ -31,6 +31,17 @@ def test_search_date_return_correct_range_for_multiple_transaction():
     assert_that(max_date, is_(datetime.date(2020, 3, 15)))
 
 
+def test_search_date_return_correct_range_for_multiple_transaction_with_search_delta():
+    min_date, max_date = get_search_dates([
+        _mock_transaction(datetime.date(2020, 3, 14)),
+        _mock_transaction(datetime.date(2019, 1, 2)),
+        _mock_transaction(datetime.date(2020, 2, 3)),
+        _mock_transaction(datetime.date(2019, 12, 15)),
+    ], timedelta(days=4))
+    assert_that(min_date, is_(datetime.date(2018, 12, 29)))
+    assert_that(max_date, is_(datetime.date(2020, 3, 19)))
+
+
 def test_search_date_ignores_non_transactions():
     min_date, max_date = get_search_dates([
         _mock_directive(datetime.date(2020, 3, 14), Open),

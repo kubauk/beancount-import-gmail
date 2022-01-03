@@ -32,7 +32,7 @@ def download_and_match_transactions_for_parser(parser: EmailParser,
     if len(filtered_transactions) == 0:
         return
 
-    min_date, max_date = get_search_dates(filtered_transactions)
+    min_date, max_date = get_search_dates(filtered_transactions, search_delta)
 
     receipts = download_email_receipts(parser, retriever, min_date, max_date)
     for transaction in filtered_transactions:
@@ -48,11 +48,19 @@ def download_and_match_transactions_for_parser(parser: EmailParser,
                 ["; ".join([str(detail) for detail in receipt_details])
                  for receipt_details in receipt.receipt_details])))
 
+    unmatched_transactions = [transaction for transaction in filtered_transactions if len(transaction.postings) < 2]
+    if unmatched_transactions:
+        print('Warning: failed to match {} transactions'.format(len(unmatched_transactions)))
+        for transaction in unmatched_transactions:
+            print('{} ({}; {})'.format(transaction.date, transaction.narration,
+                                       transaction.postings[0].units if transaction.postings else None))
 
-def get_search_dates(transactions: list[Transaction]) -> tuple[datetime.date, datetime.date]:
+
+def get_search_dates(transactions: list[Transaction], search_delta: timedelta = timedelta()) \
+        -> tuple[datetime.date, datetime.date]:
     dates = sorted({transaction.date for transaction in transactions
                     if isinstance(transaction, Transaction)})
-    return min(dates), max(dates) + timedelta(days=1)
+    return min(dates) - search_delta, max(dates) + timedelta(days=1) + search_delta
 
 
 def download_email_receipts(parser: EmailParser, retriever: gmails.retriever.Retriever,
