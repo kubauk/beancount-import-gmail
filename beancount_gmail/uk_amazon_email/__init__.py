@@ -12,4 +12,4 @@ class UKAmazonParser(EmailParser):
         return extract_receipts(message_date, soup)
 
     def search_query(self) -> str:
-        return r'"Your Amazon.co.uk order" auto-confirm@amazon.co.uk'
+        return r'\'Your Amazon.co.uk order confirmation\' auto-confirm@amazon.co.uk'
