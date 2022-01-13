@@ -60,7 +60,7 @@ The Receipts are then matched against your transactions where new legs are added
 
 
 # How to install
-pip install https://github.com/kubauk/beancount-import-gmail.git
+pip install git+https://github.com/kubauk/beancount-import-gmail
 
 ## Requirements
 beancount-import-gmail requires 
